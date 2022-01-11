@@ -11,7 +11,7 @@ def index(request):
     # for rule in rules:
     #     for k in Rule(rule.rule).Load():
     #         print(k)
-    return HttpResponse("Hello, world. You're at the lobby.")
+    return HttpResponse("Hello, world. You're at the HomePage.")
 
 
 def ScoreCardList(request):
