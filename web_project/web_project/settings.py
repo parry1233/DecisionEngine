@@ -30,6 +30,7 @@ ALLOWED_HOSTS = []
 
 # Application definition
 
+#add corsheaders and rest_framework
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -38,10 +39,11 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'system.apps.SystemConfig',
-    'corsheaders', #add cors headers
-    'rest_framework', #add rest framework
+    'corsheaders',
+    'rest_framework',
 ]
 
+#add corsheaders.middleware.CorsMiddleware
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -50,7 +52,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'corsheaders.middleware.CorsMiddleware', #add cors headers
+    'corsheaders.middleware.CorsMiddleware',
 ]
 
 ROOT_URLCONF = 'web_project.urls'
@@ -128,7 +130,10 @@ STATIC_URL = '/static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-#add cors whielist
+
+#django-cors-headers is a Python library that will prevent the errors that you would normally get due to CORS rules.
+#In the CORS_ORIGIN_WHITELIST code, you whitelisted localhost:3000 
+#because you want the frontend (which will be served on that port) of the application to interact with the API.
 CORS_ORIGIN_WHITELIST = [
-     'http://localhost:3000'
+    'http://localhost:3000',
 ]

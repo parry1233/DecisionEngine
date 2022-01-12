@@ -3,7 +3,14 @@ import system.static as static
 import json
 from types import SimpleNamespace
 
+class System(models.Model):
+    title = models.CharField(max_length=120)
+    description = models.TextField()
+    status = models.BooleanField(default=False)
 
+    def _str_(self):
+        return self.title
+    
 class URule:
     def __init__(self, var, opt, val):
         self.variable = var

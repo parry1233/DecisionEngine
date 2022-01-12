@@ -5,13 +5,24 @@ from . import static
 from .models import Rule, URule, ScoreCardLibrary, ScoreCardPool, VariablePool, DecisionTreeLibrary, DecisionTreePool
 import json
 
+#for rest
+from rest_framework import viewsets
+from .serializers import SystemSerializer
+from .models import System
+
+
+class SystemView(viewsets.ModelViewSet):
+    serializer_class = SystemSerializer
+    queryset = System.objects.all()
+
+
 
 def index(request):
     # rules = ScoreCardPool.objects.filter(fkey__name="ScoreCardLib01").all()
     # for rule in rules:
     #     for k in Rule(rule.rule).Load():
     #         print(k)
-    return HttpResponse("Hello, world. You're at the HomePage.")
+    return HttpResponse("Hello, world. You're at the lobby.")
 
 
 def ScoreCardList(request):

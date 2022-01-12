@@ -17,12 +17,17 @@ from django.contrib import admin
 from django.urls import path
 from django.conf.urls import include
 from django.views.generic import RedirectView
+from rest_framework import routers
 from system import views
+
+router = routers.DefaultRouter()
+router.register(r'systems', views.SystemView, 'system')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     # path('', RedirectView.as_view(url='/ScoreCard/')),
     path("", include('system.urls'), name="home"),
+    path('api/',include(router.urls))
     # path("ScoreCard/", include('system.urls'), name="ScoreCard"),
     # path("DecisionTree/", include('system.urls'), name="DecisionTree"),
 ]
