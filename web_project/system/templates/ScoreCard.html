@@ -1,0 +1,108 @@
+{% load static %}
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Business Engine </title>
+    <link rel="stylesheet" href="{% static 'SCexample.css' %}" />
+</head>
+
+<body>
+    <div class="header">
+        <h2>Business Enginess - Score Card method</h2>
+        <hr/>
+    </div>
+    <div class="menu-bar">
+        <ul>
+            <li>
+                <a href="{% url 'home' %}">Home</a>
+            </li>
+            <li>
+                <a >Score Card</a>
+                <ul>
+                    {% for i,v in scid.items %}
+                    <li><a href="{% url 'ScoreCardView2' id=v  %}">case {{i}}</a> </li>
+                    {% endfor %}
+                </ul>
+            </li>
+            <li>
+                <a >Decision Tree</a>
+                <ul>
+                    {% for i,v in dtid.items %}
+                    <li><a href="{% url 'DecisionTreeView2' id=v  %}">case {{i}}</a> </li>
+                    {% endfor %}
+                </ul>
+            </li>
+        </ul>
+    </div>
+    <div class="content" style="background-image: url({% static 'ncku-logo2.jpg' %});background-size:contain ; background-position:center;background-repeat: no-repeat;  ">
+
+        <div class="content left">
+            <div class="content left var">
+                <h3><b>Input value</b></h3>
+                <br/>
+
+                <table>
+                    {% for k,v in obj.items %}
+                    <tr>
+                        <td><b>{{k}}</b></td>
+                        <td>{{v}}</td>
+                    </tr>
+                    {% endfor %}
+                </table>
+
+            </div>
+
+
+            <div class="content left rule">
+                <h3><b>Calculate rules</b></h3>
+                <br/>
+
+                <table>
+
+                    <th>Rule ID</th>
+                    <th>Rule</th>
+                    <th>Weight</th>
+                    <th>Score</th>
+                    <th>Weight * Score</th>
+                    <th>satisfy</th>
+
+                    {% for rule in rules %}
+                    <tr>
+                        <td>{{rule.Rule}}</td>
+                        <td>{{rule.Ruleinfo}}</td>
+                        <td>{{rule.w}}</td>
+                        <td>{{rule.s}}</td>
+                        <td>{{rule.wxs}}</td>
+                        <td>{{rule.satisfy}}</td>
+                    </tr>
+                    {% endfor %}
+                </table>
+                <br/>
+                <hr/>
+            </div>
+
+
+            <div class="content left score">
+                <h3><b>Score</b></h3>
+                <br/>
+                <table style="border: 0px;">
+                    <tr style="border: 0px;">
+                        <td style="border: 0px;"><b>Total : </b></td>
+                        <td style="border: 0px;">{{total}}</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+
+</body>
+
+</html>

@@ -1,0 +1,97 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta name="viewport" content="width=device-width" />
+    <title>Connectors style example</title>
+    <link rel="stylesheet" href="{% static 'treant-js-master/Treant.css' %}" />
+    <link rel="stylesheet" href="{% static 'connectors.css' %}" />
+    <link rel="stylesheet" href="{% static 'treant-js-master/vendor/perfect-scrollbar/perfect-scrollbar.css' %}" />
+    <link rel="stylesheet" href="{% static 'DTexample.css' %}" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+
+<body>
+    <div class="header">
+        <h2>Business Enginess - Decision Tree method</h2>
+        <hr/>
+    </div>
+    <div class="menu-bar">
+        <ul>
+            <li>
+                <a href="{% url 'home' %}">Home</a>
+            </li>
+            <li>
+                <a >Score Card</a>
+                <ul>
+                    {% for i,v in scid.items %}
+                    <li><a href="{% url 'ScoreCardView2' id=v  %}">case {{i}}</a> </li>
+                    {% endfor %}
+                </ul>
+            </li>
+            <li>
+                <a >Decision Tree</a>
+                <ul>
+                    {% for i,v in dtid.items %}
+                    <li><a href="{% url 'DecisionTreeView2' id=v  %}">case {{i}}</a> </li>
+                    {% endfor %}
+                </ul>
+            </li>
+        </ul>
+    </div>
+    <div class="content" style="background-image: url({% static 'ncku-logo2.jpg' %});background-size:contain ; background-position:center;background-repeat: no-repeat;  ">
+        
+        <div class="content left">
+            
+            
+            <div class="content left var">
+                <h3><b>Input value</b></h3>
+                <br/>
+                <table>
+
+                    {% for k,v in var_list.items %}
+                    <tr>
+                        <td>{{k}}</td>
+                        <td>{{v}}</td>
+                    </tr>
+                    {% endfor %}
+
+                </table>
+                
+            <hr/>  
+             
+            </div>
+            
+        
+
+        <div class="content left score">
+            
+            <h3><b>Class</b></h3>
+            <br/>
+            <table style="border: 0px;margin-left: 0%;">
+                <tr style="border: 0px;">
+                    <td style="border: 0px;"><b>log :</b></td>
+                    <td style="border: 0px;">{{log}}</td>
+                </tr>
+            </table>
+            
+        </div>
+
+        
+    </div>
+    <div>
+        <div class="chart" id="OrganiseChart-big-commpany"></div>
+
+        <script src="{% static 'treant-js-master/vendor/raphael.js' %}"></script>
+        <script src="{% static 'treant-js-master/Treant.js' %}"></script>
+        <script>
+        var link = {{ link_list|safe }};
+        </script>
+        <script src="{% static 'connectors.js' %}"></script>
+    </div>
+</body>
+
+</html>

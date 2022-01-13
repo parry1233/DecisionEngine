@@ -1,0 +1,140 @@
+from django.db import models
+import system.static as static
+import json
+from types import SimpleNamespace
+
+
+class URule:
+    def __init__(self, var, opt, val):
+        self.variable = var
+        self.operator = opt
+        self.value = val
+        self.name = ""
+        obj = VariablePool.objects.filter(pk=self.variable)
+        if obj.exists:
+            self.name = obj.first().name
+            value_cast = {'b': lambda x: bool(val) == True,
+                          'F': lambda x: float(x), 'I': lambda x: float(x)}
+            self.value = value_cast[obj.first().datatype](self.value)
+
+    def ToReadable(self):
+        return SimpleNamespace(name=self.name, rule=f"{static.OPERATOR_DICT[self.operator]} {str(self.value)}")
+
+    def __str__(self):
+        obj = VariablePool.objects.filter(pk=self.variable)
+        if obj.exists:
+            value_cast = {'b': lambda x: str(x).lower() in ("true", "1"),
+                          'F': lambda x: float(x), 'I': lambda x: float(x)}
+            rvalue = value_cast[obj.first().datatype](self.value)
+            # if self.operator
+            return f"{self.name} {static.OPERATOR_DICT[self.operator]} {str(rvalue)}"
+        else:
+            return "miss variable"
+
+
+class Rule:
+    def __init__(self, lst=None):
+        self.rlist = []
+        if(lst is not None):
+            try:
+                lst = json.loads(lst)
+                for x in lst:
+                    self.Add(URule(x["variable"], x["operator"],
+                             x["value"]))
+            except:
+                print("Cannot feed in the rule, make sure your format is correct")
+
+    def Add(self, urule):
+        self.rlist.append(urule)
+
+    def Load(self):
+        if len(self.rlist) > 0:
+            urule = self.rlist.pop(0)
+            yield urule
+            yield from self.Load()
+
+    def Get(self):
+        return json.dumps(self.rlist, separators=(',', ':'), default=vars)
+
+    def GetRaw(self):
+        return self.rlist
+
+    def ToString(self):
+        lst = [str(k) for k in self.rlist]
+        return " and ".join(lst)
+
+
+class VariableLibrary(models.Model):
+    name = models.CharField(
+        max_length=20, help_text='Enter name')
+
+    def __str__(self):
+        return self.name
+
+
+class VariablePool(models.Model):
+    name = models.CharField(
+        max_length=20, help_text='Enter name')
+    datatype = models.CharField(
+        max_length=1,
+        choices=static.CATAGORY,
+        default='b',
+        help_text='Data Type',
+    )
+    intvalue = models.IntegerField(default=5)
+    fkey = models.ForeignKey(
+        'VariableLibrary', on_delete=models.CASCADE, null=False)
+
+    def __str__(self):
+        return self.name + "_" + str(self.id)
+
+
+class ScoreCardLibrary(models.Model):
+    name = models.CharField(
+        max_length=20, help_text='Enter name')
+
+    def __str__(self):
+        return self.name
+
+
+class ScoreCardPool(models.Model):
+    fkey = models.ForeignKey(
+        'ScoreCardLibrary', on_delete=models.CASCADE, null=False)
+    rule = models.TextField(help_text='Rule', null=True)
+    weight = models.FloatField(
+        default='1',
+        help_text='Weight',
+    )
+    score = models.FloatField(
+        default='1',
+        help_text='Score',
+    )
+
+    def __str__(self):
+        words = [str(k) for k in Rule(self.rule).Load()]
+        text = ""
+        text += " , ".join(words)
+        return self.fkey.name + " | " + text
+
+
+class DecisionTreeLibrary(models.Model):
+    name = models.CharField(
+        max_length=20, help_text='Enter name')
+
+    def __str__(self):
+        return self.name
+
+
+class DecisionTreePool(models.Model):
+    fkey = models.ForeignKey(
+        'DecisionTreeLibrary', on_delete=models.CASCADE, null=False)
+    prev = models.ForeignKey(
+        'DecisionTreePool', on_delete=models.CASCADE, null=True, blank=True)
+    rule = models.TextField(help_text='Rule', null=True)
+    log = models.TextField(help_text='Log', blank=True)
+
+    def __str__(self):
+        words = [str(k) for k in Rule(self.rule).Load()]
+        text = ""
+        text += " , ".join(words)
+        return f'''({self.id}) {self.fkey.name} | {text}'''

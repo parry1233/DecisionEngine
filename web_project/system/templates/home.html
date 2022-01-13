@@ -1,0 +1,45 @@
+{% load static %}
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Business Engine </title>
+    <link rel="stylesheet" href="{% static 'memolist.css' %}" />
+</head>
+
+<body>
+    <div class="header">
+        <h2>Business Engine Demo</h2>
+        <hr/>
+    </div>
+    <br/>
+    <div class="memo" style="background-image: url({% static 'ncku-logo2.jpg' %});background-size:contain ; background-position:center;background-repeat: no-repeat;  ">
+        <div class="column edge"></div>
+        <div class="column side">
+            <h2>Score Card</h2>
+            <ul>
+                   
+                {% for i,v in scid.items %}
+                    <li><a href="{% url 'ScoreCardView2' id=v  %}">case {{i}}</a> </li>
+                {% endfor %}
+                
+            </ul>
+        </div>
+        <div class="column edge"></div>
+        <div class="column side">
+            <h2>Decision Tree</h2>
+            <ul>
+                {% for i,v in dtid.items %}
+                <li><a href="{% url 'DecisionTreeView2' id=v  %}">case {{i}}</a> </li>
+                {% endfor %}
+            </ul>
+        </div>
+        <div class="column edge"></div>
+    </div>
+
+
+</body>
+
+</html>
