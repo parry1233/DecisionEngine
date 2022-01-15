@@ -28,7 +28,7 @@
                 <a >Score Card</a>
                 <ul>
                     {% for i,v in scid.items %}
-                    <li><a href="{% url 'ScoreCardView2' id=v  %}">case {{i}}</a> </li>
+                    <li><a href="{% url 'ScoreCardView' id=v  %}">case {{i}}</a> </li>
                     {% endfor %}
                 </ul>
             </li>

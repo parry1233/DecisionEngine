@@ -118,33 +118,95 @@ def build_rule():
     rule_count = rule_count + 1
 
 
+# env.build('''
+# (defrule remove-identital
+# (declare (salience 100))
+# ?f1 <- (urule (name ?a)(value ?va))
+# ?f2 <- (urule (name ?b)(value ?vb))
+# (test (and (eq ?a ?b) (neq ?va ?vb)))
+# =>
+# (println ?a " " ?va " " ?b " " ?vb)
+# (retract ?f2)
+# )
+# ''')
+total = 0
+
+
+def add(s):
+    global total
+    total = total + s
+
+
+env.define_function(add)
 env.build('''
 (defrule Rule0
-(declare (salience 2))
-(urule (name "a")(value ?value))
-(test (is_bigger ?value 0))
-=>
-(undefrule Rule1)
-(if ( do-for-fact((?r urule)) (= (str-compare ?r:name "b") 0) (modify ?r (value 2) ) )
-then else
-( assert (urule (name "b")(value 1)) )
-)
-(println hi)
-)
+            (declare (salience 9999))
+                (urule (name "r3")(value ?r3))
+
+            (test (< ?r3 10.0))
+            =>
+            (add 1)
+            )
 ''')
 env.build('''
 (defrule Rule1
-(declare (salience 1))
-(urule (name "b")(value ?value))
-(test (is_bigger ?value 0))
-=>
-( assert (urule (name "a")(value 1)) )
-(println fireR2 ?value)
-)
-''')
+            (declare (salience 9998))
+                (urule (name "r1")(value ?r1))
+
+            (test (eq ?r1 TRUE))
+            =>
+            (add 1)
+            )''')
+env.build('''
+(defrule Rule2
+            (declare (salience 9997))
+                (urule (name "r2")(value ?r2))
+
+                (urule (name "r3")(value ?r3))
+
+            (test (and (> ?r2 1.0) (> ?r3 40.0)))
+            =>
+            (add 1)
+            )''')
+# env.build('''
+# (defrule Rule0
+# (declare (salience 2))
+# (urule (name "a")(value ?value))
+# (test (neq ?value 0))
+# =>
+# (undefrule Rule1)
+# (if ( do-for-fact((?r urule)) (= (str-compare ?r:name "b") 0) (modify ?r (value 2) ) )
+# then else
+# )
+# (println (and 0 FALSE))
+# )
+# ''')
+# env.build('''
+# (defrule Rule1
+# (declare (salience 1))
+# (urule (name "b")(value ?value))
+# (test (is_bigger ?value 0))
+# =>
+# ( assert (urule (name "a")(value 1)) )
+# (println fireR2 ?value)
+# )
+# ''')
 template = env.find_template('urule')
-template.assert_fact(name="a", value=20)
+template.assert_fact(name="r1", value=True)
+template.assert_fact(name="r2", value=1.5)
+template.assert_fact(name="r3", value=65)
+# template.assert_fact(name="a", value=20)
+# template.assert_fact(name="a", value=True)
 # template.assert_fact(name="b", value=20)
+# template.assert_fact(name="b", value=False)
+# template.assert_fact(name="b", value=20)
+# a = set([1, 2, 3])
+# a.difference(set(1))
+# print(a)
+
 iteration = env.run()
+print(total)
+for x in env.facts():
+    print(x)
 # for fact in env.facts():
 #     print(fact)

@@ -4,26 +4,29 @@ from django.http import Http404
 from . import static
 from .models import Rule, URule, ScoreCardLibrary, ScoreCardPool, VariablePool, DecisionTreeLibrary, DecisionTreePool
 import json
+from system.InferenceEngine import SCEngine
 
 
 def index(request):
-    # rules = ScoreCardPool.objects.filter(fkey__name="ScoreCardLib01").all()
-    # for rule in rules:
-    #     for k in Rule(rule.rule).Load():
-    #         print(k)
+    rules = ScoreCardPool.objects.filter(fkey__name="ScoreCardLib01").all()
+    for rule in rules:
+        r = Rule(rule.rule)
+        for x in r.Load():
+            print(x.name)
+
     SCid = ScoreCardLibrary.objects.all()
     scid_list = {}
-    pos=0
+    pos = 0
     for rule in SCid:
-        pos+=1
+        pos += 1
         scid_list[pos] = rule.name
     lib = DecisionTreeLibrary.objects.all()
     dtid_list = {}
-    pos=0
+    pos = 0
     for x in lib:
-        pos+=1
-        dtid_list[pos]= x.name
-    return render(request, 'home.html',{"scid":scid_list,"dtid":dtid_list})
+        pos += 1
+        dtid_list[pos] = x.name
+    return render(request, 'home.html', {"scid": scid_list, "dtid": dtid_list})
 
 
 def ScoreCardList(request):
@@ -31,73 +34,6 @@ def ScoreCardList(request):
     strr = ""
     for rule in rules:
         strr += rule.name
-    return HttpResponse(strr)
-
-
-def ScoreCardView(request, id):
-    rules = ScoreCardPool.objects.filter(fkey__name=id).all()
-    varmap = {"1": 1, "2": 1.5, "3": 65}
-    hashmap = {}
-    for x in varmap.keys():
-        obj = VariablePool.objects.filter(pk=x)
-        if(obj.exists()):
-            varname = obj.first().name
-            hashmap[varname] = varmap[x]
-            datatype = obj.first().datatype
-            cast = {'b': lambda x: x == True,
-                    'F': lambda x: float(x), 'I': lambda x: int(x)}
-            lvalue = cast[datatype](hashmap.get(varname, 0))
-    strr = "<pre>"
-    total = 0
-    satisfy = {}
-    for rule in rules:
-        weight = rule.weight
-        score = rule.score
-        for k in Rule(rule.rule).Load():
-            obj = VariablePool.objects.filter(pk=k.variable)
-            if(obj.exists()):
-                datatype = obj.first().datatype
-                varname = obj.first().name
-                operator = k.operator
-                switch = {'b': lambda x, y: x > y, 'e': lambda x,
-                          y: x == y, 's': lambda x, y: x < y}
-                cast = {'b': lambda x: x == True,
-                        'F': lambda x: float(x), 'I': lambda x: int(x)}
-                value_cast = {'b': lambda x: str(x).lower() in ("true", "1"),
-                              'F': lambda x: float(x), 'I': lambda x: float(x)}
-                lvalue = cast[datatype](hashmap.get(varname, 0))
-                rvalue = value_cast[datatype](k.value)
-
-                satisfy[rule] = switch[operator](lvalue, rvalue)
-                if satisfy[rule] == False:
-                    break
-        if satisfy[rule]:
-            scores = score * weight
-            total += scores
-
-    namelist = []
-    for rule in rules:
-        for k in Rule(rule.rule).Load():
-            obj = VariablePool.objects.filter(pk=k.variable)
-            if(obj.exists()):
-                varname = obj.first().name
-                datatype = obj.first().datatype
-                lvalue = cast[datatype](hashmap.get(varname, 0))
-                if varname not in namelist:
-                    strr += f"<p>{varname:<16}={str(lvalue):>6}</p>"
-                    namelist.append(varname)
-    strr += "<hr>"
-    for i, rule in enumerate(rules):
-        strr += f'''<p style="color: Tomato">Rule {i:<2}: '''
-        strr += f"{Rule(rule.rule).ToString():<50}"
-        strr += f" | w: {rule.weight}, s: {rule.score}, wxs: {rule.score*rule.weight:>5}"
-        if satisfy[rule] == True:
-            strr += f" --> pass"
-        else:
-            strr += f" --> fire"
-        strr += "</p>"
-
-    strr += f"<hr><p>Total score = {total}</p></pre>"
     return HttpResponse(strr)
 
 
@@ -137,7 +73,7 @@ def DecisionTreeView(request, id):
     strr = []
     varmap = {"1": 1, "3": 65, "4": 1, "5": 0, "6": 1, "7": 0, "8": 1}
     hashmap = {}
-    
+
     for x in varmap.keys():
         obj = VariablePool.objects.filter(pk=x)
         if(obj.exists()):
@@ -148,7 +84,7 @@ def DecisionTreeView(request, id):
                     'F': lambda x: float(x), 'I': lambda x: int(x)}
             lvalue = cast[datatype](hashmap.get(varname, 0))
             strr.append(f"{varname:<9}={str(lvalue):>6}")
-            
+
     front = None
     logs = ""
     namelist = []
@@ -189,6 +125,7 @@ def DecisionTreeView(request, id):
     }
     return render(request, 'index.html', context=context)
 
+
 def DecisionTreeView2(request, id):
     def node(var, x):
         return {"self": x, "other": [], "next": {"var": var, "rules": []}}
@@ -217,7 +154,7 @@ def DecisionTreeView2(request, id):
     strr = []
     varmap = {"1": 1, "3": 65, "4": 1, "5": 0, "6": 1, "7": 0, "8": 1}
     hashmap = {}
-    vardata={} ## varvalue return to templates
+    vardata = {}  # varvalue return to templates
     for x in varmap.keys():
         obj = VariablePool.objects.filter(pk=x)
         if(obj.exists()):
@@ -227,8 +164,8 @@ def DecisionTreeView2(request, id):
             cast = {'b': lambda x: x == True,
                     'F': lambda x: float(x), 'I': lambda x: int(x)}
             lvalue = cast[datatype](hashmap.get(varname, 0))
-            #strr.append(f"{varname:<9}={str(lvalue):>6}")
-            vardata[varname]=str(lvalue)
+            # strr.append(f"{varname:<9}={str(lvalue):>6}")
+            vardata[varname] = str(lvalue)
     front = None
     logs = ""
     namelist = []
@@ -245,11 +182,11 @@ def DecisionTreeView2(request, id):
                         varname = obj.first().name
                         operator = k.operator
                         switch = {'b': lambda x, y: x > y, 'e': lambda x,
-                                y: x == y, 's': lambda x, y: x < y}
+                                  y: x == y, 's': lambda x, y: x < y}
                         cast = {'b': lambda x: x == True,
                                 'F': lambda x: float(x), 'I': lambda x: int(x)}
                         value_cast = {'b': lambda x: str(x).lower() in ("true", "1"),
-                                    'F': lambda x: float(x), 'I': lambda x: float(x)}
+                                      'F': lambda x: float(x), 'I': lambda x: float(x)}
                         lvalue = cast[datatype](hashmap.get(varname, 0))
                         rvalue = value_cast[datatype](k.value)
                         satisfy = switch[operator](lvalue, rvalue)
@@ -264,109 +201,71 @@ def DecisionTreeView2(request, id):
     print(head)
     SCid = ScoreCardLibrary.objects.all()
     scid_list = {}
-    pos=0
+    pos = 0
     for rule in SCid:
-        pos+=1
+        pos += 1
         scid_list[pos] = rule.name
     lib = DecisionTreeLibrary.objects.all()
     dtid_list = {}
-    pos=0
+    pos = 0
     for x in lib:
-        pos+=1
-        dtid_list[pos]= x.name
+        pos += 1
+        dtid_list[pos] = x.name
     context = {
         'var_list': vardata,
         'link_list': json.dumps(head, default=vars),
         'log': log,
-        "scid":scid_list,
-        "dtid":dtid_list
+        "scid": scid_list,
+        "dtid": dtid_list
     }
     return render(request, 'DecisionTree.html', context=context)
 
-def ScoreCardView2(request, id):
-    rules = ScoreCardPool.objects.filter(fkey__name=id).all()
-    varmap = {"1": 1, "2": 1.5, "3": 65}
-    hashmap = {}
-    vardata={}
-    strr = "<pre>"
-    for x in varmap.keys():
+
+def value_transform(kmap):
+    # turn kmap to value according to it's datatype, also map kmap id to readable name in k2names
+    k2names = {}
+    for x in kmap.keys():
         obj = VariablePool.objects.filter(pk=x)
         if(obj.exists()):
             varname = obj.first().name
-            hashmap[varname] = varmap[x]
+            k2names |= {x: varname}
             datatype = obj.first().datatype
             cast = {'b': lambda x: x == True,
                     'F': lambda x: float(x), 'I': lambda x: int(x)}
-            lvalue = cast[datatype](hashmap.get(varname, 0))
-            
-    total = 0
-    satisfy = {}
-    for rule in rules:
-        weight = rule.weight
-        score = rule.score
-        for k in Rule(rule.rule).Load():
-            obj = VariablePool.objects.filter(pk=k.variable)
-            if(obj.exists()):
-                datatype = obj.first().datatype
-                varname = obj.first().name
-                operator = k.operator
-                switch = {'b': lambda x, y: x > y, 'e': lambda x,
-                          y: x == y, 's': lambda x, y: x < y}
-                cast = {'b': lambda x: x == True,
-                        'F': lambda x: float(x), 'I': lambda x: int(x)}
-                value_cast = {'b': lambda x: str(x).lower() in ("true", "1"),
-                              'F': lambda x: float(x), 'I': lambda x: float(x)}
-                lvalue = cast[datatype](hashmap.get(varname, 0))
-                rvalue = value_cast[datatype](k.value)
+            kmap[x] = cast[datatype](kmap[x])
+    kmap = {"r"+x: y for x, y in kmap.items()}
+    k2names = {"r"+x: y for x, y in k2names.items()}
+    return kmap, k2names
 
-                satisfy[rule] = switch[operator](lvalue, rvalue)
-                if satisfy[rule] == False:
-                    break
-        if satisfy[rule]:
-            scores = score * weight
-            total += scores
 
-    namelist = []
-    line=""
-    pos = 0
-    for rule in rules:
-        for k in Rule(rule.rule).Load():
-            obj = VariablePool.objects.filter(pk=k.variable)
-            if(obj.exists()):
-                varname = obj.first().name
-                datatype = obj.first().datatype
-                lvalue = cast[datatype](hashmap.get(varname, 0))
-                if varname not in namelist:
-                    vardata[varname]=str(lvalue)
-                    namelist.append(varname)
+def ScoreCardView(request, id):
 
-    ruleresult=[]
-    
+    rules = ScoreCardPool.objects.filter(fkey__name=id).all()
+
+    engine = SCEngine.SCE()
+    rulelist = [(Rule(rule.rule), rule.score * rule.weight)
+                for rule in rules]
+    engine.defrule(rulelist)
+    kmap = {"1": 1, "2": 1.5, "3": 50}
+    kmap, k2names = value_transform(kmap)
+    engine.assign(kmap)
+    score, satisfy = engine.run()
+
+    ruleresult = []
     for i, rule in enumerate(rules):
-        line={}
+        line = {}
         line["Rule"] = i
         line["Ruleinfo"] = f"{Rule(rule.rule).ToString():<50}"
-        line["w"]=rule.weight
-        line["s"]=rule.score
-        line["wxs"]=rule.score*rule.weight
-        
-        if satisfy[rule] == True:
-            line["satisfy"]= "pass"
-        else:
-            line["satisfy"]= "fire"
-        ruleresult.append (line)
-    SCid = ScoreCardLibrary.objects.all()
-    scid_list = {}
-    pos=0
-    for rule in SCid:
-        pos+=1
-        scid_list[pos] = rule.name
-    lib = DecisionTreeLibrary.objects.all()
-    dtid_list = {}
-    pos=0
-    for x in lib:
-        pos+=1
-        dtid_list[pos]= x.name
-    
-    return render(request, 'ScoreCard.html', {'obj': vardata,"rules":ruleresult,"total":total,"scid":scid_list,"dtid":dtid_list})
+        line["w"] = rule.weight
+        line["s"] = rule.score
+        line["wxs"] = rule.score*rule.weight
+        line["satisfy"] = "pass" if satisfy[i] else "fire"
+        ruleresult.append(line)
 
+    SCid = ScoreCardLibrary.objects.all()
+    scid_list = {i: rule.name for i, rule in enumerate(SCid)}
+
+    lib = DecisionTreeLibrary.objects.all()
+    dtid_list = {i: rule.name for i, rule in enumerate(lib)}
+
+    return render(request, 'ScoreCard.html', {'obj': {k2names[x]: y for x, y in kmap.items()}, "rules": ruleresult, "total": score, "scid": scid_list, "dtid": dtid_list})
