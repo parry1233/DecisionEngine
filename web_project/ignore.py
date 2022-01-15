@@ -149,25 +149,29 @@ env.build('''
             )
 ''')
 env.build('''
-(defrule Rule1
-            (declare (salience 9998))
-                (urule (name "r1")(value ?r1))
+(defrule Rule4
+                (declare (salience 9995))
+                    (urule (name "r1")(value ?r1))
 
-            (test (eq ?r1 TRUE))
-            =>
-            (add 1)
-            )''')
+                    (urule (name "r3")(value ?r3))
+
+                    (urule (name "r3")(value ?r3))
+
+                (test (and (eq ?r1 TRUE) (> ?r3 59.0) (< ?r3 65.0)))
+                =>
+                (println 1)
+                )''')
 env.build('''
-(defrule Rule2
-            (declare (salience 9997))
-                (urule (name "r2")(value ?r2))
+(defrule Rule5
+                (declare (salience 9994))
+                    (urule (name "r1")(value ?r1))
 
-                (urule (name "r3")(value ?r3))
+                    (urule (name "r3")(value ?r3))
 
-            (test (and (> ?r2 1.0) (> ?r3 40.0)))
-            =>
-            (add 1)
-            )''')
+                (test (and (eq ?r1 TRUE) (> ?r3 64.0)))
+                =>
+                (println 1)
+                )''')
 # env.build('''
 # (defrule Rule0
 # (declare (salience 2))
@@ -193,8 +197,9 @@ env.build('''
 # ''')
 template = env.find_template('urule')
 template.assert_fact(name="r1", value=True)
-template.assert_fact(name="r2", value=1.5)
 template.assert_fact(name="r3", value=65)
+template.assert_fact(name="r4", value=True)
+
 # template.assert_fact(name="a", value=20)
 # template.assert_fact(name="a", value=True)
 # template.assert_fact(name="b", value=20)
@@ -205,8 +210,3 @@ template.assert_fact(name="r3", value=65)
 # print(a)
 
 iteration = env.run()
-print(total)
-for x in env.facts():
-    print(x)
-# for fact in env.facts():
-#     print(fact)

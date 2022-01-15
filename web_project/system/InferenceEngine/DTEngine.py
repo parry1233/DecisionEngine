@@ -4,8 +4,8 @@ import logging
 from types import SimpleNamespace
 
 
-class SCE:
-    # Scoreboard Engine
+class DTE:
+    # Decision Tree Engine
     def __init__(self):
         self.setrule = False
         self.total = 0
@@ -13,20 +13,17 @@ class SCE:
         self.typemap = dict()
         self.rule_ctr = 0
         self.salience = 9999
-        self.satisfy = []
+        self.log = ""
         self.env = clips.Environment()
 
         logging.basicConfig(level=10, format='%(message)s')
         router = clips.LoggingRouter()
         self.env.add_router(router)
 
-        def addscore(score):
-            self.total = self.total + score
+        def record(l):
+            self.log = self.log + str(l)
 
-        def is_satisfy(i):
-            self.satisfy[i] = True
-        self.env.define_function(addscore)
-        self.env.define_function(is_satisfy)
+        self.env.define_function(record)
 
         self.env.build('''
         (deftemplate urule
@@ -39,35 +36,34 @@ class SCE:
             raise NameError('rule must be set before assign variable')
 
         for x, y in name_value_map.items():
-            template = self.env.find_template('urule')
-            template.assert_fact(name=x, value=y)
-            self.varmap |= {x: y}
+            if x in self.varmap:
+                template = self.env.find_template('urule')
+                template.assert_fact(name=x, value=y)
+                self.varmap |= {x: y}
 
     def defrule(self, rules):
         self.setrule = True
-        for rule, score in rules:
+        for rule, log in rules:
             rstr = f'''
-            (defrule Rule{self.rule_ctr}
-            (declare (salience {self.salience}))'''
+                (defrule Rule{self.rule_ctr}
+                (declare (salience {self.salience}))'''
             for x in rule.GetRaw():
                 rstr += f'''
-                (urule (name "{x.ID()}")(value ?{x.ID()}))
-                '''
+                    (urule (name "{x.ID()}")(value ?{x.ID()}))
+                    '''
                 if x.ID() not in self.varmap:
                     self.varmap |= {x.ID(): None}
                 self.typemap |= {x.ID(): x.datatype}
 
             rstr += f'''
-            (test {rule.Prefix()})
-            =>
-            (addscore {score})
-            (is_satisfy {self.rule_ctr})
-            )
-            '''
+                (test {rule.Prefix()})
+                =>
+                (record {log})
+                )
+                '''
             self.env.build(rstr)
             self.rule_ctr = self.rule_ctr + 1
             self.salience = self.salience - 1
-            self.satisfy.append(False)
 
     def info(self):
         return SimpleNamespace(varmap=self.varmap)
@@ -82,4 +78,4 @@ class SCE:
 
         self.assign(unassign_map)
         self.env.run()
-        return self.total, self.satisfy
+        return self.log

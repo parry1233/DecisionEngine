@@ -22,7 +22,7 @@
             <ul>
                    
                 {% for i,v in scid.items %}
-                    <li><a href="{% url 'ScoreCardView2' id=v  %}">case {{i}}</a> </li>
+                    <li><a href="{% url 'ScoreCardView' id=v  %}">case {{i}}</a> </li>
                 {% endfor %}
                 
             </ul>
@@ -32,7 +32,7 @@
             <h2>Decision Tree</h2>
             <ul>
                 {% for i,v in dtid.items %}
-                <li><a href="{% url 'DecisionTreeView2' id=v  %}">case {{i}}</a> </li>
+                <li><a href="{% url 'DecisionTreeView' id=v  %}">case {{i}}</a> </li>
                 {% endfor %}
             </ul>
         </div>

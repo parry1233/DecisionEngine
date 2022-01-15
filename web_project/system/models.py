@@ -68,6 +68,14 @@ class Rule:
     def Add(self, urule):
         self.rlist.append(urule)
 
+    def Copy(self):
+        u = Rule()
+        u.rlist = u.rlist + self.rlist
+        return u
+
+    def Concatenate(self, ruleb):
+        self.rlist = self.rlist + ruleb.GetRaw()
+
     def Load(self):
         if len(self.rlist) > 0:
             urule = self.rlist.pop(0)

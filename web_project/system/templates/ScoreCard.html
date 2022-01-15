@@ -31,7 +31,7 @@
                 <a >Decision Tree</a>
                 <ul>
                     {% for i,v in dtid.items %}
-                    <li><a href="{% url 'DecisionTreeView2' id=v  %}">case {{i}}</a> </li>
+                    <li><a href="{% url 'DecisionTreeView' id=v  %}">case {{i}}</a> </li>
                     {% endfor %}
                 </ul>
             </li>

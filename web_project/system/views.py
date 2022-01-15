@@ -4,28 +4,33 @@ from django.http import Http404
 from . import static
 from .models import Rule, URule, ScoreCardLibrary, ScoreCardPool, VariablePool, DecisionTreeLibrary, DecisionTreePool
 import json
-from system.InferenceEngine import SCEngine
+from system.InferenceEngine import SCEngine, DTEngine
+
+
+def value_transform(kmap):
+    # turn kmap to value according to it's datatype, also map kmap id to readable name in k2names
+    kmap = {x.replace('r', ''): y for x, y in kmap.items()}
+    k2names = {}
+    for x in kmap.keys():
+        obj = VariablePool.objects.filter(pk=x)
+        if(obj.exists()):
+            varname = obj.first().name
+            k2names |= {x: varname}
+            datatype = obj.first().datatype
+            cast = {'b': lambda x: x == True,
+                    'F': lambda x: float(x), 'I': lambda x: int(x)}
+            kmap[x] = cast[datatype](kmap[x])
+    kmap = {"r"+x: y for x, y in kmap.items()}
+    k2names = {"r"+x: y for x, y in k2names.items()}
+    # return (facts for clipspy, variable info for template)
+    return kmap, {k2names[x]: y for x, y in kmap.items()}
 
 
 def index(request):
-    rules = ScoreCardPool.objects.filter(fkey__name="ScoreCardLib01").all()
-    for rule in rules:
-        r = Rule(rule.rule)
-        for x in r.Load():
-            print(x.name)
-
     SCid = ScoreCardLibrary.objects.all()
-    scid_list = {}
-    pos = 0
-    for rule in SCid:
-        pos += 1
-        scid_list[pos] = rule.name
+    scid_list = {i: rule.name for i, rule in enumerate(SCid)}
     lib = DecisionTreeLibrary.objects.all()
-    dtid_list = {}
-    pos = 0
-    for x in lib:
-        pos += 1
-        dtid_list[pos] = x.name
+    dtid_list = {i: rule.name for i, rule in enumerate(lib)}
     return render(request, 'home.html', {"scid": scid_list, "dtid": dtid_list})
 
 
@@ -64,192 +69,70 @@ def DecisionTreeView(request, id):
             parent["next"]["var"] = xname
             parent["next"]["rules"].append(new_link)
             AppendTo(x, new_link)
-    # else:
-    #     raise Http404("Poll does not exist")
-
     head = node(None, "start")
     AppendTo(None, head)
+
     # Calculate
-    strr = []
     varmap = {"1": 1, "3": 65, "4": 1, "5": 0, "6": 1, "7": 0, "8": 1}
-    hashmap = {}
+    varmap = {f"r{x}": y for x, y in varmap.items()}
+    engine = DTEngine.DTE()
+    rulelist = []
 
-    for x in varmap.keys():
-        obj = VariablePool.objects.filter(pk=x)
-        if(obj.exists()):
-            varname = obj.first().name
-            hashmap[varname] = varmap[x]
-            datatype = obj.first().datatype
-            cast = {'b': lambda x: x == True,
-                    'F': lambda x: float(x), 'I': lambda x: int(x)}
-            lvalue = cast[datatype](hashmap.get(varname, 0))
-            strr.append(f"{varname:<9}={str(lvalue):>6}")
-
-    front = None
-    logs = ""
-    namelist = []
-    while True:
+    def IterateThrough(prev, rnext, rlog):
         rules = DecisionTreePool.objects.filter(
-            fkey__name=id, prev=front).all()
+            fkey__name=id, prev=prev).all()
         if(rules.exists()):
             for rule in rules:
-                satisfy = True
-                for k in Rule(rule.rule).Load():
-                    obj = VariablePool.objects.filter(pk=k.variable)
-                    if(obj.exists()):
-                        datatype = obj.first().datatype
-                        varname = obj.first().name
-                        operator = k.operator
-                        switch = {'b': lambda x, y: x > y, 'e': lambda x,
-                                  y: x == y, 's': lambda x, y: x < y}
-                        cast = {'b': lambda x: x == True,
-                                'F': lambda x: float(x), 'I': lambda x: int(x)}
-                        value_cast = {'b': lambda x: str(x).lower() in ("true", "1"),
-                                      'F': lambda x: float(x), 'I': lambda x: float(x)}
-                        lvalue = cast[datatype](hashmap.get(varname, 0))
-                        rvalue = value_cast[datatype](k.value)
-                        satisfy = switch[operator](lvalue, rvalue)
-                        if not satisfy:
-                            break
-                if satisfy:
-                    front = rule
-                    break
+                r = Rule(rule.rule)
+                lnext = rnext.copy() + [r]
+                llog = rlog + rule.log
+                IterateThrough(rule, lnext, llog)
         else:
-            log = front.log
-            break
-    print(head)
-    context = {
-        'var_list': strr,
-        'link_list': json.dumps(head, default=vars),
-        'log': log,
-    }
-    return render(request, 'index.html', context=context)
+            if len(rnext) > 1:
+                m = rnext[0].Copy()
+                for x in rnext[1:]:
+                    m.Concatenate(x)
+                rulelist.append((m, rlog))
+            elif len(rnext) == 1:
+                rulelist.append((rnext[0], rlog))
 
+    IterateThrough(None, list(), "")
 
-def DecisionTreeView2(request, id):
-    def node(var, x):
-        return {"self": x, "other": [], "next": {"var": var, "rules": []}}
+    engine.defrule(rulelist)
+    engine.assign(varmap)
+    logs = engine.run()
+    # retract only variabe used in rule
+    _, vardata = value_transform(engine.info().varmap)
 
-    def AppendTo(pname, parent):
-        rules = DecisionTreePool.objects.filter(
-            fkey__name=id, prev=pname).all()
-        for x in rules:
-            lst = [x.ToReadable() for x in Rule(x.rule).GetRaw()]
-            only_rule = [x.rule for x in lst]
-            xname = lst[0].name
-            xrule = " and ".join(only_rule)
-
-            new_link = node(None, xrule)
-            if x.log != "":
-                new_link["other"].append(f"印出{x.log}")
-            parent["next"]["var"] = xname
-            parent["next"]["rules"].append(new_link)
-            AppendTo(x, new_link)
-    # else:
-    #     raise Http404("Poll does not exist")
-
-    head = node(None, "start")
-    AppendTo(None, head)
-    # Calculate
-    strr = []
-    varmap = {"1": 1, "3": 65, "4": 1, "5": 0, "6": 1, "7": 0, "8": 1}
-    hashmap = {}
-    vardata = {}  # varvalue return to templates
-    for x in varmap.keys():
-        obj = VariablePool.objects.filter(pk=x)
-        if(obj.exists()):
-            varname = obj.first().name
-            hashmap[varname] = varmap[x]
-            datatype = obj.first().datatype
-            cast = {'b': lambda x: x == True,
-                    'F': lambda x: float(x), 'I': lambda x: int(x)}
-            lvalue = cast[datatype](hashmap.get(varname, 0))
-            # strr.append(f"{varname:<9}={str(lvalue):>6}")
-            vardata[varname] = str(lvalue)
-    front = None
-    logs = ""
-    namelist = []
-    while True:
-        rules = DecisionTreePool.objects.filter(
-            fkey__name=id, prev=front).all()
-        if(rules.exists()):
-            for rule in rules:
-                satisfy = True
-                for k in Rule(rule.rule).Load():
-                    obj = VariablePool.objects.filter(pk=k.variable)
-                    if(obj.exists()):
-                        datatype = obj.first().datatype
-                        varname = obj.first().name
-                        operator = k.operator
-                        switch = {'b': lambda x, y: x > y, 'e': lambda x,
-                                  y: x == y, 's': lambda x, y: x < y}
-                        cast = {'b': lambda x: x == True,
-                                'F': lambda x: float(x), 'I': lambda x: int(x)}
-                        value_cast = {'b': lambda x: str(x).lower() in ("true", "1"),
-                                      'F': lambda x: float(x), 'I': lambda x: float(x)}
-                        lvalue = cast[datatype](hashmap.get(varname, 0))
-                        rvalue = value_cast[datatype](k.value)
-                        satisfy = switch[operator](lvalue, rvalue)
-                        if not satisfy:
-                            break
-                if satisfy:
-                    front = rule
-                    break
-        else:
-            log = front.log
-            break
-    print(head)
     SCid = ScoreCardLibrary.objects.all()
-    scid_list = {}
-    pos = 0
-    for rule in SCid:
-        pos += 1
-        scid_list[pos] = rule.name
+    scid_list = {i: rule.name for i, rule in enumerate(SCid)}
     lib = DecisionTreeLibrary.objects.all()
-    dtid_list = {}
-    pos = 0
-    for x in lib:
-        pos += 1
-        dtid_list[pos] = x.name
+    dtid_list = {i: rule.name for i, rule in enumerate(lib)}
+
     context = {
         'var_list': vardata,
         'link_list': json.dumps(head, default=vars),
-        'log': log,
+        'log': logs,
         "scid": scid_list,
         "dtid": dtid_list
     }
     return render(request, 'DecisionTree.html', context=context)
 
 
-def value_transform(kmap):
-    # turn kmap to value according to it's datatype, also map kmap id to readable name in k2names
-    k2names = {}
-    for x in kmap.keys():
-        obj = VariablePool.objects.filter(pk=x)
-        if(obj.exists()):
-            varname = obj.first().name
-            k2names |= {x: varname}
-            datatype = obj.first().datatype
-            cast = {'b': lambda x: x == True,
-                    'F': lambda x: float(x), 'I': lambda x: int(x)}
-            kmap[x] = cast[datatype](kmap[x])
-    kmap = {"r"+x: y for x, y in kmap.items()}
-    k2names = {"r"+x: y for x, y in k2names.items()}
-    return kmap, k2names
-
-
 def ScoreCardView(request, id):
 
     rules = ScoreCardPool.objects.filter(fkey__name=id).all()
 
+    varmap = {"1": 1, "2": 1.5, "3": 50}
+    varmap = {f"r{x}": y for x, y in varmap.items()}
     engine = SCEngine.SCE()
     rulelist = [(Rule(rule.rule), rule.score * rule.weight)
                 for rule in rules]
     engine.defrule(rulelist)
-    kmap = {"1": 1, "2": 1.5, "3": 50}
-    kmap, k2names = value_transform(kmap)
-    engine.assign(kmap)
+    engine.assign(varmap)
     score, satisfy = engine.run()
+    # retract only variabe used in rule
+    kmap, vardata = value_transform(engine.info().varmap)
 
     ruleresult = []
     for i, rule in enumerate(rules):
@@ -264,8 +147,15 @@ def ScoreCardView(request, id):
 
     SCid = ScoreCardLibrary.objects.all()
     scid_list = {i: rule.name for i, rule in enumerate(SCid)}
-
     lib = DecisionTreeLibrary.objects.all()
     dtid_list = {i: rule.name for i, rule in enumerate(lib)}
 
-    return render(request, 'ScoreCard.html', {'obj': {k2names[x]: y for x, y in kmap.items()}, "rules": ruleresult, "total": score, "scid": scid_list, "dtid": dtid_list})
+    context = {
+        'obj': vardata,
+        'rules': ruleresult,
+        'total': score,
+        "scid": scid_list,
+        "dtid": dtid_list
+    }
+
+    return render(request, 'ScoreCard.html', context)
