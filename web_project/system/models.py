@@ -35,6 +35,9 @@ class URule:
                 'b': '>',
                 'e': 'eq',
                 's': '<',
+                'a': '>=',
+                'p': '<=',
+
             }
 
             return f"({OPERATOR_CAST[self.operator]} ?{self.ID()} {str(rvalue)})"
@@ -111,7 +114,7 @@ class VariableLibrary(models.Model):
 
 class VariablePool(models.Model):
     name = models.CharField(
-        max_length=20, help_text='Enter name')
+        max_length=40, help_text='Enter name')
     datatype = models.CharField(
         max_length=1,
         choices=static.CATAGORY,
@@ -119,7 +122,7 @@ class VariablePool(models.Model):
         help_text='Data Type',
     )
     fkey = models.ForeignKey(
-        'VariableLibrary', on_delete=models.CASCADE, null=False)
+        'VariableLibrary', on_delete=models.CASCADE)
 
     def __str__(self):
         return self.name + "_" + str(self.id)
@@ -135,7 +138,7 @@ class ScoreCardLibrary(models.Model):
 
 class ScoreCardPool(models.Model):
     fkey = models.ForeignKey(
-        'ScoreCardLibrary', on_delete=models.CASCADE, null=False)
+        'ScoreCardLibrary', on_delete=models.CASCADE)
     rule = models.TextField(help_text='Rule', null=True)
     weight = models.FloatField(
         default='1',
@@ -163,11 +166,18 @@ class DecisionTreeLibrary(models.Model):
 
 class DecisionTreePool(models.Model):
     fkey = models.ForeignKey(
-        'DecisionTreeLibrary', on_delete=models.CASCADE, null=False)
+        'DecisionTreeLibrary', on_delete=models.CASCADE)
     prev = models.ForeignKey(
         'DecisionTreePool', on_delete=models.CASCADE, null=True, blank=True)
     rule = models.TextField(help_text='Rule', null=True)
     log = models.TextField(help_text='Log', blank=True)
+
+    def duplicate_event(modeladmin, request, queryset):
+        for object in queryset:
+            object.id = None
+            object.save()
+
+    duplicate_event.short_description = "Duplicate selected record"
 
     def __str__(self):
         words = [str(k) for k in Rule(self.rule).Load()]

@@ -42,6 +42,48 @@ def ScoreCardList(request):
     return HttpResponse(strr)
 
 
+def ScoreCardView(request, id):
+    rules = ScoreCardPool.objects.filter(fkey__name=id).all()
+
+    varmap = {"1": 1, "2": 1.5, "3": 50}
+    varmap, _ = value_transform(varmap)
+
+    engine = SCEngine.SCE()
+    rulelist = [(Rule(rule.rule), rule.score * rule.weight)
+                for rule in rules]
+    engine.defrule(rulelist)
+    engine.assign(varmap)
+    score, satisfy = engine.run()
+    # retract only variabe used in rule
+    kmap, vardata = value_transform(engine.info().varmap)
+
+    ruleresult = []
+    for i, rule in enumerate(rules):
+        line = {}
+        line["Rule"] = i
+        line["Ruleinfo"] = f"{Rule(rule.rule).ToString():<50}"
+        line["w"] = rule.weight
+        line["s"] = rule.score
+        line["wxs"] = rule.score*rule.weight
+        line["satisfy"] = "pass" if satisfy[i] else "fire"
+        ruleresult.append(line)
+
+    SCid = ScoreCardLibrary.objects.all()
+    scid_list = {i: rule.name for i, rule in enumerate(SCid)}
+    lib = DecisionTreeLibrary.objects.all()
+    dtid_list = {i: rule.name for i, rule in enumerate(lib)}
+
+    context = {
+        'obj': vardata,
+        'rules': ruleresult,
+        'total': score,
+        "scid": scid_list,
+        "dtid": dtid_list
+    }
+
+    return render(request, 'ScoreCard.html', context)
+
+
 def DecisionTreeList(request):
     lib = DecisionTreeLibrary.objects.all()
     strr = []
@@ -73,8 +115,9 @@ def DecisionTreeView(request, id):
     AppendTo(None, head)
 
     # Calculate
-    varmap = {"1": 1, "3": 65, "4": 1, "5": 0, "6": 1, "7": 0, "8": 1}
-    varmap = {f"r{x}": y for x, y in varmap.items()}
+    varmap = {"1": 1, "3": 65, "4": 1, "5": 0, "6": 1, "7": 0,
+              "8": 1, "9": 18, "10": True, "11": True, "12": 20, "13": True, "14": False, "15": True}
+    varmap, _ = value_transform(varmap)
     engine = DTEngine.DTE()
     rulelist = []
 
@@ -117,45 +160,3 @@ def DecisionTreeView(request, id):
         "dtid": dtid_list
     }
     return render(request, 'DecisionTree.html', context=context)
-
-
-def ScoreCardView(request, id):
-
-    rules = ScoreCardPool.objects.filter(fkey__name=id).all()
-
-    varmap = {"1": 1, "2": 1.5, "3": 50}
-    varmap = {f"r{x}": y for x, y in varmap.items()}
-    engine = SCEngine.SCE()
-    rulelist = [(Rule(rule.rule), rule.score * rule.weight)
-                for rule in rules]
-    engine.defrule(rulelist)
-    engine.assign(varmap)
-    score, satisfy = engine.run()
-    # retract only variabe used in rule
-    kmap, vardata = value_transform(engine.info().varmap)
-
-    ruleresult = []
-    for i, rule in enumerate(rules):
-        line = {}
-        line["Rule"] = i
-        line["Ruleinfo"] = f"{Rule(rule.rule).ToString():<50}"
-        line["w"] = rule.weight
-        line["s"] = rule.score
-        line["wxs"] = rule.score*rule.weight
-        line["satisfy"] = "pass" if satisfy[i] else "fire"
-        ruleresult.append(line)
-
-    SCid = ScoreCardLibrary.objects.all()
-    scid_list = {i: rule.name for i, rule in enumerate(SCid)}
-    lib = DecisionTreeLibrary.objects.all()
-    dtid_list = {i: rule.name for i, rule in enumerate(lib)}
-
-    context = {
-        'obj': vardata,
-        'rules': ruleresult,
-        'total': score,
-        "scid": scid_list,
-        "dtid": dtid_list
-    }
-
-    return render(request, 'ScoreCard.html', context)

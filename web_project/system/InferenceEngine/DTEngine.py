@@ -58,7 +58,7 @@ class DTE:
             rstr += f'''
                 (test {rule.Prefix()})
                 =>
-                (record {log})
+                (record "{log}")
                 )
                 '''
             self.env.build(rstr)

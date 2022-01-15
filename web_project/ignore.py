@@ -105,17 +105,14 @@ def is_equal(a, b):
     return a == b
 
 
+def record(l):
+    print(str(l))
+
+
 env.define_function(is_bigger)
 env.define_function(is_smaller)
 env.define_function(is_equal)
-rule_count = 0
-
-
-def build_rule():
-    global rule_count
-
-    env.build()
-    rule_count = rule_count + 1
+env.define_function(record)
 
 
 # env.build('''
@@ -159,7 +156,7 @@ env.build('''
 
                 (test (and (eq ?r1 TRUE) (> ?r3 59.0) (< ?r3 65.0)))
                 =>
-                (println 1)
+                (println 0)
                 )''')
 env.build('''
 (defrule Rule5
@@ -170,6 +167,7 @@ env.build('''
 
                 (test (and (eq ?r1 TRUE) (> ?r3 64.0)))
                 =>
+                (record "a b")
                 (println 1)
                 )''')
 # env.build('''
