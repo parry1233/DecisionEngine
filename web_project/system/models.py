@@ -66,7 +66,7 @@ class Rule:
                     self.Add(URule(x["variable"], x["operator"],
                              x["value"]))
             except:
-                print("Cannot feed in the rule, make sure your format is correct")
+                raise RuntimeError("wrong rule format")
 
     def Add(self, urule):
         self.rlist.append(urule)
@@ -133,7 +133,7 @@ class ScoreCardLibrary(models.Model):
         max_length=20, help_text='Enter name')
 
     def __str__(self):
-        return self.name
+        return f"{self.name} ({str(self.id)})"
 
 
 class ScoreCardPool(models.Model):

@@ -1,10 +1,14 @@
+from django.http import JsonResponse
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.http import Http404
+from django.views.decorators.csrf import csrf_exempt
 from . import static
 from .models import Rule, URule, ScoreCardLibrary, ScoreCardPool, VariablePool, DecisionTreeLibrary, DecisionTreePool
 import json
 from system.InferenceEngine import SCEngine, DTEngine
+from system.DBAccess import Setter
+from .utility import sint, sfloat
 
 
 def value_transform(kmap):
@@ -160,3 +164,41 @@ def DecisionTreeView(request, id):
         "dtid": dtid_list
     }
     return render(request, 'DecisionTree.html', context=context)
+
+
+def ScoreBoardOperation(request):
+    return render(request, 'ScoreBoardOperation.html')
+
+
+@csrf_exempt
+def DBAccess(request):
+    if request.method == "POST":
+        get = (lambda x: request.POST.get(x))
+        if get("category") == "SCB":
+            (fkey, rule, weight, score) = (sint(get("fkey")), str(
+                get("rule")), sfloat(get("weight")), sfloat(get("score")))
+            try:
+                if isinstance(fkey, (int)) and rule and isinstance(weight, (float)) and isinstance(score, (float)):
+                    x = Rule(rule)
+                    (fkey, rule) = (ScoreCardLibrary.objects.filter(
+                        pk=fkey).first(), Rule(rule))
+                    if fkey is None:
+                        raise RuntimeError("fk not exists")
+                    # Setter.SC_SaveRule(fkey, rule.Get(), weight, score)
+                    return JsonResponse("save", safe=False)
+                else:
+                    raise RuntimeError(
+                        "each field must be filled, weight and score must be int or float")
+            except RuntimeError as e:
+                return JsonResponse(repr(e), safe=False)
+
+    if request.method == "GET":
+        get = (lambda x: request.GET.get(x))
+        if get("category") == "SCBLB":
+            lst = [str(x) for x in ScoreCardLibrary.objects.all()]
+            return JsonResponse("\n".join(lst), safe=False)
+        elif get("category") == "SCBPL":
+            lst = [str(x) for x in ScoreCardPool.objects.all().order_by("-id")]
+            return JsonResponse("\n".join(lst), safe=False)
+
+    return JsonResponse(None, safe=False)
