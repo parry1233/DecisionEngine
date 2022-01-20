@@ -3,44 +3,28 @@ from django.contrib import admin
 from django import forms
 from . import static
 from django.contrib.admin.helpers import ActionForm
-from .models import VariableLibrary, VariablePool, ScoreCardLibrary, ScoreCardPool, DecisionTreeLibrary, DecisionTreePool, User
-import copy
+from .models import VariableLibrary, VariablePool, ScoreCardLibrary, ScoreCardPool, DecisionTreeLibrary, DecisionTreePool
+from .models import System
 
 # Register your models here.
 admin.site.register(VariableLibrary)
 admin.site.register(VariablePool)
 admin.site.register(ScoreCardLibrary)
+admin.site.register(ScoreCardPool)
 admin.site.register(DecisionTreeLibrary)
-admin.site.register(User)
+admin.site.register(DecisionTreePool)
 
+# @admin.register(ScoreCardPool)
+# class ScoreCardPoolAdmin(admin.ModelAdmin):
+#     class XForm(ActionForm):
+#         variable = forms.ModelChoiceField(queryset=VariablePool.objects.all())
+#         operator = forms.ChoiceField(choices=static.OPERATOR)
+#         value = forms.CharField(
+#             max_length=20, help_text='Value')
+#     action_form = XForm
+#     actions = [AddRules]
 
-@admin.register(DecisionTreePool)
-class DecisionTreePoolAdmin(admin.ModelAdmin):
-    @admin.action(description='duplicate')
-    def duplicate(modeladmin, request, query):
-        for course in query:
-            course_copy = copy.copy(course)  # django copy object
-            course_copy.id = None   # set 'id' to None to create new object
-            course_copy.save()
+class SystemAdmin(admin.ModelAdmin):
+    list_display = ('title', 'description', 'status')
 
-    @admin.action(description='update prev')
-    def update_prev(modeladmin, request, query):
-        query.update(prev=request.POST['prev'])
-
-    class XForm(ActionForm):
-        prev = forms.ModelChoiceField(
-            queryset=DecisionTreePool.objects.all(), required=False)
-    action_form = XForm
-    save_as = True
-    actions = ['duplicate', 'update_prev']
-
-
-@admin.register(ScoreCardPool)
-class ScoreCardPoolAdmin(admin.ModelAdmin):
-    @admin.action(description='duplicate')
-    def duplicate(modeladmin, request, query):
-        for course in query:
-            course_copy = copy.copy(course)  # django copy object
-            course_copy.id = None   # set 'id' to None to create new object
-            course_copy.save()
-    actions = ['duplicate']
+admin.site.register(System, SystemAdmin)
