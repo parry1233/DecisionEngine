@@ -3,6 +3,7 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from django.http import Http404
 from django.views.decorators.csrf import csrf_exempt
+
 from . import static
 from .models import Rule, URule, ScoreCardLibrary, ScoreCardPool, VariablePool, DecisionTreeLibrary, DecisionTreePool
 import json
@@ -10,6 +11,12 @@ from system.InferenceEngine import SCEngine, DTEngine
 from system.DBAccess import Setter
 from .utility import sint, sfloat
 
+from django.db import transaction
+from rest_framework.generics import GenericAPIView
+from rest_framework import viewsets
+
+from system.serializers import UserSerializer, DTPSerializer
+from system.models import User
 
 def value_transform(kmap):
     # turn kmap to value according to it's datatype, also map kmap id to readable name in k2names
@@ -202,3 +209,42 @@ def DBAccess(request):
             return JsonResponse("\n".join(lst), safe=False)
 
     return JsonResponse(None, safe=False)
+
+
+'''Below are View for user API, By using viewsets.ModelViewSet, frontend can do:
+    1. GET all by /
+    2. GET specific data by /<id>
+    3. POST data by /
+    4. PUT, DELETE data by /<id>
+'''
+class UserView(viewsets.ModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+
+'''Below are View for decision tree API, frontend can only access GET all data currently'''
+class DTPView(GenericAPIView):
+    queryset = DecisionTreePool.objects.all()
+    serializer_class = DTPSerializer
+
+    #GET api request, return all users
+    def get(self, request, *args, **krgs):
+        decisions = self.get_queryset()
+        serializer = self.serializer_class(decisions, many = True)
+        data = {'decisions' : serializer.data}
+        return JsonResponse(data, safe = False)
+    
+    '''
+    #POST api request, save to SQLite DB then return data, if error return error msg
+    def post(self, request, *args, **krgs):
+        data = request.data
+        try:
+            serializer = self.serializer_class(data=data)
+            serializer.is_valid(raise_exception=True)
+            with transaction.atomic():
+                serializer.save()
+            data = serializer.data
+            #data = {'reached' : True}
+        except Exception as e:
+            data = {'error' : str(e)}
+        return JsonResponse(data)
+    '''

@@ -3,7 +3,7 @@ from django.contrib import admin
 from django import forms
 from . import static
 from django.contrib.admin.helpers import ActionForm
-from .models import VariableLibrary, VariablePool, ScoreCardLibrary, ScoreCardPool, DecisionTreeLibrary, DecisionTreePool
+from .models import VariableLibrary, VariablePool, ScoreCardLibrary, ScoreCardPool, DecisionTreeLibrary, DecisionTreePool, User
 import copy
 
 # Register your models here.
@@ -11,6 +11,7 @@ admin.site.register(VariableLibrary)
 admin.site.register(VariablePool)
 admin.site.register(ScoreCardLibrary)
 admin.site.register(DecisionTreeLibrary)
+admin.site.register(User)
 
 
 @admin.register(DecisionTreePool)

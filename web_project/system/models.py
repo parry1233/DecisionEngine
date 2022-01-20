@@ -1,3 +1,4 @@
+from pyexpat import model
 from django.db import models
 import system.static as static
 import json
@@ -184,3 +185,10 @@ class DecisionTreePool(models.Model):
         text = ""
         text += " , ".join(words)
         return f'''({self.id}) {self.fkey.name} | {text}'''
+
+'''Try API with user data'''
+class User(models.Model):
+    id = models.AutoField(auto_created=True, primary_key=True)
+    email = models.EmailField(unique=100)
+    name = models.CharField(max_length=100)
+    income = models.IntegerField()
