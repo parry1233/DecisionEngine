@@ -1,5 +1,5 @@
 from dataclasses import fields
-from system.models import User, DecisionTreePool # import user class from models.py
+from system.models import User, DecisionTreePool, ScoreCardPool # import user class from models.py
 from rest_framework import serializers
 
 '''Serializer for User models'''
@@ -12,4 +12,9 @@ class UserSerializer(serializers.ModelSerializer):
 class DTPSerializer(serializers.ModelSerializer):
     class Meta:
         model = DecisionTreePool
+        fields = '__all__'
+        
+class SCPSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ScoreCardPool
         fields = '__all__'

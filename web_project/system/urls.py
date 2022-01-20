@@ -20,4 +20,8 @@ urlpatterns = [
     path("DBAccess/", views.DBAccess, name="DBAccess"),
     path('Account/',include(USERrouter.urls)),
     path('Decision/',views.DTPView.as_view()),
+    path('SC/',views.ScoreCard.ScoreCardList),
+    path('SC/<id>/',views.ScoreCard.ScoreCardView),
+    path('DT/',views.DecisionTree.DecisionTreeList),
+    path('DT/<id>/',views.DecisionTree.DecisionTreeView),
 ]
