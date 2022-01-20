@@ -19,7 +19,7 @@ urlpatterns = [
     path("ScoreBoardOperation/", views.ScoreBoardOperation, name="ajax_example"),
     path("DBAccess/", views.DBAccess, name="DBAccess"),
     path('Account/',include(USERrouter.urls)),
-    path('Decision/',views.DTPView.as_view()),
+    path('Decision/',views.DTPool.as_view()),
     path('SC/',views.ScoreCard.ScoreCardList),
     path('SC/<id>/',views.ScoreCard.ScoreCardView),
     path('DT/',views.DecisionTree.DecisionTreeList),
