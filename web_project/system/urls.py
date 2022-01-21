@@ -10,6 +10,8 @@ urlpatterns = [
     path("DecisionTree/", views.DecisionTreeList, name='DecisionTreeList'),
     path("DecisionTree/<id>/",
          views.DecisionTreeView, name="DecisionTreeView"),
-    path("ScoreBoardOperation/", views.ScoreBoardOperation, name="ajax_example"),
+    path("VariableOperation/", views.VariableOperation, name="VariableOperation"),
+    path("ScoreBoardOperation/", views.ScoreBoardOperation,
+         name="ScoreBoardOperation"),
     path("DBAccess/", views.DBAccess, name="DBAccess"),
 ]

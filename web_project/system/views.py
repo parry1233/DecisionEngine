@@ -1,13 +1,14 @@
+from unicodedata import category
 from django.http import JsonResponse
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.http import Http404
 from django.views.decorators.csrf import csrf_exempt
 from . import static
-from .models import Rule, URule, ScoreCardLibrary, ScoreCardPool, VariablePool, DecisionTreeLibrary, DecisionTreePool
+from .models import Rule, URule, ScoreCardLibrary, ScoreCardPool, VariableLibrary, VariablePool, DecisionTreeLibrary, DecisionTreePool
 import json
 from system.InferenceEngine import SCEngine, DTEngine
-from system.DBAccess import Setter
+from system.DBAccess import Setter, Getter
 from .utility import sint, sfloat
 
 
@@ -166,6 +167,10 @@ def DecisionTreeView(request, id):
     return render(request, 'DecisionTree.html', context=context)
 
 
+def VariableOperation(request):
+    return render(request, 'VariableOperation.html')
+
+
 def ScoreBoardOperation(request):
     return render(request, 'ScoreBoardOperation.html')
 
@@ -174,7 +179,23 @@ def ScoreBoardOperation(request):
 def DBAccess(request):
     if request.method == "POST":
         get = (lambda x: request.POST.get(x))
-        if get("category") == "SCB":
+        category = get("category")
+        action = get("action")
+
+        if category == "VARLB":
+            if action == "ADD":
+                return Setter.VARLB_Add(get("name"))
+            elif action == "DEL":
+                return Setter.VARLB_Del(get("id"))
+
+        if category == "VARPL":
+            if action == "ADD":
+                return Setter.VARPL_Add(get("fk"), get("name"), get("datatype"))
+            elif action == "DEL":
+                print(request.POST)
+                return Setter.VARPL_Del(get("fk"), get("id"))
+
+        if category == "SCB":
             (fkey, rule, weight, score) = (sint(get("fkey")), str(
                 get("rule")), sfloat(get("weight")), sfloat(get("score")))
             try:
@@ -194,10 +215,17 @@ def DBAccess(request):
 
     if request.method == "GET":
         get = (lambda x: request.GET.get(x))
-        if get("category") == "SCBLB":
+        category = get("category")
+        if category == "VARLB":
+            return JsonResponse(Getter.VARLB_Read(), safe=False)
+        elif category == "VARPL":
+            return JsonResponse(Getter.VARPL_Read(get("id")), safe=False)
+        elif category == "DATATYPE":
+            return JsonResponse(Getter.DATATYPE_Read(), safe=False)
+        elif category == "SCBLB":
             lst = [str(x) for x in ScoreCardLibrary.objects.all()]
             return JsonResponse("\n".join(lst), safe=False)
-        elif get("category") == "SCBPL":
+        elif category == "SCBPL":
             lst = [str(x) for x in ScoreCardPool.objects.all().order_by("-id")]
             return JsonResponse("\n".join(lst), safe=False)
 
