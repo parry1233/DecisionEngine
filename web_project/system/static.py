@@ -24,4 +24,4 @@ ERRORMSG = ["the name must not be empty",
             "invalid datatype",
             "the name must not be empty",
             "foreign key must be an integer",
-            "deleted obj not corresponed to specified library", ]
+            "operated obj not corresponed to specified library", ]

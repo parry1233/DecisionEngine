@@ -15,6 +15,9 @@
     <button type="button" id='varlbadd'>提交</button>
     delete lib with id: <input type="text" id="varlbdeltext">
     <button type="button" id='varlbdel'>提交</button>
+    update lib with id and name: 
+    <input type="text" id="varlbupdtext"><input type="text" id="varlbupdnametext">
+    <button type="button" id='varlbupd'>提交</button>
     <span>result: <span id="varlbresult"></span></span>
   </div>
   <br>
@@ -43,6 +46,12 @@
     delete variable with id: <input type="text" id="varpldeltext">
     <button type="button" id='varpldel'>提交</button>
     <br>
+    update variable with id, name, type: <input type="text" id="varplupdtext">
+    <input type="text" id="varplupdnametext">
+    <select id="datatypeselectupd">
+    </select>
+    <button type="button" id='varplupd'>提交</button>
+    <br>
     <span>result: <span id="varplresult"></span></span>
   </div>
   <br>
@@ -70,6 +79,17 @@
         })
       });
 
+      $("#varlbupd").click(function () {
+        var a = $("#varlbupdtext").val();
+        var b = $("#varlbupdnametext").val();
+        $.post("{% url 'DBAccess' %}", { 'category': "VARLB", 'action': "UPD", 'id': a, 'name':b }, function (ret, status) {
+          $("#varlbresult").text(ret);
+          if (ret == 0) {
+            getVarLib();
+          }
+        })
+      });
+
       $("#varplselect").click(function () {
         var a = $("#varplselecttext").val();
         getVarPool(a);
@@ -89,6 +109,19 @@
         var a = $("#varplselecttext").val();
         var b = $("#varpldeltext").val();
         $.post("{% url 'DBAccess' %}", { 'category': "VARPL", 'action': "DEL", 'fk': a, 'id': b }, function (ret, status) {
+          $("#varplresult").text(ret);
+          if (ret == 0) {
+            getVarPool(a);
+          }
+        })
+      });
+
+      $("#varplupd").click(function () {
+        var a = $("#varplselecttext").val();
+        var b = $("#varplupdtext").val();
+        var c = $("#varplupdnametext").val();
+        var d = $("#datatypeselectupd").val();
+        $.post("{% url 'DBAccess' %}", { 'category': "VARPL", 'action': "UPD", 'fk': a, 'id': b, 'name':c, 'datatype':d }, function (ret, status) {
           $("#varplresult").text(ret);
           if (ret == 0) {
             getVarPool(a);
@@ -147,7 +180,8 @@
         $.get("{% url 'DBAccess' %}", { 'category': "DATATYPE" }, function (ret, status) {
           ret.forEach(function (value, index) {
             var txt1 = $("<option></option>").attr("value", value[0]).text(value[1]);
-            $("#datatypeselect").append(txt1);
+            $('#datatypeselect').append(txt1);
+            $('#datatypeselectupd').append(txt1.clone());
           });
         });
       }

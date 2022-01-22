@@ -33,6 +33,23 @@ def VARLB_Del(id):
         return JsonResponse(repr(e), safe=False)
 
 
+def VARLB_Update(id, name):
+    try:
+        id = sint(id)
+        if id == None:
+            raise RuntimeError(ERRORMSG[1])
+        if not name:
+            raise RuntimeError(ERRORMSG[0])
+        obj = VariableLibrary.objects.filter(pk=id).first()
+        if obj == None:
+            raise RuntimeError(ERRORMSG[2])
+        obj.name = name
+        obj.save()
+        return JsonResponse(0, safe=False)
+    except RuntimeError as e:
+        return JsonResponse(repr(e), safe=False)
+
+
 def VARPL_Add(fkey, name, datatype):
     (fkey, name, datatype) = (sint(fkey), str(name), str(datatype))
     try:
@@ -62,23 +79,51 @@ def VARPL_Add(fkey, name, datatype):
 def VARPL_Del(fkey, id):
     try:
         fkey = sint(fkey)
-        if isinstance(fkey, (int)):
-            varlib = VariableLibrary.objects.filter(pk=fkey).first()
-            if varlib is None:
-                raise RuntimeError(
-                    ERRORMSG[3])
-            id = sint(id)
-            if id == None:
-                raise RuntimeError(ERRORMSG[1])
-            obj = VariablePool.objects.filter(pk=id).first()
-            if obj == None:
-                raise RuntimeError(ERRORMSG[2])
-            if obj.fkey != varlib:
-                raise RuntimeError(ERRORMSG[7])
-            obj.delete()
-            return JsonResponse(0, safe=False)
-        else:
+        if fkey is None:
             raise RuntimeError(ERRORMSG[6])
+        varlib = VariableLibrary.objects.filter(pk=fkey).first()
+        if varlib is None:
+            raise RuntimeError(
+                ERRORMSG[3])
+        id = sint(id)
+        if id is None:
+            raise RuntimeError(ERRORMSG[1])
+        obj = VariablePool.objects.filter(pk=id).first()
+        if obj is None:
+            raise RuntimeError(ERRORMSG[2])
+        if obj.fkey != varlib:
+            raise RuntimeError(ERRORMSG[7])
+        obj.delete()
+        return JsonResponse(0, safe=False)
+    except RuntimeError as e:
+        return JsonResponse(repr(e), safe=False)
+
+
+def VARPL_Update(fkey, id, name, datatype):
+    (fkey, id, name, datatype) = (sint(fkey), sint(id), str(name), str(datatype))
+    try:
+        if fkey is None:
+            raise RuntimeError(ERRORMSG[6])
+        if id is None:
+            raise RuntimeError(ERRORMSG[1])
+        if not name:
+            raise RuntimeError(ERRORMSG[0])
+
+        varlib = VariableLibrary.objects.filter(pk=fkey).first()
+        if varlib is None:
+            raise RuntimeError(
+                ERRORMSG[3])
+        obj = VariablePool.objects.filter(pk=id).first()
+        if obj is None:
+            raise RuntimeError(ERRORMSG[2])
+        if datatype not in static.CATAGORY_DICT.keys():
+            raise RuntimeError(ERRORMSG[4])
+        if obj.fkey != varlib:
+            raise RuntimeError(ERRORMSG[7])
+        obj.name = name
+        obj.datatype = datatype
+        obj.save()
+        return JsonResponse(0, safe=False)
     except RuntimeError as e:
         return JsonResponse(repr(e), safe=False)
 

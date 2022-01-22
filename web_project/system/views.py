@@ -187,14 +187,16 @@ def DBAccess(request):
                 return Setter.VARLB_Add(get("name"))
             elif action == "DEL":
                 return Setter.VARLB_Del(get("id"))
+            elif action == "UPD":
+                return Setter.VARLB_Update(get("id"), get("name"))
 
         if category == "VARPL":
             if action == "ADD":
                 return Setter.VARPL_Add(get("fk"), get("name"), get("datatype"))
             elif action == "DEL":
-                print(request.POST)
                 return Setter.VARPL_Del(get("fk"), get("id"))
-
+            elif action == "UPD":
+                return Setter.VARPL_Update(get("fk"), get("id"), get("name"), get("datatype"))
         if category == "SCB":
             (fkey, rule, weight, score) = (sint(get("fkey")), str(
                 get("rule")), sfloat(get("weight")), sfloat(get("score")))
