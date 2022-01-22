@@ -44,6 +44,7 @@ class Page1 extends React.Component{
     };
 
     Detail = (item) => {
+        //console.log(item)
         axios
           .get(`/SC/${item}/`)
           .then((res) => {
@@ -105,7 +106,7 @@ class Page1 extends React.Component{
                                 <div className="mb-4">
                                     <button
                                         className="btn btn-primary"
-                                        onClick={this.createItem}
+                                        //onClick={this.createItem}
                                     >
                                         Add task
                                     </button>

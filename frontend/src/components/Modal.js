@@ -18,7 +18,7 @@ export default class CustomModal extends Component {
     this.state = {
       activeItem: this.props.activeItem,
     };
-    console.log(this.state.activeItem)
+    //console.log(this.state.activeItem)
   }
 
   handleChange = (e) => {
@@ -38,7 +38,7 @@ export default class CustomModal extends Component {
 
     return (
       <Modal isOpen={true} toggle={toggle}>
-        <ModalHeader toggle={toggle}>System Item</ModalHeader>
+        <ModalHeader toggle={toggle}>Case Score Card View</ModalHeader>
         <ModalBody>
           <Form>
             <FormGroup>
@@ -48,6 +48,7 @@ export default class CustomModal extends Component {
                 id="sc-age"
                 name="age"
                 value={this.state.activeItem.obj["年齡(int)"]}
+                readOnly={true}
                 //onChange={this.handleChange}
                 placeholder="Enter Age"
               />
@@ -59,6 +60,7 @@ export default class CustomModal extends Component {
                 id="sc-gender"
                 name="gender"
                 value={this.state.activeItem.obj["性別(int)"]? "男":"女"}
+                readOnly={true}
                 //onChange={this.handleChange}
                 placeholder="Enter Gender"
               />
@@ -70,6 +72,7 @@ export default class CustomModal extends Component {
                 id="sc-cscore"
                 name="credit score"
                 value={this.state.activeItem.obj["信用分數(float)"]}
+                readOnly={true}
                 //onChange={this.handleChange}
                 placeholder="Enter Credit Score"
               />
@@ -85,6 +88,7 @@ export default class CustomModal extends Component {
                 value={this.state.activeItem.rules.map((x) => {
                   return (`[[Rule${x.Rule}]], [Rule Info] ${x.Ruleinfo}, [weight] ${x.w}, [score] ${x.s}, [weight*score] ${x.wxs}, [satisfy] ${x.satisfy}\n`)
                 })}
+                readOnly={true}
                 //onChange={this.handleChange}
                 placeholder="Enter rules"
               />
@@ -96,6 +100,7 @@ export default class CustomModal extends Component {
                 id="sc-total"
                 name="total"
                 value={this.state.activeItem.total}
+                readOnly={true}
                 //onChange={this.handleChange}
                 placeholder="Enter Total"
               />
