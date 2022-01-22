@@ -258,7 +258,8 @@ class ScoreCard():
     @api_view(['GET'])
     def ScoreCardList(request):
         id = request.data.get('name')
-        #print(request.data.get('name'))
+        #print(id)
+        #print(request.data)
         
         #? if _id is empty return all
         if not id:
@@ -282,6 +283,7 @@ class ScoreCard():
             score, satisfy = engine.run()
             # retract only variabe used in rule
             kmap, vardata = value_transform(engine.info().varmap)
+            #print(vardata)
 
             ruleresult = []
             for i, rule in enumerate(rules):
@@ -310,6 +312,7 @@ class ScoreCard():
             return JsonResponse(context, safe = False)
     
     def ScoreCardView(request, id):
+        #print(id)
         rules = ScoreCardPool.objects.filter(fkey__name=id).all()
 
         varmap = {"1": 1, "2": 1.5, "3": 50}
@@ -323,6 +326,7 @@ class ScoreCard():
         score, satisfy = engine.run()
         # retract only variabe used in rule
         kmap, vardata = value_transform(engine.info().varmap)
+        #print(vardata)
 
         ruleresult = []
         for i, rule in enumerate(rules):

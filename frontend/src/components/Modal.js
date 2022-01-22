@@ -14,17 +14,19 @@ import {
 export default class CustomModal extends Component {
   constructor(props) {
     super(props);
+    //console.log(props)
     this.state = {
       activeItem: this.props.activeItem,
     };
+    console.log(this.state.activeItem)
   }
 
   handleChange = (e) => {
     let { name, value } = e.target;
 
-    if (e.target.type === "checkbox") {
-      value = e.target.checked;
-    }
+    //if (e.target.type === "checkbox") {
+    //  value = e.target.checked;
+    //}
 
     const activeItem = { ...this.state.activeItem, [name]: value };
 
@@ -40,46 +42,72 @@ export default class CustomModal extends Component {
         <ModalBody>
           <Form>
             <FormGroup>
-              <Label for="system-title">Title</Label>
+              <Label for="sc-age">年齡</Label>
               <Input
                 type="text"
-                id="system-title"
-                name="title"
-                value={this.state.activeItem.title}
-                onChange={this.handleChange}
-                placeholder="Enter System Title"
+                id="sc-age"
+                name="age"
+                value={this.state.activeItem.obj["年齡(int)"]}
+                //onChange={this.handleChange}
+                placeholder="Enter Age"
               />
             </FormGroup>
             <FormGroup>
-              <Label for="system-description">Description</Label>
+              <Label for="sc-gender">性別</Label>
               <Input
                 type="text"
-                id="system-description"
-                name="description"
-                value={this.state.activeItem.description}
-                onChange={this.handleChange}
-                placeholder="Enter system description"
+                id="sc-gender"
+                name="gender"
+                value={this.state.activeItem.obj["性別(int)"]? "男":"女"}
+                //onChange={this.handleChange}
+                placeholder="Enter Gender"
               />
             </FormGroup>
-            <FormGroup check>
-              <Label check>
-                <Input
-                  type="checkbox"
-                  name="status"
-                  checked={this.state.activeItem.completed}
-                  onChange={this.handleChange}
-                />
-                Status
-              </Label>
+            <FormGroup>
+              <Label for="sc-cscore">信用分數</Label>
+              <Input
+                type="text"
+                id="sc-cscore"
+                name="credit score"
+                value={this.state.activeItem.obj["信用分數(float)"]}
+                //onChange={this.handleChange}
+                placeholder="Enter Credit Score"
+              />
+            </FormGroup>
+            <FormGroup>
+              <Label for="sc-rules">Rules</Label>
+              <textarea
+                cols="60"
+                rows="20"
+                type="text"
+                id="sc-rules"
+                name="rules"
+                value={this.state.activeItem.rules.map((x) => {
+                  return (`[[Rule${x.Rule}]], [Rule Info] ${x.Ruleinfo}, [weight] ${x.w}, [score] ${x.s}, [weight*score] ${x.wxs}, [satisfy] ${x.satisfy}\n`)
+                })}
+                //onChange={this.handleChange}
+                placeholder="Enter rules"
+              />
+            </FormGroup>
+            <FormGroup>
+              <Label for="sc-total">Total</Label>
+              <Input
+                type="text"
+                id="sc-total"
+                name="total"
+                value={this.state.activeItem.total}
+                //onChange={this.handleChange}
+                placeholder="Enter Total"
+              />
             </FormGroup>
           </Form>
         </ModalBody>
         <ModalFooter>
           <Button
             color="success"
-            onClick={() => onSave(this.state.activeItem)}
+            //onClick={() => onSave(this.state.activeItem)}
           >
-            Save
+            Save (Currently unavailable)
           </Button>
         </ModalFooter>
       </Modal>
