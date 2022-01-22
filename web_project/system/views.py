@@ -171,17 +171,18 @@ def VariableOperation(request):
     return render(request, 'VariableOperation.html')
 
 
-def ScoreBoardOperation(request):
-    return render(request, 'ScoreBoardOperation.html')
+def ScoreCardOperation(request):
+    return render(request, 'ScoreCardOperation.html')
 
 
 @csrf_exempt
 def DBAccess(request):
+    # POST method
     if request.method == "POST":
         get = (lambda x: request.POST.get(x))
         category = get("category")
         action = get("action")
-
+        # variable library
         if category == "VARLB":
             if action == "ADD":
                 return Setter.VARLB_Add(get("name"))
@@ -189,7 +190,7 @@ def DBAccess(request):
                 return Setter.VARLB_Del(get("id"))
             elif action == "UPD":
                 return Setter.VARLB_Update(get("id"), get("name"))
-
+        # variable pool
         if category == "VARPL":
             if action == "ADD":
                 return Setter.VARPL_Add(get("fk"), get("name"), get("datatype"))
@@ -197,24 +198,22 @@ def DBAccess(request):
                 return Setter.VARPL_Del(get("fk"), get("id"))
             elif action == "UPD":
                 return Setter.VARPL_Update(get("fk"), get("id"), get("name"), get("datatype"))
-        if category == "SCB":
-            (fkey, rule, weight, score) = (sint(get("fkey")), str(
-                get("rule")), sfloat(get("weight")), sfloat(get("score")))
-            try:
-                if isinstance(fkey, (int)) and rule and isinstance(weight, (float)) and isinstance(score, (float)):
-                    x = Rule(rule)
-                    (fkey, rule) = (ScoreCardLibrary.objects.filter(
-                        pk=fkey).first(), Rule(rule))
-                    if fkey is None:
-                        raise RuntimeError("fk not exists")
-                    # Setter.SC_SaveRule(fkey, rule.Get(), weight, score)
-                    return JsonResponse("save", safe=False)
-                else:
-                    raise RuntimeError(
-                        "each field must be filled, weight and score must be int or float")
-            except RuntimeError as e:
-                return JsonResponse(repr(e), safe=False)
-
+        # scorecard library
+        if category == "SCLB":
+            if action == "ADD":
+                return Setter.SCLB_Add(get("name"))
+            elif action == "DEL":
+                return Setter.SCLB_Del(get("id"))
+            elif action == "UPD":
+                return Setter.SCLB_Update(get("id"), get("name"))
+        if category == "SCPL":
+            if action == "ADD":
+                return Setter.SCPL_Add(get("fk"), get("rule"), get("weight"), get("score"))
+            elif action == "DEL":
+                return Setter.SCPL_Del(get("fk"), get("id"))
+            elif action == "UPD":
+                return Setter.SCPL_Update(get("fk"), get("id"), get("rule"), get("weight"), get("score"))
+    # Get method
     if request.method == "GET":
         get = (lambda x: request.GET.get(x))
         category = get("category")
@@ -224,11 +223,9 @@ def DBAccess(request):
             return JsonResponse(Getter.VARPL_Read(get("id")), safe=False)
         elif category == "DATATYPE":
             return JsonResponse(Getter.DATATYPE_Read(), safe=False)
-        elif category == "SCBLB":
-            lst = [str(x) for x in ScoreCardLibrary.objects.all()]
-            return JsonResponse("\n".join(lst), safe=False)
-        elif category == "SCBPL":
-            lst = [str(x) for x in ScoreCardPool.objects.all().order_by("-id")]
-            return JsonResponse("\n".join(lst), safe=False)
+        elif category == "SCLB":
+            return JsonResponse(Getter.SCLB_Read(), safe=False)
+        elif category == "SCPL":
+            return JsonResponse(Getter.SCPL_Read(get("id")), safe=False)
 
     return JsonResponse(None, safe=False)

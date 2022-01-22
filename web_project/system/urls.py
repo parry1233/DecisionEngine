@@ -11,7 +11,7 @@ urlpatterns = [
     path("DecisionTree/<id>/",
          views.DecisionTreeView, name="DecisionTreeView"),
     path("VariableOperation/", views.VariableOperation, name="VariableOperation"),
-    path("ScoreBoardOperation/", views.ScoreBoardOperation,
-         name="ScoreBoardOperation"),
+    path("ScoreCardOperation/", views.ScoreCardOperation,
+         name="ScoreCardOperation"),
     path("DBAccess/", views.DBAccess, name="DBAccess"),
 ]

@@ -5,16 +5,17 @@ from system.utility import sint, sfloat
 from system import static
 from system.static import ERRORMSG
 
+# variable library
+
 
 def VARLB_Add(name):
     try:
-        if name:
-            variablelb = VariableLibrary()
-            variablelb.name = name
-            variablelb.save()
-            return JsonResponse(0, safe=False)
-        else:
+        if not name:
             raise RuntimeError(ERRORMSG[0])
+        variablelb = VariableLibrary()
+        variablelb.name = name
+        variablelb.save()
+        return JsonResponse(0, safe=False)
     except RuntimeError as e:
         return JsonResponse(repr(e), safe=False)
 
@@ -22,10 +23,10 @@ def VARLB_Add(name):
 def VARLB_Del(id):
     try:
         id = sint(id)
-        if id == None:
+        if id is None:
             raise RuntimeError(ERRORMSG[1])
         obj = VariableLibrary.objects.filter(pk=id).first()
-        if obj == None:
+        if obj is None:
             raise RuntimeError(ERRORMSG[2])
         obj.delete()
         return JsonResponse(0, safe=False)
@@ -36,18 +37,20 @@ def VARLB_Del(id):
 def VARLB_Update(id, name):
     try:
         id = sint(id)
-        if id == None:
+        if id is None:
             raise RuntimeError(ERRORMSG[1])
         if not name:
             raise RuntimeError(ERRORMSG[0])
         obj = VariableLibrary.objects.filter(pk=id).first()
-        if obj == None:
+        if obj is None:
             raise RuntimeError(ERRORMSG[2])
         obj.name = name
         obj.save()
         return JsonResponse(0, safe=False)
     except RuntimeError as e:
         return JsonResponse(repr(e), safe=False)
+
+# variable pool
 
 
 def VARPL_Add(fkey, name, datatype):
@@ -127,11 +130,132 @@ def VARPL_Update(fkey, id, name, datatype):
     except RuntimeError as e:
         return JsonResponse(repr(e), safe=False)
 
+# score card
 
-def SC_SaveRule(fkey, rule, weight, score):
-    scoreboard = ScoreCardPool()
-    scoreboard.fkey = fkey
-    scoreboard.rule = rule
-    scoreboard.weight = weight
-    scoreboard.score = score
-    scoreboard.save()
+
+def SCLB_Add(name):
+    try:
+        if not name:
+            raise RuntimeError(ERRORMSG[0])
+        lb = ScoreCardLibrary()
+        lb.name = name
+        lb.save()
+        return JsonResponse(0, safe=False)
+    except RuntimeError as e:
+        return JsonResponse(repr(e), safe=False)
+
+
+def SCLB_Del(id):
+    try:
+        id = sint(id)
+        if id is None:
+            raise RuntimeError(ERRORMSG[1])
+        obj = ScoreCardLibrary.objects.filter(pk=id).first()
+        if obj is None:
+            raise RuntimeError(ERRORMSG[2])
+        obj.delete()
+        return JsonResponse(0, safe=False)
+    except RuntimeError as e:
+        return JsonResponse(repr(e), safe=False)
+
+
+def SCLB_Update(id, name):
+    try:
+        id = sint(id)
+        if id is None:
+            raise RuntimeError(ERRORMSG[1])
+        if not name:
+            raise RuntimeError(ERRORMSG[0])
+        obj = ScoreCardLibrary.objects.filter(pk=id).first()
+        if obj is None:
+            raise RuntimeError(ERRORMSG[2])
+        obj.name = name
+        obj.save()
+        return JsonResponse(0, safe=False)
+    except RuntimeError as e:
+        return JsonResponse(repr(e), safe=False)
+
+# scorecard pool
+
+
+def SCPL_Add(fkey, rule, weight, score):
+    (fkey, weight, score) = (sint(fkey), sfloat(weight), sfloat(score))
+    try:
+        if fkey is None:
+            raise RuntimeError(ERRORMSG[6])
+        if weight is None:
+            raise RuntimeError(ERRORMSG[8])
+        if score is None:
+            raise RuntimeError(ERRORMSG[9])
+
+        lib = ScoreCardLibrary.objects.filter(pk=fkey).first()
+        if lib is None:
+            raise RuntimeError(
+                ERRORMSG[3])
+        r = Rule(rule)
+        pool = ScoreCardPool()
+        pool.fkey = lib
+        pool.rule = r.Get()
+        pool.weight = weight
+        pool.score = score
+        pool.save()
+        return JsonResponse(0, safe=False)
+
+    except RuntimeError as e:
+        return JsonResponse(repr(e), safe=False)
+
+
+def SCPL_Del(fkey, id):
+    try:
+        fkey = sint(fkey)
+        if fkey is None:
+            raise RuntimeError(ERRORMSG[6])
+        varlib = ScoreCardLibrary.objects.filter(pk=fkey).first()
+        if varlib is None:
+            raise RuntimeError(
+                ERRORMSG[3])
+        id = sint(id)
+        if id is None:
+            raise RuntimeError(ERRORMSG[1])
+        obj = ScoreCardPool.objects.filter(pk=id).first()
+        if obj is None:
+            raise RuntimeError(ERRORMSG[2])
+        if obj.fkey != varlib:
+            raise RuntimeError(ERRORMSG[7])
+        obj.delete()
+        return JsonResponse(0, safe=False)
+    except RuntimeError as e:
+        return JsonResponse(repr(e), safe=False)
+
+
+def SCPL_Update(fkey, id, rule, weight, score):
+    (fkey, id, weight, score) = (sint(fkey),
+                                 sint(id), sfloat(weight), sfloat(score))
+    try:
+        if fkey is None:
+            raise RuntimeError(ERRORMSG[6])
+        if id is None:
+            raise RuntimeError(ERRORMSG[1])
+        if weight is None:
+            raise RuntimeError(ERRORMSG[8])
+        if score is None:
+            raise RuntimeError(ERRORMSG[9])
+
+        lib = ScoreCardLibrary.objects.filter(pk=fkey).first()
+        if lib is None:
+            raise RuntimeError(
+                ERRORMSG[3])
+        obj = ScoreCardPool.objects.filter(pk=id).first()
+        if obj is None:
+            raise RuntimeError(ERRORMSG[2])
+        if obj.fkey != lib:
+            raise RuntimeError(ERRORMSG[7])
+        r = Rule(rule)
+        obj.rule = r.Get()
+        obj.weight = weight
+        obj.score = score
+        obj.save()
+        return JsonResponse(0, safe=False)
+
+    except RuntimeError as e:
+        return JsonResponse(repr(e), safe=False)
