@@ -46,7 +46,18 @@ class Page1 extends React.Component{
     Detail = (item) => {
         //console.log(item)
         axios
-          .get(`/SC/${item}/`)
+          .post(`/SC/`,
+          {
+              //here is body(data)
+              'action':'get',
+              'name':item
+          },
+          {
+              headers:{
+                  //here is headers for token and cookies
+                  'token':'try4sdgsdsafsd232a84sd'
+              }
+          })
           .then((res) => {
               //console.log(res.data["names"])
               //console.log(res.data)
