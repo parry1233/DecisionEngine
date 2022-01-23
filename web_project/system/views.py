@@ -255,61 +255,70 @@ class DTPool(GenericAPIView):
 
 class ScoreCard():
     
-    @api_view(['GET'])
+    @api_view(['GET','POST'])
     def ScoreCardList(request):
-        id = request.data.get('name')
-        #print(id)
-        #print(request.data)
-        
-        #? if _id is empty return all
-        if not id:
+        #print(request.headers.get('token'))
+        if request.method == 'GET':
             rules = ScoreCardLibrary.objects.all()
             names = []
             for rule in rules:
                 names.append(rule.name)
             context = {'names' : names}
             return JsonResponse(context, safe = False)
-        else:
-            rules = ScoreCardPool.objects.filter(fkey__name=id).all()
+        elif request.method == 'POST' and request.data.get('action') == 'get':
+            id = request.data.get('name')
+            #print(id)
+            #print(request.data)
+        
+            #? if _id is empty return all
+            if not id:
+                rules = ScoreCardLibrary.objects.all()
+                names = []
+                for rule in rules:
+                    names.append(rule.name)
+                context = {'names' : names}
+                return JsonResponse(context, safe = False)
+            else:
+                rules = ScoreCardPool.objects.filter(fkey__name=id).all()
 
-            varmap = {"1": 1, "2": 1.5, "3": 50}
-            varmap, _ = value_transform(varmap)
+                varmap = {"1": 1, "2": 1.5, "3": 50}
+                varmap, _ = value_transform(varmap)
 
-            engine = SCEngine.SCE()
-            rulelist = [(Rule(rule.rule), rule.score * rule.weight)
-                        for rule in rules]
-            engine.defrule(rulelist)
-            engine.assign(varmap)
-            score, satisfy = engine.run()
-            # retract only variabe used in rule
-            kmap, vardata = value_transform(engine.info().varmap)
-            #print(vardata)
+                engine = SCEngine.SCE()
+                rulelist = [(Rule(rule.rule), rule.score * rule.weight)
+                            for rule in rules]
+                engine.defrule(rulelist)
+                engine.assign(varmap)
+                score, satisfy = engine.run()
+                # retract only variabe used in rule
+                kmap, vardata = value_transform(engine.info().varmap)
+                #print(vardata)
 
-            ruleresult = []
-            for i, rule in enumerate(rules):
-                line = {}
-                line["Rule"] = i
-                line["Ruleinfo"] = f"{Rule(rule.rule).ToString():<50}"
-                line["w"] = rule.weight
-                line["s"] = rule.score
-                line["wxs"] = rule.score*rule.weight
-                line["satisfy"] = "pass" if satisfy[i] else "fire"
-                ruleresult.append(line)
+                ruleresult = []
+                for i, rule in enumerate(rules):
+                    line = {}
+                    line["Rule"] = i
+                    line["Ruleinfo"] = f"{Rule(rule.rule).ToString():<50}"
+                    line["w"] = rule.weight
+                    line["s"] = rule.score
+                    line["wxs"] = rule.score*rule.weight
+                    line["satisfy"] = "pass" if satisfy[i] else "fire"
+                    ruleresult.append(line)
 
-            SCid = ScoreCardLibrary.objects.all()
-            scid_list = {i: rule.name for i, rule in enumerate(SCid)}
-            lib = DecisionTreeLibrary.objects.all()
-            dtid_list = {i: rule.name for i, rule in enumerate(lib)}
+                SCid = ScoreCardLibrary.objects.all()
+                scid_list = {i: rule.name for i, rule in enumerate(SCid)}
+                lib = DecisionTreeLibrary.objects.all()
+                dtid_list = {i: rule.name for i, rule in enumerate(lib)}
 
-            context = {
-                'obj': vardata,
-                'rules': ruleresult,
-                'total': score,
-                "scid": scid_list,
-                "dtid": dtid_list
-            }
+                context = {
+                    'obj': vardata,
+                    'rules': ruleresult,
+                    'total': score,
+                    "scid": scid_list,
+                    "dtid": dtid_list
+                }
 
-            return JsonResponse(context, safe = False)
+                return JsonResponse(context, safe = False)
     
     def ScoreCardView(request, id):
         #print(id)
