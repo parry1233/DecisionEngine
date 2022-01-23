@@ -1,0 +1,222 @@
+.header {
+    background-color: #c9ddfa;
+    padding: 30px;
+    text-align: center;
+    font-size: 40px;
+    height: fit-content;
+}
+
+div.menu-bar {
+    position: relative;
+    margin: 0;
+    padding: 0;
+    /* menu header width and height */
+    height: 30px;
+    width: 100%;
+}
+
+
+/* horizontal menu */
+
+div.menu-bar ul {
+    margin: 0;
+    padding: 0;
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    list-style-type: none;
+    background-color: SteelBlue;
+    overflow: visible;
+}
+
+div.menu-bar ul li {
+    display: block;
+    float: left;
+    height: auto;
+    /* menu header's items width */
+    width: 120px;
+}
+
+div.menu-bar li>span,
+div.menu-bar li>a,
+div.menu-bar li>a:link,
+div.menu-bar li>a:visited,
+div.menu-bar li>a:active {
+    display: block;
+    padding: 0 0 0 10px;
+    height: 100%;
+    width: 109px;
+    border-right: 1px #ffffff solid;
+    line-height: 30px;
+    font-family: times, serif;
+    font-size: 17px;
+    font-style: italic;
+    text-decoration: none;
+    background-color: SteelBlue;
+    color: #ffffff;
+    cursor: pointer;
+}
+
+div.menu-bar li:hover>span,
+div.menu-bar li:hover>a {
+    color: #04ff75;
+    background-color: SteelBlue;
+}
+
+
+/* vertical sub-menus */
+
+div.menu-bar ul ul {
+    margin-top: 2px;
+    display: none;
+    position: static;
+    height: auto;
+    /* vertical-menus width */
+    width: 160px;
+    border: 1px #666666 solid;
+    background-color: #dddddd;
+}
+
+div.menu-bar li:hover>ul {
+    display: block;
+}
+
+div.menu-bar ul ul li {
+    position: relative;
+    float: none;
+    display: block;
+    height: 28px;
+    width: 100%;
+    border: none;
+}
+
+div.menu-bar ul ul li>span,
+div.menu-bar ul ul li>a,
+div.menu-bar ul ul li>a:link,
+div.menu-bar ul ul li>a:visited,
+div.menu-bar ul ul li>a:active {
+    height: 100%;
+    width: 96%;
+    padding: 0 0 0 4%;
+    line-height: 28px;
+    background-color: transparent;
+    border: none;
+    color: #000000;
+    font-family: georgia, serif;
+    font-size: 15px;
+    font-style: normal;
+}
+
+div.menu-bar ul ul li:hover>span,
+div.menu-bar ul ul li:hover>a {
+    background-color: #cccccc;
+    color: #ff0000;
+}
+
+
+/* vertical sub-sub-menus */
+
+div.menu-bar ul ul ul {
+    /* sub-sub-menu position is relative to its parent */
+    position: absolute;
+    top: 4px;
+    left: 155px;
+    margin: 0;
+}
+
+
+/* an arrow on the right side of menu's folders */
+
+span.menu-nav:after,
+a.menu-nav:after {
+    content: "\00BB";
+    float: right;
+    margin-right: 8px;
+}
+
+.content {
+    text-align: center;
+}
+
+table {
+    overflow-x: auto;
+    border: 2px;
+    margin-left: 20%;
+    margin-right: 20%;
+    width: auto;
+    border-collapse: collapse;
+    border: 1px solid black;
+}
+
+tr td {
+    border: 1px solid black;
+    padding: 1px;
+}
+
+th {
+    border: 1px solid black;
+}
+
+tr:hover {
+    background-color: rgb(219, 238, 150);
+}
+
+.content.left {
+    display: flex;
+}
+
+.content.left.var {
+    margin-left: 25%;
+    flex: 1;
+}
+
+.content.left.score {
+    margin-right: 25%;
+    flex: 1;
+}
+
+hr {
+    margin: 0;
+}
+
+.jsmind li {
+    margin-top: 2px;
+    margin-bottom: 2px;
+}
+
+.jsmind button {
+    width: 140px;
+}
+
+.jsmind select {
+    width: 140px;
+}
+
+#layout {
+    width: 1230px;
+    height: 800px
+}
+
+#jsmind_nav {
+    width: 1230px;
+    height: 200px;
+    border: solid 1px #ccc;
+    overflow: auto;
+    float: left;
+}
+
+.file_input {
+    width: 100px;
+}
+
+.jsmind button.sub {
+    width: 100px;
+}
+
+#jsmind_container {
+    float: left;
+    width: 1000px;
+    height: 600px;
+    border: solid 1px #ccc;
+    background: #f4f4f4;
+}

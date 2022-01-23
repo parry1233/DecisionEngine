@@ -12,4 +12,5 @@ urlpatterns = [
          views.DecisionTreeView, name="DecisionTreeView"),
     path("ScoreBoardOperation/", views.ScoreBoardOperation, name="ajax_example"),
     path("DBAccess/", views.DBAccess, name="DBAccess"),
+    path("DecisionTreeCreate/", views.DecisionTreeCreate, name='DecisionTreeCreate'),
 ]

@@ -1,0 +1,206 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta name="viewport" content="width=device-width" />
+    <title>Decision Tree Create</title>
+    <link type="text/css" rel="stylesheet" href="{% static 'jsmind/style/jsmind.css' %}" />
+    <link rel="stylesheet" href="{% static 'DTexample2.css' %}" />
+
+</head>
+
+<body>
+    <div class="header">
+        <h2>Business Enginess - Decision Tree method</h2>
+        <hr/>
+    </div>
+    <div class="menu-bar">
+        <ul>
+            <li>
+                <a href="{% url 'home' %}">Home</a>
+            </li>
+            <li>
+                <a>Score Card</a>
+                <ul>
+                    {% for i,v in scid.items %}
+                    <li><a href="{% url 'ScoreCardView' id=v  %}">case {{i}}</a> </li>
+                    {% endfor %}
+                </ul>
+            </li>
+            <li>
+                <a>Decision Tree</a>
+                <ul>
+                    {% for i,v in dtid.items %}
+                    <li><a href="{% url 'DecisionTreeView' id=v  %}">case {{i}}</a> </li>
+                    {% endfor %}
+                </ul>
+            </li>
+        </ul>
+    </div>
+    <div class="content" style="background-image: url({% static 'ncku-logo2.jpg' %});background-size:contain ; background-position:center;background-repeat: no-repeat;  ">
+
+        <div class="content left">
+
+
+            <div class="content left var">
+                <h3><b>Input value</b></h3>
+                <br/>
+                <table>
+
+                    {% for k,v in var_list.items %}
+                    <tr>
+                        <td>{{k}}</td>
+                        <td>{{v}}</td>
+                    </tr>
+                    {% endfor %}
+
+                </table>
+
+                <hr/>
+
+            </div>
+
+        </div>
+
+        <div class="content left score">
+
+            <h3><b>Class</b></h3>
+            <br/>
+            <table style="border: 0px;margin-left: 0%;">
+                <tr style="border: 0px;">
+                    <td style="border: 0px;"><b>log :</b></td>
+                    <td style="border: 0px;">{{log}}</td>
+                </tr>
+            </table>
+
+        </div>
+
+
+    </div>
+
+    <div id="layout">
+        <div id="jsmind_nav">
+            <div>1. Open</div>
+            <ol type='A'>
+                <li class="jsmind"><button onclick="open_json();" class="jsmind">open example</button></li>
+                <li class="jsmind"><button onclick="open_ajax();" class="jsmind">open remote</button></li>
+                <li class="jsmind"><button onclick="prompt_info('see 6.Multi Format');" class="jsmind">open local file</button></li>
+                <li class="jsmind"><button onclick="prompt_info('see 6.Multi Format');" class="jsmind">save local file</button></li>
+                <li class="jsmind"><button onclick="screen_shot();" class="jsmind">screenshot</button></li>
+            </ol>
+            </ol>
+            <div>2. Select &amp; Toggle</div>
+            <ol type='A'>
+                <li class="jsmind"><button onclick="select_node();" class="jsmind">select a node</button></li>
+                <li class="jsmind"><button onclick="prompt_info('please try click a node');" class="jsmind">try click a node</button></li>
+                <li class="jsmind"><button onclick="show_selected();" class="jsmind">get the selected</button></li>
+            </ol>
+            <div>3. Edit</div>
+            <ol type='A'>
+                <li class="jsmind"><button onclick="toggle_editable(this);" class="jsmind">disable editable</button></li>
+                <li class="jsmind"><button onclick="add_node();" class="jsmind">add a node</button></li>
+                <li><button onclick="add_image_node();" class="jsmind">add a image node</button></li>
+                <li class="jsmind"><button onclick="modify_node();" class="jsmind">modify node</button></li>
+                <li class="jsmind"><button onclick="prompt_info('please try double click a node');" class="jsmind">try double click</button></li>
+                <li class="jsmind"><button onclick="move_node();" class="jsmind">move a node</button></li>
+                <li class="jsmind"><button onclick="move_to_first();" class="jsmind">move to first</button></li>
+                <li class="jsmind"><button onclick="move_to_last();" class="jsmind">move to last</button></li>
+                <li class="jsmind"><button onclick="remove_node();" class="jsmind">remove node</button></li>
+            </ol>
+            <div>4. Style</div>
+            <ol type='A'>
+                <li class="jsmind"><button onclick="change_text_font();" class="jsmind">change font</button></li>
+                <li class="jsmind"><button onclick="change_text_color();" class="jsmind">change color</button></li>
+                <li class="jsmind"><button onclick="change_background_color();" class="jsmind">change bg-color</button></li>
+                <li class="jsmind"><button onclick="change_background_image();" class="jsmind">change background</button></li>
+            </ol>
+            <div>5. Theme</div>
+            <ol type='A'>
+                <li class="jsmind">
+                    <select onchange="set_theme(this.value);" class="jsmind">
+                <option value="" class="jsmind">default</option>
+                <option value="primary" class="jsmind">primary</option>
+                <option value="warning" class="jsmind">warning</option>
+                <option value="danger" class="jsmind">danger</option>
+                <option value="success" class="jsmind">success</option>
+                <option value="info" class="jsmind">info</option>
+                <option value="greensea" selected="selected" class="jsmind">greensea</option>
+                <option value="nephrite" class="jsmind">nephrite</option>
+                <option value="belizehole" class="jsmind">belizehole</option>
+                <option value="wisteria" class="jsmind">wisteria</option>
+                <option value="asphalt" class="jsmind">asphalt</option>
+                <option value="orange" class="jsmind">orange</option>
+                <option value="pumpkin" class="jsmind">pumpkin</option>
+                <option value="pomegranate" class="jsmind">pomegranate</option>
+                <option value="clouds" class="jsmind">clouds</option>
+                <option value="asbestos" class="jsmind">asbestos</option>
+            </select>
+                </li>
+            </ol>
+            <div>6. Adjusting</div>
+            <ol type='A'>
+                <li class="jsmind"><button onclick="change_container();" class="jsmind">resize container</button>
+                    <button onclick="resize_jsmind();" class="jsmind">adusting</button></li>
+                <li>expand/collapse</li>
+                <ol>
+                    <li class="jsmind"><button class="sub jsmind" onclick="expand();">expand node</button></li>
+                    <li class="jsmind"><button class="sub jsmind" onclick="collapse();">collapse node</button></li>
+                    <li class="jsmind"> <button class="sub jsmind" onclick="toggle();">toggle node</button></li>
+                    <li class="jsmind"><button class="sub jsmind" onclick="expand_to_level2();">expand to level 2</button></li>
+                    <li class="jsmind"><button class="sub jsmind" onclick="expand_to_level3();">expand to level 3</button></li>
+                    <li class="jsmind"><button class="sub jsmind" onclick="expand_all();">expand all</button></li>
+                    <li class="jsmind"><button class="sub jsmind" onclick="collapse_all();">collapse all</button></li>
+                </ol>
+                <li>zoom</li>
+
+                <button id="zoom-in-button" style="width:50px" onclick="zoomIn();" class="jsmind">
+                    In
+                </button>
+                <button id="zoom-out-button" style="width:50px" onclick="zoomOut();" class="jsmind">
+                    Out
+                </button>
+            </ol>
+
+            <div>7. Multi Format</div>
+            <ol type='A'>
+                <li class="jsmind">node_tree(default)</li>
+                <ol>
+                    <li class="jsmind"><button class="sub" onclick="show_data();">show data</button></li>
+                    <li class="jsmind"><button class="sub" onclick="save_file();">save file</button></li>
+                    <li class="jsmind"><input id="file_input" class="file_input" type="file" /></li>
+                    <li class="jsmind"><button class="sub" onclick="open_file();">open file</button></li>
+                </ol>
+                <li class="jsmind">node_array</li>
+                <ol>
+                    <li class="jsmind"><button class="sub jsmind" onclick="get_nodearray_data();">show data</button></li>
+                    <li class="jsmind"><button class="sub jsmind" onclick="save_nodearray_file();">save file</button></li>
+                    <li class="jsmind"><input id="file_input_nodearray" class="file_input" type="file" /></li>
+                    <li class="jsmind"><button class="sub jsmind" onclick="open_nodearray();">open file</button></li>
+                </ol>
+                <li class="jsmind">freemind(.mm)</li>
+                <ol>
+                    <li class="jsmind"><button class="sub jsmind" onclick="get_freemind_data();">show data</button></li>
+                    <li class="jsmind"><button class="sub jsmind" onclick="save_freemind_file();">save file</button></li>
+                    <li class="jsmind"><input id="file_input_freemind" class="file_input" type="file" /></li>
+                    <li class="jsmind"><button class="sub jsmind" onclick="open_freemind();">open file</button></li>
+                </ol>
+            </ol>
+        </div>
+        <div id="jsmind_container"></div>
+        <div style="display:none">
+            <input class="file" type="file" id="image-chooser" accept="image/*" />
+        </div>
+
+    </div>
+</body>
+
+
+<script type="text/javascript" src="{% static 'jsmind/js/jsmind.js' %}"></script>
+<script type="text/javascript" src="{% static 'jsmind/js/jsmind.draggable.js' %}"></script>
+<script type="text/javascript" src="{% static 'jsmind/js/jsmind.screenshot.js' %}"></script>
+<script type="text/javascript" src="{% static 'jsmind/js/jsmindCerate.js' %}"></script>
+
+</html>

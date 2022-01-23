@@ -168,7 +168,8 @@ def DecisionTreeView(request, id):
 
 def ScoreBoardOperation(request):
     return render(request, 'ScoreBoardOperation.html')
-
+def DecisionTreeCreate(request):
+    return render(request, 'DecisionTreeCreate.html')
 
 @csrf_exempt
 def DBAccess(request):
