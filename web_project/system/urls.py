@@ -2,6 +2,16 @@ from django.urls import path, include
 
 from . import views
 from system.DBAccess import Setter
+from rest_framework.routers import DefaultRouter
+from django.conf.urls import include
+
+router = DefaultRouter()
+router.register(r'VariableLibrary', views.VariableLibViewSet)
+router.register(r'VariablePool', views.VariablePoolViewSet)
+router.register(r'ScoreCardLibrary', views.ScoreCardLibViewSet)
+router.register(r'ScoreCardPool', views.ScoreCardPoolViewSet)
+router.register(r'DecisionTreeLibrary', views.DecisionTreeLibViewSet)
+router.register(r'DecisionTreePool', views.DecisionTreePoolViewSet)
 
 from rest_framework import routers
 USERrouter = routers.DefaultRouter()
@@ -16,12 +26,6 @@ urlpatterns = [
     path("DecisionTree/", views.DecisionTreeList, name='DecisionTreeList'),
     path("DecisionTree/<id>/",
          views.DecisionTreeView, name="DecisionTreeView"),
-    path("ScoreBoardOperation/", views.ScoreBoardOperation, name="ajax_example"),
-    path("DBAccess/", views.DBAccess, name="DBAccess"),
-    path('Account/',include(USERrouter.urls)),
-    path('Decision/',views.DTPool.as_view()),
-    path('SC/',views.ScoreCard.ScoreCardList),
-    path('SC/<id>/',views.ScoreCard.ScoreCardView),
-    path('DT/',views.DecisionTree.DecisionTreeList),
-    path('DT/<id>/',views.DecisionTree.DecisionTreeView),
+    path("staticdt/<category>/", views.StaticData, name="StaticData"),
+    path("api/", include(router.urls)),
 ]

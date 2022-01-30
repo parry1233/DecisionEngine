@@ -1,0 +1,35 @@
+@host = http://127.0.0.1:8000/api
+
+GET {{host}}/ScoreCardPool/
+
+###
+
+GET {{host}}/ScoreCardPool/link/1
+
+###
+
+POST {{host}}/ScoreCardPool/
+Content-Type: application/json
+
+{
+    "fk":2,
+    "rule":"[{\"variable\": \"11\", \"operator\": \"e\", \"value\": 0}]",
+    "weight":"1",
+    "score":"1"
+}
+
+###
+
+PUT {{host}}/ScoreCardPool/59/
+Content-Type: application/json
+
+{
+    "fk":2,
+    "rule":"[{\"variable\": \"1\", \"operator\": \"e\", \"value\": 0}]",
+    "weight":"1.6",
+    "score":"0.8"
+}
+
+###
+
+DELETE  {{host}}/ScoreCardPool/57/

@@ -1,0 +1,25 @@
+@host = http://127.0.0.1:8000/api
+
+GET {{host}}/VariableLibrary/
+
+###
+
+POST {{host}}/VariableLibrary/
+Content-Type: application/json
+
+{
+    "name":"new vlib"
+}
+
+###
+
+PUT {{host}}/VariableLibrary/19/
+Content-Type: application/json
+
+{
+    "name":"sdf"
+}
+
+###
+
+DELETE  {{host}}/VariableLibrary/19/

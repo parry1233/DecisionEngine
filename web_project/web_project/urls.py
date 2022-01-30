@@ -16,14 +16,6 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from django.conf.urls import include
-from django.views.generic import RedirectView
-from system import views
-from rest_framework import routers
-
-#DTProuter = routers.DefaultRouter()
-#DTProuter.register(r'DTPs',views.DecisionTreeView,'DTP')
-#UserRouter = routers.DefaultRouter()
-#UserRouter.register(r'users',views.UserView,'user')
 
 urlpatterns = [
     path('admin/', admin.site.urls),

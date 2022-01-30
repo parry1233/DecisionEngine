@@ -1,0 +1,25 @@
+@host = http://127.0.0.1:8000/api
+
+GET {{host}}/ScoreCardLibrary/
+
+###
+
+POST {{host}}/ScoreCardLibrary/
+Content-Type: application/json
+
+{
+    "name":"test"
+}
+
+###
+
+PUT {{host}}/ScoreCardLibrary/10/
+Content-Type: application/json
+
+{
+    "name":"sssss"
+}
+
+###
+
+DELETE  {{host}}/ScoreCardLibrary/9/

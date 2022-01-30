@@ -10,15 +10,19 @@ class URule:
         self.variable = var
         self.datatype = ""
         self.operator = opt
+        if self.operator not in static.OPERATOR_DICT:
+            raise RuntimeError(static.ERRORMSG[10])
         self.value = val
         self.name = ""
-        obj = VariablePool.objects.filter(pk=self.variable)
-        if obj.exists:
-            self.name = obj.first().name
+        obj = VariablePool.objects.filter(pk=self.variable).first()
+        if obj is not None:
+            self.name = obj.name
             value_cast = {'b': lambda x: bool(x) == True,
                           'F': lambda x: float(x), 'I': lambda x: float(x)}
-            self.datatype = obj.first().datatype
+            self.datatype = obj.datatype
             self.value = value_cast[self.datatype](self.value)
+        else:
+            raise RuntimeError(static.ERRORMSG[2])
 
     def ID(self):
         return f"r{self.variable}"
@@ -51,8 +55,12 @@ class URule:
             value_cast = {'b': lambda x: str(x).lower() in ("true", "1"),
                           'F': lambda x: float(x), 'I': lambda x: float(x)}
             rvalue = value_cast[self.datatype](self.value)
-            # if self.operator
-            return f"{self.name} {static.OPERATOR_DICT[self.operator]} {str(rvalue)}"
+            opera = ""
+            if self.operator not in static.OPERATOR_DICT:
+                opera = "?"
+            else:
+                opera = static.OPERATOR_DICT[self.operator]
+            return f"{self.name} {opera} {str(rvalue)}"
         else:
             return "miss variable"
 
@@ -60,14 +68,16 @@ class URule:
 class Rule:
     def __init__(self, lst=None):
         self.rlist = []
-        if(lst is not None):
+        if lst is not None:
             try:
                 lst = json.loads(lst)
                 for x in lst:
                     self.Add(URule(x["variable"], x["operator"],
-                             x["value"]))
-            except:
+                                   x["value"]))
+            except json.decoder.JSONDecodeError:
                 raise RuntimeError("wrong rule format")
+            except RuntimeError as e:
+                raise RuntimeError(str(e))
 
     def Add(self, urule):
         self.rlist.append(urule)
@@ -103,6 +113,12 @@ class Rule:
             return f"(and {ce})"
         else:
             return f"{self.rlist[0].Prefix()}"
+
+    def Partial(self, lst):
+        return [{key: vars(r)[key] for key in lst} for r in self.rlist]
+
+    def PartialDump(self, lst):
+        return json.dumps(self.Partial(lst), separators=(',', ':'), default=vars)
 
 
 class VariableLibrary(models.Model):

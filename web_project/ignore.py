@@ -207,4 +207,5 @@ template.assert_fact(name="r4", value=True)
 # a.difference(set(1))
 # print(a)
 
-iteration = env.run()
+# iteration = env.run()
+print(bool(""))

@@ -13,7 +13,6 @@ toml = "==0.10.2"
 Django = "==3.2.9"
 clipspy = "*"
 djangorestframework = "*"
-django-cors-headers = "*"
 
 [dev-packages]
 
