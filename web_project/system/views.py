@@ -20,7 +20,7 @@ from rest_framework.generics import GenericAPIView
 from rest_framework import viewsets
 from rest_framework.decorators import api_view
 
-from system.serializers import UserSerializer, DTPSerializer
+#from system.serializers import UserSerializer, DTPSerializer
 from system.models import User
 
 def value_transform(kmap):

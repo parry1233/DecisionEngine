@@ -15,7 +15,7 @@ router.register(r'DecisionTreePool', views.DecisionTreePoolViewSet)
 
 from rest_framework import routers
 USERrouter = routers.DefaultRouter()
-USERrouter.register(r'users',views.UserView,'user')
+#USERrouter.register(r'users',views.UserView,'user')
 #DTProuter = routers.DefaultRouter()
 #DTProuter.register(r'dtps',views.DTPView,'dtp')
 
