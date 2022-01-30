@@ -1,4 +1,5 @@
-from unicodedata import category
+
+from rest_framework.decorators import action
 from django.http import JsonResponse
 from django.shortcuts import render
 from django.http import HttpResponse
@@ -9,7 +10,9 @@ from .models import Rule, URule, ScoreCardLibrary, ScoreCardPool, VariableLibrar
 import json
 from system.InferenceEngine import SCEngine, DTEngine
 from system.DBAccess import Setter, Getter
-from .utility import sint, sfloat
+from . import serializers
+from rest_framework import viewsets
+from rest_framework.decorators import action
 
 
 def value_transform(kmap):
@@ -166,66 +169,74 @@ def DecisionTreeView(request, id):
     }
     return render(request, 'DecisionTree.html', context=context)
 
-
-def VariableOperation(request):
-    return render(request, 'VariableOperation.html')
-
-
-def ScoreCardOperation(request):
-    return render(request, 'ScoreCardOperation.html')
-
-
 @csrf_exempt
-def DBAccess(request):
-    # POST method
-    if request.method == "POST":
-        get = (lambda x: request.POST.get(x))
-        category = get("category")
-        action = get("action")
-        # variable library
-        if category == "VARLB":
-            if action == "ADD":
-                return Setter.VARLB_Add(get("name"))
-            elif action == "DEL":
-                return Setter.VARLB_Del(get("id"))
-            elif action == "UPD":
-                return Setter.VARLB_Update(get("id"), get("name"))
-        # variable pool
-        if category == "VARPL":
-            if action == "ADD":
-                return Setter.VARPL_Add(get("fk"), get("name"), get("datatype"))
-            elif action == "DEL":
-                return Setter.VARPL_Del(get("fk"), get("id"))
-            elif action == "UPD":
-                return Setter.VARPL_Update(get("fk"), get("id"), get("name"), get("datatype"))
-        # scorecard library
-        if category == "SCLB":
-            if action == "ADD":
-                return Setter.SCLB_Add(get("name"))
-            elif action == "DEL":
-                return Setter.SCLB_Del(get("id"))
-            elif action == "UPD":
-                return Setter.SCLB_Update(get("id"), get("name"))
-        if category == "SCPL":
-            if action == "ADD":
-                return Setter.SCPL_Add(get("fk"), get("rule"), get("weight"), get("score"))
-            elif action == "DEL":
-                return Setter.SCPL_Del(get("fk"), get("id"))
-            elif action == "UPD":
-                return Setter.SCPL_Update(get("fk"), get("id"), get("rule"), get("weight"), get("score"))
-    # Get method
-    if request.method == "GET":
-        get = (lambda x: request.GET.get(x))
-        category = get("category")
-        if category == "VARLB":
-            return JsonResponse(Getter.VARLB_Read(), safe=False)
-        elif category == "VARPL":
-            return JsonResponse(Getter.VARPL_Read(get("id")), safe=False)
-        elif category == "DATATYPE":
-            return JsonResponse(Getter.DATATYPE_Read(), safe=False)
-        elif category == "SCLB":
-            return JsonResponse(Getter.SCLB_Read(), safe=False)
-        elif category == "SCPL":
-            return JsonResponse(Getter.SCPL_Read(get("id")), safe=False)
+def StaticData(request, category):
+    if category == "datatype":
+        return JsonResponse(Getter.DATATYPE_Read(), safe=False)
+    return JsonResponse(0, safe=False)
 
-    return JsonResponse(None, safe=False)
+
+class VariableLibViewSet(viewsets.ModelViewSet):
+    queryset = VariableLibrary.objects.all()
+    serializer_class = serializers.VariableLibrarySerializer
+
+
+class VariablePoolViewSet(viewsets.ModelViewSet):
+    queryset = VariablePool.objects.all()
+    serializer_class = serializers.VariablePoolSerializer
+
+    @action(methods=['get'], detail=False, url_path='link/(?P<fk>\d+)')
+    def getListFromFk(self, request, fk):
+        serializer = serializers.VariablePoolSerializer(
+            VariablePool.objects.filter(fkey__id=fk).all(), many=True)
+        return JsonResponse(serializer.data, safe=False, json_dumps_params={"ensure_ascii": False})
+
+    def create(self, validated_data):
+        get = (lambda x: validated_data.data[x])
+        return Setter.VARPL_Add(get("fk"), get("name"), get("datatype"))
+
+    def update(self, request, pk):
+        get = (lambda x: request.data[x])
+        return Setter.VARPL_Update(get("fk"), pk, get("name"), get("datatype"))
+
+
+class ScoreCardLibViewSet(viewsets.ModelViewSet):
+    queryset = ScoreCardLibrary.objects.all()
+    serializer_class = serializers.ScoreCardLibrarySerializer
+
+
+class ScoreCardPoolViewSet(viewsets.ModelViewSet):
+    queryset = ScoreCardPool.objects.all()
+    serializer_class = serializers.ScoreCardPoolSerializer
+
+    @action(methods=['get'], detail=False, url_path='link/(?P<fk>\d+)')
+    def getListFromFk(self, request, fk):
+        serializer = serializers.ScoreCardPoolSerializer(
+            ScoreCardPool.objects.filter(fkey__id=fk).all(), many=True)
+        return JsonResponse(serializer.data, safe=False, json_dumps_params={"ensure_ascii": False})
+
+    def create(self, validated_data):
+        get = (lambda x: validated_data.data[x])
+        return Setter.SCPL_Add(get("fk"), get("rule"), get("weight"), get("score"))
+
+    def update(self, request, pk):
+        get = (lambda x: request.data[x])
+        return Setter.SCPL_Update(get("fk"), pk, get("rule"), get("weight"), get("score"))
+
+
+class DecisionTreeLibViewSet(viewsets.ModelViewSet):
+    queryset = DecisionTreeLibrary.objects.all()
+    serializer_class = serializers.DecisionTreeLibrarySerializer
+
+
+class DecisionTreePoolViewSet(viewsets.ModelViewSet):
+    queryset = DecisionTreePool.objects.all()
+
+    serializer_class = serializers.DecisionTreePoolSerializer
+
+    @action(methods=['get'], detail=False, url_path='link/(?P<fk>\d+)')
+    def getListFromFk(self, request, fk):
+        serializer = serializers.DecisionTreePoolSerializer(
+            DecisionTreePool.objects.filter(fkey__id=fk).all(), many=True)
+        return JsonResponse(serializer.data, safe=False, json_dumps_params={"ensure_ascii": False})
+

@@ -113,6 +113,12 @@ class Rule:
         else:
             return f"{self.rlist[0].Prefix()}"
 
+    def Partial(self, lst):
+        return [{key: vars(r)[key] for key in lst} for r in self.rlist]
+
+    def PartialDump(self, lst):
+        return json.dumps(self.Partial(lst), separators=(',', ':'), default=vars)
+
 
 class VariableLibrary(models.Model):
     name = models.CharField(

@@ -4,27 +4,19 @@ from system import static
 
 
 def DATATYPE_Read():
-    return static.CATAGORY
-
-
-def VARLB_Read():
-    lst = []
-    for x in VariableLibrary.objects.all():
-        lst.append((x.id, str(x)))
-    return lst
+    return static.CATAGORY_DICT
 
 
 def VARPL_Read(id):
-    lst = []
-    for x in VariablePool.objects.filter(fkey__id=id).all():
-        lst.append((x.id, x.name, static.CATAGORY_DICT[x.datatype]))
-    return lst
+    return [{"id": x.id, "name": x.name,
+             "datatype": static.CATAGORY_DICT[x.datatype]}
+            for x in VariablePool.objects.filter(fkey__id=id).all()]
 
 
 def SCLB_Read():
     lst = []
     for x in ScoreCardLibrary.objects.all():
-        lst.append((x.id, x.name))
+        lst.append({"id": x.id, "name": x.name})
     return lst
 
 
@@ -32,5 +24,6 @@ def SCPL_Read(id):
 
     lst = []
     for x in ScoreCardPool.objects.filter(fkey__id=id).all():
-        lst.append((x.id, Rule(x.rule).ToString(), x.weight, x.score))
+        lst.append({"id": x.id, "rule": Rule(x.rule).ToString(),
+                   "weight": x.weight, "score": x.score})
     return lst
