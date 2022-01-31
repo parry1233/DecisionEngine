@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import axios from "axios";
 import {
   Button,
   Modal,
@@ -51,12 +52,43 @@ export default class CustomModal extends Component {
     this.setState({ activeItem });
   };
 
-  onSave = (dataIn) => {
+  Edit = (dataIn) => {
     console.log(dataIn)
+    //console.log(dataIn.id)
+    console.log(dataIn["id"])
+    //console.log(dataIn.rule[0].name)
+    console.log(dataIn["rule"][0]["name"])
+
+    //this part is currently a test version for specific id api, should be POST func
+    axios
+      .get(`/api/ScoreCardPool/${dataIn["id"]}`,
+      //{
+      //    //here is body(data)
+      //    'action':'get',
+      //    'name':item
+      //},
+      //{
+          //headers:{
+              //here is headers for token and cookies
+              //'token':'try4sdgsdsafsd232a84sd'
+          //}
+      //}
+      )
+      .then((res) => {
+          //console.log(res.data["names"])
+          console.log(res.data)
+              
+          //this.setState({
+          //    activeCase: res.data,
+          //    modal: !this.state.modal });
+          //console.log(this.state.activeCase)
+      })
+      .catch((err) => console.log(err));
   };
 
   renderRule() {
     const rules = this.state.activeItem
+    const { onSave } = this.props
     return rules.map((eachRule) => (
       <Form key={eachRule["id"]}>
         <FormGroup>
@@ -157,7 +189,7 @@ export default class CustomModal extends Component {
         </FormGroup>
         <Button
           color="success"
-          onClick={() => this.onSave(eachRule)}
+          onClick={() => onSave(eachRule)}
         >
           Save (Currently unavailable)
         </Button>
@@ -166,7 +198,7 @@ export default class CustomModal extends Component {
   }
 
   render() {
-    const { toggle, onSave } = this.props;
+    const { toggle } = this.props;
 
     return (
       <Modal isOpen={true} toggle={toggle}>
@@ -176,10 +208,10 @@ export default class CustomModal extends Component {
         </ModalBody>
         <ModalFooter>
           <Button
-            color="success"
-            //onClick={() => onSave(this.state.activeItem)}
+            color="secondary"
+            onClick={() => toggle()}
           >
-            All Save (Currently unavailable)
+            Close
           </Button>
         </ModalFooter>
       </Modal>

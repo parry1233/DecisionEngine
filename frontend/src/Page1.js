@@ -12,13 +12,7 @@ class Page1 extends React.Component{
         this.state = {
           systemList: [],
           modal: false,
-          activeCase: {
-            info: {},
-            rules: [],
-            total: 0.0,
-            scid: {},
-            dtid: {}
-          },
+          activeCase: [],
         };
     }
 
@@ -70,6 +64,40 @@ class Page1 extends React.Component{
           })
           .catch((err) => console.log(err));
     };
+
+    handleSubmit = (item) => {
+        console.log(item)
+        //console.log(dataIn.id)
+        //console.log(item["id"])
+        //console.log(dataIn.rule[0].name)
+        //console.log(item["rule"][0]["name"])
+    
+        //this part is currently a test version for specific id api, should be POST func
+        axios
+          .get(`/api/ScoreCardPool/${item["id"]}`,
+          //{
+          //    //here is body(data)
+          //    'action':'get',
+          //    'name':item
+          //},
+          //{
+              //headers:{
+                  //here is headers for token and cookies
+                  //'token':'try4sdgsdsafsd232a84sd'
+              //}
+          //}
+          )
+          .then((res) => {
+              //console.log(res.data["names"])
+              console.log(res.data)
+                  
+              //this.setState({
+              //    activeCase: res.data,
+              //    modal: !this.state.modal });
+              //console.log(this.state.activeCase)
+          })
+          .catch((err) => console.log(err));
+      };
 
 
     renderCase = () => {
@@ -133,6 +161,7 @@ class Page1 extends React.Component{
                         <Modal
                             activeItem={this.state.activeCase}
                             toggle={this.toggle}
+                            onSave={this.handleSubmit}
                         />
                     ) : null}
                 </main>
