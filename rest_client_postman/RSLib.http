@@ -1,0 +1,25 @@
+@host = http://127.0.0.1:8000/api
+
+GET {{host}}/RuleSetLibrary/
+
+###
+
+POST {{host}}/RuleSetLibrary/
+Content-Type: application/json
+
+{
+    "name":"case 2"
+}
+
+###
+
+PUT {{host}}/RuleSetLibrary/1/
+Content-Type: application/json
+
+{
+    "name":"case 1"
+}
+
+###
+
+DELETE  {{host}}/RuleSetLibrary/19/

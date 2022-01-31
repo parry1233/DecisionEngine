@@ -1,8 +1,117 @@
-from pyexpat import model
 from django.db import models
 import system.static as static
 import json
 from types import SimpleNamespace
+from enum import IntEnum
+from . import utility
+
+
+class UAction:
+    def __init__(self, method: static.METHOD, data: dict):
+        if method == static.METHOD.PRINT:
+            try:
+                log = data["log"]
+            except:
+                raise RuntimeError(static.ERRORMSG[12])
+            self.method = method
+            self.content = {"log": log}
+        elif method == static.METHOD.ASSIGN:
+            try:
+                target = data["id"]
+                value = data["value"]
+            except:
+                raise RuntimeError(static.ERRORMSG[12])
+
+            obj = VariablePool.objects.filter(
+                pk=target).first()
+            if obj is None:
+                raise RuntimeError(static.ERRORMSG[2])
+            value_check = {'b': lambda x: type(x) == bool,
+                           'F': lambda x: utility.sfloat(x) is not None, 'I': lambda x: type(x) == int}
+            value_cast = {'b': lambda x: bool(x),
+                          'F': lambda x: float(x), 'I': lambda x: float(int(x))}
+            try:
+                if not value_check[obj.datatype](value):
+                    raise RuntimeError(
+                        f"cannot assign {value} to obj({target}, {static.CATAGORY_DICT[obj.datatype]})")
+                value = value_cast[obj.datatype](value)
+            except:
+                raise RuntimeError(
+                    f"cannot assign {value} to obj({target}, {static.CATAGORY_DICT[obj.datatype]})")
+
+            self.method = method
+            self.content = {"id": target, "value": value}
+        else:
+            raise RuntimeError(static.ERRORMSG[13])
+
+    def IsPrint(self):
+        return self.method == static.METHOD.PRINT
+
+    def PRINT_data(self):
+        if self.IsPrint():
+            return self.content["log"]
+        return None
+
+    def IsAssign(self):
+        return self.method == static.METHOD.ASSIGN
+
+    def ASSIGN_data(self):
+        if self.IsAssign():
+            return (self.content["id"], self.content["value"])
+        return None
+
+    def Prefix(self):
+        if self.IsPrint():
+            return f'''(record "{self.PRINT_data()}")'''
+        elif self.IsAssign():
+            def ID():
+                return f'''r{self.content["id"]}'''
+
+            def Val():
+                return self.content["value"]
+            return f'''
+            (
+                if ( do-for-fact((?r urule)) (eq ?r:name "{ID()}") (modify ?r (value {Val()}) ) )
+                then else
+                ( assert (urule (name "{ID()}")(value {Val()})) )
+            )
+            '''
+
+
+class Action:
+    def __init__(self, lst=None):        
+        self.rlist = []
+        if lst:
+            try:
+                lst = json.loads(lst)
+                if lst:
+                    for x in lst:
+                        self.rlist.append(UAction(x["method"], x["content"]))
+            except json.decoder.JSONDecodeError as e:
+                raise RuntimeError("wrong action format {}".format(str(e)))
+            except RuntimeError as e:
+                raise RuntimeError(str(e))
+
+    def Get(self):
+        return json.dumps(self.rlist, separators=(',', ':'), default=vars)
+
+    def GetRaw(self):
+        return self.rlist
+
+    def exists(self):
+        return len(self.rlist) != 0
+
+    def Partial(self, lst=None):
+        if lst is not None:
+            return [{key: vars(r)[key] for key in lst} for r in self.rlist]
+        else:
+            if self.exists():
+                return [vars(r) for r in self.rlist]
+            else:
+                return None
+
+    def PartialDump(self, lst=None):
+        return json.dumps(self.Partial(lst), separators=(',', ':'), default=vars)
 
 
 class URule:
@@ -20,7 +129,10 @@ class URule:
             value_cast = {'b': lambda x: bool(x) == True,
                           'F': lambda x: float(x), 'I': lambda x: float(x)}
             self.datatype = obj.datatype
-            self.value = value_cast[self.datatype](self.value)
+            try:
+                self.value = value_cast[self.datatype](self.value)
+            except:
+                raise RuntimeError(static.ERRORMSG[11])
         else:
             raise RuntimeError(static.ERRORMSG[2])
 
@@ -42,9 +154,7 @@ class URule:
                 's': '<',
                 'a': '>=',
                 'p': '<=',
-
             }
-
             return f"({OPERATOR_CAST[self.operator]} ?{self.ID()} {str(rvalue)})"
         else:
             return "miss variable"
@@ -202,9 +312,18 @@ class DecisionTreePool(models.Model):
         text += " , ".join(words)
         return f'''({self.id}) {self.fkey.name} | {text}'''
 
-'''Try API with user data'''
-class User(models.Model):
-    id = models.AutoField(auto_created=True, primary_key=True)
-    email = models.EmailField(unique=100)
-    name = models.CharField(max_length=100)
-    income = models.IntegerField()
+
+class RuleSetLibrary(models.Model):
+    name = models.CharField(
+        max_length=20, help_text='Enter name')
+
+    def __str__(self):
+        return self.name
+
+
+class RuleSetPool(models.Model):
+    fkey = models.ForeignKey(
+        'RuleSetLibrary', on_delete=models.CASCADE)
+    rule = models.TextField(help_text='Rule', null=True)
+    action = models.TextField(help_text='Action', blank=True, null=True)
+    naction = models.TextField(help_text='nAction', blank=True, null=True)

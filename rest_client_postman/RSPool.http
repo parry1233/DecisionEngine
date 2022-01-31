@@ -1,0 +1,35 @@
+@host = http://127.0.0.1:8000/api
+
+GET {{host}}/RuleSetPool/
+
+###
+
+GET {{host}}/RuleSetPool/link/2
+
+###
+
+POST {{host}}/RuleSetPool/
+Content-Type: application/json
+
+{
+    "fk":2,
+    "rule":"[{\"variable\": \"3\", \"operator\": \"e\", \"value\": \"1\"}]",
+    "action":"[{\"method\":1,\"content\":{\"log\":5}}]",
+    "naction":"[{\"method\":1,\"content\":{\"log\":2}}]"
+}
+
+###
+
+PUT {{host}}/RuleSetPool/14/
+Content-Type: application/json
+
+{
+    "fk":2,
+    "rule":"[{\"variable\": \"3\", \"operator\": \"e\", \"value\": \"1\"}]",
+    "action":null,
+    "naction":null
+}
+
+###
+
+DELETE  {{host}}/RuleSetPool/7/

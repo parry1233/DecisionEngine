@@ -3,7 +3,8 @@ from django.contrib import admin
 from django import forms
 from . import static
 from django.contrib.admin.helpers import ActionForm
-from .models import VariableLibrary, VariablePool, ScoreCardLibrary, ScoreCardPool, DecisionTreeLibrary, DecisionTreePool, User
+from .models import VariableLibrary, VariablePool, ScoreCardLibrary, ScoreCardPool, DecisionTreeLibrary, DecisionTreePool, RuleSetLibrary,RuleSetPool
+import copy
 
 # Register your models here.
 admin.site.register(VariableLibrary)
@@ -11,16 +12,6 @@ admin.site.register(VariablePool)
 admin.site.register(ScoreCardLibrary)
 admin.site.register(ScoreCardPool)
 admin.site.register(DecisionTreeLibrary)
-admin.site.register(DecisionTreePool)
-admin.site.register(User)
-
-# @admin.register(ScoreCardPool)
-# class ScoreCardPoolAdmin(admin.ModelAdmin):
-#     class XForm(ActionForm):
-#         variable = forms.ModelChoiceField(queryset=VariablePool.objects.all())
-#         operator = forms.ChoiceField(choices=static.OPERATOR)
-#         value = forms.CharField(
-#             max_length=20, help_text='Value')
-#     action_form = XForm
-#     actions = [AddRules]
+admin.site.register(RuleSetLibrary)
+admin.site.register(RuleSetPool)
 
