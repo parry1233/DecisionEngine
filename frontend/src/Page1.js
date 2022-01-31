@@ -30,10 +30,10 @@ class Page1 extends React.Component{
     //function
     refreshList = () => {
         axios
-          .get("/SC/")
+          .get("/api/ScoreCardLibrary/")
           .then((res) => {
               //console.log(res.data["names"])
-              this.setState({ systemList: res.data["names"] });
+              this.setState({ systemList: res.data });
               
           })
           .catch((err) => console.log(err));
@@ -46,18 +46,19 @@ class Page1 extends React.Component{
     Detail = (item) => {
         //console.log(item)
         axios
-          .post(`/SC/`,
-          {
-              //here is body(data)
-              'action':'get',
-              'name':item
-          },
-          {
-              headers:{
+          .get(`/api/ScoreCardPool/link/${item["id"]}`,
+          //{
+          //    //here is body(data)
+          //    'action':'get',
+          //    'name':item
+          //},
+          //{
+              //headers:{
                   //here is headers for token and cookies
-                  'token':'try4sdgsdsafsd232a84sd'
-              }
-          })
+                  //'token':'try4sdgsdsafsd232a84sd'
+              //}
+          //}
+          )
           .then((res) => {
               //console.log(res.data["names"])
               //console.log(res.data)
@@ -76,9 +77,9 @@ class Page1 extends React.Component{
         //console.log(cases)
     
         return cases.map((eachCase) => (
-          <li key={eachCase} className="list-group-item d-flex justify-content-between align-items-center">
-            <span className={`todo-title mr-2`} title={eachCase}>
-              {eachCase}
+          <li key={eachCase["id"]} className="list-group-item d-flex justify-content-between align-items-center">
+            <span className={`todo-title mr-2`} title={eachCase["name"]}>
+              {eachCase["name"]}
             </span>
             <span>
               <button className="btn btn-secondary mr-2" onClick={() => this.Detail(eachCase)}>
