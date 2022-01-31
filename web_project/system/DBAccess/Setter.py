@@ -1,5 +1,5 @@
 from distutils.log import error
-from system.models import Rule, URule, ScoreCardLibrary, ScoreCardPool, VariableLibrary, VariablePool, DecisionTreeLibrary, DecisionTreePool
+from system.models import Rule, Action, ScoreCardLibrary, ScoreCardPool, VariableLibrary, VariablePool, DecisionTreeLibrary, DecisionTreePool, RuleSetLibrary, RuleSetPool
 from django.http import JsonResponse
 from system.utility import sint, sfloat
 from system import static
@@ -18,7 +18,7 @@ from system import serializers
 #         variablelb.save()
 #         return JsonResponse(0, safe=False)
 #     except RuntimeError as e:
-#         return JsonResponse({"error": repr(e)}, safe=False)
+#         return JsonResponse({"error": str(e)}, safe=False)
 
 
 # def VARLB_Del(id):
@@ -32,7 +32,7 @@ from system import serializers
 #         obj.delete()
 #         return JsonResponse(0, safe=False)
 #     except RuntimeError as e:
-#         return JsonResponse({"error": repr(e)}, safe=False)
+#         return JsonResponse({"error": str(e)}, safe=False)
 
 
 # def VARLB_Update(id, name):
@@ -49,7 +49,7 @@ from system import serializers
 #         obj.save()
 #         return JsonResponse(0, safe=False)
 #     except RuntimeError as e:
-#         return JsonResponse({"error": repr(e)}, safe=False)
+#         return JsonResponse({"error": str(e)}, safe=False)
 
 # variable pool
 
@@ -69,7 +69,7 @@ def VARPL_Add(fkey, name, datatype):
                     variablepool.name = name
                     variablepool.datatype = datatype
                     variablepool.save()
-                    return JsonResponse(serializers.VariablePoolSerializer(variablepool).data, safe=False , json_dumps_params={"ensure_ascii": False})
+                    return JsonResponse(serializers.VariablePoolSerializer(variablepool).data, safe=False, json_dumps_params={"ensure_ascii": False})
                 else:
                     raise RuntimeError(ERRORMSG[4])
             else:
@@ -77,7 +77,7 @@ def VARPL_Add(fkey, name, datatype):
         else:
             raise RuntimeError(ERRORMSG[6])
     except RuntimeError as e:
-        return JsonResponse({"error": repr(e)}, safe=False)
+        return JsonResponse({"error": str(e)}, safe=False)
 
 
 # def VARPL_Del(fkey, id):
@@ -100,7 +100,7 @@ def VARPL_Add(fkey, name, datatype):
 #         obj.delete()
 #         return JsonResponse(0, safe=False)
 #     except RuntimeError as e:
-#         return JsonResponse({"error": repr(e)}, safe=False)
+#         return JsonResponse({"error": str(e)}, safe=False)
 
 
 def VARPL_Update(fkey, id, name, datatype):
@@ -129,7 +129,7 @@ def VARPL_Update(fkey, id, name, datatype):
         obj.save()
         return JsonResponse(serializers.VariablePoolSerializer(obj).data, safe=False, json_dumps_params={"ensure_ascii": False})
     except RuntimeError as e:
-        return JsonResponse({"error": repr(e)}, safe=False)
+        return JsonResponse({"error": str(e)}, safe=False)
 
 # score card
 
@@ -143,7 +143,7 @@ def VARPL_Update(fkey, id, name, datatype):
 #         lb.save()
 #         return JsonResponse(0, safe=False)
 #     except RuntimeError as e:
-#         return JsonResponse({"error": repr(e)}, safe=False)
+#         return JsonResponse({"error": str(e)}, safe=False)
 
 
 # def SCLB_Del(id):
@@ -157,7 +157,7 @@ def VARPL_Update(fkey, id, name, datatype):
 #         obj.delete()
 #         return JsonResponse(0, safe=False)
 #     except RuntimeError as e:
-#         return JsonResponse({"error": repr(e)}, safe=False)
+#         return JsonResponse({"error": str(e)}, safe=False)
 
 
 # def SCLB_Update(id, name):
@@ -174,7 +174,7 @@ def VARPL_Update(fkey, id, name, datatype):
 #         obj.save()
 #         return JsonResponse(0, safe=False)
 #     except RuntimeError as e:
-#         return JsonResponse({"error": repr(e)}, safe=False)
+#         return JsonResponse({"error": str(e)}, safe=False)
 
 # scorecard pool
 
@@ -193,10 +193,9 @@ def SCPL_Add(fkey, rule, weight, score):
         if lib is None:
             raise RuntimeError(
                 ERRORMSG[3])
-        r = Rule(rule)
         pool = ScoreCardPool()
         pool.fkey = lib
-        pool.rule = r.PartialDump(
+        pool.rule = Rule(rule).PartialDump(
             ["variable", "datatype", "operator", "value"])
         pool.weight = weight
         pool.score = score
@@ -204,7 +203,7 @@ def SCPL_Add(fkey, rule, weight, score):
         return JsonResponse(serializers.ScoreCardPoolSerializer(pool).data, safe=False, json_dumps_params={"ensure_ascii": False})
 
     except RuntimeError as e:
-        return JsonResponse({"error": repr(e)}, safe=False)
+        return JsonResponse({"error": str(e)}, safe=False)
 
 
 # def SCPL_Del(fkey, id):
@@ -227,7 +226,7 @@ def SCPL_Add(fkey, rule, weight, score):
 #         obj.delete()
 #         return JsonResponse(0, safe=False)
 #     except RuntimeError as e:
-#         return JsonResponse({"error": repr(e)}, safe=False)
+#         return JsonResponse({"error": str(e)}, safe=False)
 
 
 def SCPL_Update(fkey, id, rule, weight, score):
@@ -260,4 +259,54 @@ def SCPL_Update(fkey, id, rule, weight, score):
         return JsonResponse(serializers.ScoreCardPoolSerializer(obj).data, safe=False,  json_dumps_params={"ensure_ascii": False})
 
     except RuntimeError as e:
-        return JsonResponse({"error": repr(e)}, safe=False)
+        return JsonResponse({"error": str(e)}, safe=False)
+
+
+def RSPL_Add(fkey, rule, action, naction):
+    fkey = sint(fkey)
+    try:
+        if fkey is None:
+            raise RuntimeError(ERRORMSG[6])
+
+        lib = RuleSetLibrary.objects.filter(pk=fkey).first()
+        if lib is None:
+            raise RuntimeError(
+                ERRORMSG[3])
+        pool = RuleSetPool()
+        pool.fkey = lib
+        pool.rule = Rule(rule).PartialDump(
+            ["variable", "datatype", "operator", "value"])
+        pool.action = Action(action).PartialDump()
+        pool.naction = Action(naction).PartialDump()
+        pool.save()
+        return JsonResponse(serializers.RuleSetPoolSerializer(pool).data, safe=False, json_dumps_params={"ensure_ascii": False})
+
+    except RuntimeError as e:
+        return JsonResponse({"error": str(e)}, safe=False)
+
+
+def RSPL_Update(fkey, id, rule, action, naction):
+    (fkey, id) = (sint(fkey), sint(id))
+    try:
+        if fkey is None or id is None:
+            raise RuntimeError(ERRORMSG[6])
+
+        lib = RuleSetLibrary.objects.filter(pk=fkey).first()
+        if lib is None:
+            raise RuntimeError(
+                ERRORMSG[3])
+        obj = RuleSetPool.objects.filter(pk=id).first()
+        if obj is None:
+            raise RuntimeError(ERRORMSG[2])
+        if obj.fkey != lib:
+            raise RuntimeError(ERRORMSG[7])
+        obj.rule = Rule(rule).PartialDump(
+            ["variable", "datatype", "operator", "value"])
+        obj.action = Action(action).PartialDump()
+        obj.naction = Action(naction).PartialDump()
+        print(0)
+        obj.save()
+        return JsonResponse(serializers.RuleSetPoolSerializer(obj).data, safe=False, json_dumps_params={"ensure_ascii": False})
+
+    except RuntimeError as e:
+        return JsonResponse({"error": str(e)}, safe=False)

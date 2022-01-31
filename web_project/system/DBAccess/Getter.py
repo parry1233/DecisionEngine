@@ -3,10 +3,6 @@ from system.models import Rule, URule, ScoreCardLibrary, ScoreCardPool, Variable
 from system import static
 
 
-def DATATYPE_Read():
-    return static.CATAGORY_DICT
-
-
 def VARPL_Read(id):
     return [{"id": x.id, "name": x.name,
              "datatype": static.CATAGORY_DICT[x.datatype]}
