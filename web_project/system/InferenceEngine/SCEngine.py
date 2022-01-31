@@ -37,11 +37,11 @@ class SCE:
     def assign(self, name_value_map):
         if not self.setrule:
             raise NameError('rule must be set before assign variable')
-
-        for x, y in name_value_map.items():
-            template = self.env.find_template('urule')
-            template.assert_fact(name=x, value=y)
-            self.varmap |= {x: y}
+        if name_value_map is not None:
+            for x, y in name_value_map.items():
+                template = self.env.find_template('urule')
+                template.assert_fact(name=x, value=y)
+                self.varmap |= {x: y}
 
     def defrule(self, rules):
         self.setrule = True
@@ -53,8 +53,7 @@ class SCE:
                 rstr += f'''
                 (urule (name "{x.ID()}")(value ?{x.ID()}))
                 '''
-                if x.ID() not in self.varmap:
-                    self.varmap |= {x.ID(): None}
+                self.varmap |= {x.ID(): None}
                 self.typemap |= {x.ID(): x.datatype}
 
             rstr += f'''

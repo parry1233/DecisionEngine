@@ -1,0 +1,36 @@
+@host = http://127.0.0.1:8000
+
+GET {{host}}/RuleSetEngine/
+Content-Type: application/json
+
+{
+    "fk":2,
+    "circular":true,
+    "varmap":{
+        "2": 1
+    }
+}
+
+###
+
+GET {{host}}/ScoreCardEngine/
+Content-Type: application/json
+
+{
+    "fk":2,
+    "varmap":{
+        "1": 1,"2":1.5,"3":50
+    }
+}
+
+###
+
+GET {{host}}/DecisionTreeEngine/
+Content-Type: application/json
+
+{
+    "fk":1,
+    "varmap":{"1": 1, "3": 65}
+}
+
+###

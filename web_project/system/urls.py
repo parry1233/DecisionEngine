@@ -12,6 +12,8 @@ router.register(r'ScoreCardLibrary', views.ScoreCardLibViewSet)
 router.register(r'ScoreCardPool', views.ScoreCardPoolViewSet)
 router.register(r'DecisionTreeLibrary', views.DecisionTreeLibViewSet)
 router.register(r'DecisionTreePool', views.DecisionTreePoolViewSet)
+router.register(r'RuleSetLibrary', views.RuleSetLibViewSet)
+router.register(r'RuleSetPool', views.RuleSetPoolViewSet)
 
 urlpatterns = [
     path("", views.index, name="home"),
@@ -22,4 +24,10 @@ urlpatterns = [
          views.DecisionTreeView, name="DecisionTreeView"),
     path("staticdt/<category>/", views.StaticData, name="StaticData"),
     path("api/", include(router.urls)),
+    path("RuleSetEngine/",
+         views.RuleSetEngine, name=""),
+    path("ScoreCardEngine/",
+         views.ScoreCardEngine, name=""),
+    path("DecisionTreeEngine/",
+         views.DecisionTreeEngine, name=""),
 ]

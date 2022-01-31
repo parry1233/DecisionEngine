@@ -6,14 +6,14 @@ from django.http import HttpResponse
 from django.http import Http404
 from django.views.decorators.csrf import csrf_exempt
 from . import static
-from .models import Rule, URule, ScoreCardLibrary, ScoreCardPool, VariableLibrary, VariablePool, DecisionTreeLibrary, DecisionTreePool
+from .models import Rule,Action, RuleSetLibrary, RuleSetPool, URule, ScoreCardLibrary, ScoreCardPool, VariableLibrary, VariablePool, DecisionTreeLibrary, DecisionTreePool
 import json
-from system.InferenceEngine import SCEngine, DTEngine
+from system.InferenceEngine import SCEngine, DTEngine, RSEngine
 from system.DBAccess import Setter, Getter
 from . import serializers
 from rest_framework import viewsets
 from rest_framework.decorators import action
-
+from rest_framework.decorators import api_view
 
 def value_transform(kmap):
     # turn kmap to value according to it's datatype, also map kmap id to readable name in k2names
@@ -26,12 +26,13 @@ def value_transform(kmap):
             k2names |= {x: varname}
             datatype = obj.first().datatype
             cast = {'b': lambda x: x == True,
-                    'F': lambda x: float(x), 'I': lambda x: int(x)}
+                    'F': lambda x: float(x), 'I': lambda x: float(int(x))}
             kmap[x] = cast[datatype](kmap[x])
     kmap = {"r"+x: y for x, y in kmap.items()}
-    k2names = {"r"+x: y for x, y in k2names.items()}
+    k2names = {"r"+x: (x,y) for x, y in k2names.items()}
+    vardata = {k2names[x][1]: (k2names[x][0],y) for x, y in kmap.items()}
     # return (facts for clipspy, variable info for template)
-    return kmap, {k2names[x]: y for x, y in kmap.items()}
+    return kmap, [{"id":y[0],"name":x, "value":y[1]} for x,y in vardata.items()]
 
 
 def index(request):
@@ -169,11 +170,79 @@ def DecisionTreeView(request, id):
     }
     return render(request, 'DecisionTree.html', context=context)
 
+
+@api_view(["GET"])
+def ScoreCardEngine(request):
+    get = (lambda x: request.data[x])
+    varmap, _ = value_transform(get("varmap"))
+    rules = ScoreCardPool.objects.filter(fkey=get("fk")).all()
+    rulelist = [(Rule(rule.rule), rule.score * rule.weight)
+                for rule in rules]
+
+    engine = SCEngine.SCE()
+    engine.defrule(rulelist)
+    engine.assign(varmap)
+    score, satisfy = engine.run()
+
+    _, vardata = value_transform(engine.info().varmap)
+    return JsonResponse({"total": score, "satisfy": satisfy, "varmap": vardata}, safe=False, json_dumps_params={"ensure_ascii": False})
+@api_view(["GET"])
+def DecisionTreeEngine(request):
+    get = (lambda x: request.data[x])
+    varmap, _ = value_transform(get("varmap"))
+    engine = DTEngine.DTE()
+    rulelist = []
+    id = get("fk")
+    def IterateThrough(prev, rnext, rlog):
+        rules = DecisionTreePool.objects.filter(
+            fkey=id, prev=prev).all()
+        if(rules.exists()):
+            for rule in rules:
+                r = Rule(rule.rule)
+                lnext = rnext.copy() + [r]
+                llog = rlog + rule.log
+                IterateThrough(rule, lnext, llog)
+        else:
+            if len(rnext) > 1:
+                m = rnext[0].Copy()
+                for x in rnext[1:]:
+                    m.Concatenate(x)
+                rulelist.append((m, rlog))
+            elif len(rnext) == 1:
+                rulelist.append((rnext[0], rlog))
+
+    IterateThrough(None, list(), "")
+    engine.defrule(rulelist)
+    engine.assign(varmap)
+    logs = engine.run()
+
+    _, vardata = value_transform(engine.info().varmap)
+
+    return JsonResponse({"log": logs, "varmap": vardata}, safe=False, json_dumps_params={"ensure_ascii": False})
+
+@api_view(["GET"])
+def RuleSetEngine(request):
+    get = (lambda x: request.data[x])
+    varmap, _ = value_transform(get("varmap"))
+    rules = RuleSetPool.objects.filter(fkey=get("fk")).all()
+    rulelist = [(Rule(rule.rule), Action(rule.action), Action(rule.naction))
+                for rule in rules]
+
+    engine = RSEngine.RSE(get("circular"))
+    engine.defrule(rulelist)
+    engine.assign(varmap)
+    log = engine.run()
+    _, vardata = value_transform(engine.info().varmap)
+    return JsonResponse({"log": log, "varmap": vardata}, safe=False, json_dumps_params={"ensure_ascii": False})
+
+
 @csrf_exempt
 def StaticData(request, category):
     if category == "datatype":
-        return JsonResponse(Getter.DATATYPE_Read(), safe=False)
-    return JsonResponse(0, safe=False)
+        return JsonResponse(static.CATAGORY_DICT, safe=False)
+    elif category == "method":
+        return JsonResponse(static.METHOD_RDCIT, safe=False)
+    return JsonResponse(None, safe=False)
 
 
 class VariableLibViewSet(viewsets.ModelViewSet):
@@ -240,3 +309,26 @@ class DecisionTreePoolViewSet(viewsets.ModelViewSet):
             DecisionTreePool.objects.filter(fkey__id=fk).all(), many=True)
         return JsonResponse(serializer.data, safe=False, json_dumps_params={"ensure_ascii": False})
 
+
+class RuleSetLibViewSet(viewsets.ModelViewSet):
+    queryset = RuleSetLibrary.objects.all()
+    serializer_class = serializers.RuleSetLibrarySerializer
+
+
+class RuleSetPoolViewSet(viewsets.ModelViewSet):
+    queryset = RuleSetPool.objects.all()
+    serializer_class = serializers.RuleSetPoolSerializer
+
+    @action(methods=['get'], detail=False, url_path='link/(?P<fk>\d+)')
+    def getListFromFk(self, request, fk):
+        serializer = serializers.RuleSetPoolSerializer(
+            RuleSetPool.objects.filter(fkey__id=fk).all(), many=True)
+        return JsonResponse(serializer.data, safe=False, json_dumps_params={"ensure_ascii": False})
+
+    def create(self, validated_data):
+        get = (lambda x: validated_data.data[x])
+        return Setter.RSPL_Add(get("fk"), get("rule"), get("action"), get("naction"))
+
+    def update(self, request, pk):
+        get = (lambda x: request.data[x])
+        return Setter.RSPL_Update(get("fk"), pk, get("rule"), get("action"), get("naction"))
