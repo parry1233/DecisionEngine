@@ -15,8 +15,8 @@ class Page2 extends React.Component{
                     <Link to="/" className="btn btn-secondary mr-2">
                         Home
                     </Link>
-                    <Link to="/Page1" className="btn btn-secondary mr-2">
-                        Page 1
+                    <Link to="/ScoreLibrary" className="btn btn-secondary mr-2">
+                        Score Library
                     </Link>
                     <Link to="/Page2" className="btn btn-secondary mr-2">
                         Page 2

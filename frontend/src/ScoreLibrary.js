@@ -4,7 +4,7 @@ import { Button } from "reactstrap";
 import Modal from "./components/Modal";
 import axios from "axios";
 
-class Page1 extends React.Component{
+class ScoreLibrary extends React.Component{
 
     //constructor
     constructor(props) {
@@ -89,6 +89,7 @@ class Page1 extends React.Component{
           )
           .then((res) => {
               //console.log(res.data["names"])
+              
               console.log(res.data)
                   
               //this.setState({
@@ -110,10 +111,10 @@ class Page1 extends React.Component{
               {eachCase["name"]}
             </span>
             <span>
-              <button className="btn btn-secondary mr-2" onClick={() => this.Detail(eachCase)}>
+              <Link className="btn btn-info mr-2" to={`/ScoreCard`} state ={{id:eachCase["id"], name:eachCase["name"]}}>
                 Score Card Detail
-              </button>
-              <button className="btn btn-danger">
+              </Link>
+              <button className="btn btn-success disabled">
                 Tree Detail
               </button>
             </span>
@@ -126,30 +127,36 @@ class Page1 extends React.Component{
     render(){
         return(
             <div>
-                <div>This is Page1!</div>
+                <div>This is ScoreCardLibrary!</div>
                 <div>
                     <Link to="/" className="btn btn-secondary mr-2">
                         Home
                     </Link>
-                    <Link to="/Page1" className="btn btn-secondary mr-2">
-                        Page 1
+                    <Link to="/ScoreLibrary" className="btn btn-secondary mr-2">
+                        Score Library
                     </Link>
                     <Link to="/Page2" className="btn btn-secondary mr-2">
                         Page 2
                     </Link>
                 </div>
                 <main className="container">
-                    <h1 className="text-black text-uppercase text-center my-4">Score Card</h1>
+                    <h1 className="text-black text-uppercase text-center my-4">Score Card Library</h1>
                     <div className="row">
                         <div className="col-md-6 col-sm-10 mx-auto p-0">
                             <div className="card p-3">
                                 <div className="mb-4">
                                     <button
-                                        className="btn btn-primary"
+                                        className="btn btn-primary mr-2"
                                         //onClick={this.createItem}
                                     >
-                                        Add task
+                                        Add Library
                                     </button>
+                                    <Link to ="/ScoreCardAll"
+                                        className="btn btn-warning mr-2"
+                                        //onClick={this.createItem}
+                                    >
+                                        View All Score Card
+                                    </Link>
                                 </div>
                                 <ul className="list-group list-group-flush border-top-0">
                                     {this.renderCase()}
@@ -171,4 +178,4 @@ class Page1 extends React.Component{
     }
 }
 
-export default Page1;
+export default ScoreLibrary;
