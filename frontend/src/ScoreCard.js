@@ -16,8 +16,8 @@ class ScoreCard extends React.Component{
             modal: false,
             new_modal: false,
             activeCard:[],
-            type: -1
-
+            type: -1,
+            allCardPool :[]
         }
     }
 
@@ -28,11 +28,7 @@ class ScoreCard extends React.Component{
 
     //function
 
-    toggle = () => {
-        this.setState({ modal: !this.state.modal });
-    };
-
-    openNew = () => {
+    openNew = (id) => {
         axios
             .get(`/api/VariablePool/`,
             {
@@ -47,11 +43,11 @@ class ScoreCard extends React.Component{
             )
             .then((res) => {
                 //console.log(res.data["names"])
-                console.log(res.data)
+                //console.log(res.data)
     
-                //this.setState({
-                //    activeCase: res.data,
-                //    modal: !this.state.modal });
+                this.setState({
+                    allCardPool: res.data,
+                    new_modal: !this.state.new_modal });
                 //console.log(this.state.activeCase)
             })
             .catch((err) => console.log(err));
@@ -59,16 +55,12 @@ class ScoreCard extends React.Component{
         //this.setState( { case_id: id, modal: !this.state.modal } );
     };
 
-    onAdd = () => {
-        
-    };
-
     ruleParse = (item) => {
-        console.log(item);
+        //console.log(item);
         let rule = `[`
         for(var i = 0; i<item.length;i++)
         {
-            console.log(item[i]);
+            //console.log(item[i]);
             rule+=(`{`
                 +`\"variable\":\"${item[i]["variable"]}\", `
                 +`\"operator\":\"${item[i]["operator"]}\", `
@@ -83,8 +75,43 @@ class ScoreCard extends React.Component{
         item.forEach((element) => {
             ruleArr.push(element)
         });
-        console.log(rule);
+        //console.log(rule);
         return rule
+    };
+
+    onAdd = (item) => {
+        axios
+            .post(`/api/ScoreCardPool/`,
+            {
+                //here is body(data)
+                'fk': this.case_info.id,
+                'rule': this.ruleParse(item["rule"]),
+                'weight': `${item["weight"]}`,
+                'score': `${item["score"]}`
+            },
+            {
+              headers:{
+                  //here is headers for token and cookies
+                  'token':'try4sdgsdsafsd232a84sd'
+              }
+            })
+            .then((res) => {
+                //console.log(res.data["names"])
+                //console.log(res.data)
+                if(res.data)
+                {
+                    if(res.data["error"])
+                    {
+                        alert(res.data["error"])
+                    }
+                }
+                this.new_toggle();
+                //this.setState({
+                //    activeCase: res.data,
+                //    modal: !this.state.modal });
+                //console.log(this.state.activeCase)
+            })
+            .catch((err) => console.log(err));
     };
 
     onSave = (item,type) => {
@@ -200,10 +227,40 @@ class ScoreCard extends React.Component{
         this.refreshList();
     };
 
-    edit = (item,etype,id) => {
+    new_toggle = () => {
+        this.setState({ new_modal: !this.state.new_modal });
+        this.refreshList();
+    };
+
+    edit = (item,etype) => {
+        axios
+            .get(`/api/VariablePool/`,
+            {
+                //here is body(data)
+            },
+            {
+                headers:{
+                    //here is headers for token and cookies
+                    'token':'try4sdgsdsafsd232a84sd'
+                }
+            }
+            )
+            .then((res) => {
+                //console.log(res.data["names"])
+                //console.log(res.data)
+    
+                this.setState({
+                    allCardPool: res.data,
+                    activeCard: item,
+                    type: etype,
+                    modal: !this.state.modal
+                });
+                //console.log(this.state.activeCase)
+            })
+            .catch((err) => console.log(err));
         //console.log(item)
         //etype=1(edit varaible); etype=2(edit score)
-        this.setState( { activeCard: item, type: etype, case_id: id, modal: !this.state.modal } );
+        //this.setState( { activeCard: item, type: etype, modal: !this.state.modal } );
     };
 
     renderScoreCard = () => {
@@ -237,10 +294,10 @@ class ScoreCard extends React.Component{
                 <td> {eachCard["weight"]} </td>
                 <td> {eachCard["score"]} </td>
                 <td>
-                    <button className="btn btn-primary mr-2" onClick={() => this.edit(eachCard,1, this.case_info.id)}>
+                    <button className="btn btn-primary mr-2 disabled" onClick={() => this.edit(eachCard,1)}>
                         Variable
                     </button>
-                    <button className="btn btn-warning mr-2" onClick={() => this.edit(eachCard,2, this.case_info.id)}>
+                    <button className="btn btn-warning mr-2" onClick={() => this.edit(eachCard,2)}>
                         Score
                     </button>
                     <button className="btn btn-danger mr-2" onClick={() => this.onDelete(eachCard)}>
@@ -286,7 +343,7 @@ class ScoreCard extends React.Component{
                     </table>
                     <button
                         className="btn btn-primary"
-                        onClick={this.openNew}
+                        onClick={() => this.openNew()}
                         >
                          Add
                     </button>
@@ -294,6 +351,7 @@ class ScoreCard extends React.Component{
                 {this.state.modal ? (
                         <ScoreModal
                             activeCard={this.state.activeCard}
+                            existVariable={this.state.allCardPool}
                             active = {this.state.type}
                             toggle={this.toggle}
                             onSave={this.onSave}
@@ -301,8 +359,9 @@ class ScoreCard extends React.Component{
                     ) : null}
                 {this.state.new_modal ? (
                         <AddScoreModal
-                            existVariable={this.state.activeCard}
-                            toggle={this.toggle}
+                            fk = {this.props.case_info.id}
+                            existVariable={this.state.allCardPool}
+                            toggle={this.new_toggle}
                             onAdd={this.onAdd}
                         />
                     ) : null}

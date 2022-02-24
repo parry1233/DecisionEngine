@@ -17,6 +17,7 @@ export default class CustomModal extends Component {
     super(props);
     //console.log(props)
     this.state = {
+      variable : this.props.existVariable,
       activeItem: this.props.activeCard,
       edit_type: this.props.active,
     };
@@ -56,6 +57,7 @@ export default class CustomModal extends Component {
   
   renderRule() {
     const rule = this.state.activeItem
+    const varaible = this.state.variable
     //const etype = this.state.edit_type
     //console.log(rule);
     return(
@@ -75,36 +77,12 @@ export default class CustomModal extends Component {
 
         {rule["rule"].map((eachrule,index) => {return (
           <FormGroup key={index}>
-            <Label for="scpool-ruleVariable">Rule Variable</Label>
-            <Input
-              type="text"
-              id="scpool-ruleVariable"
-              name="variable"
-              value={eachrule["variable"]}
-              readOnly={this.state.edit_type===1 ? true : false}
-              onChange={(event) => this.handleRuleChange(index, event)}
-              placeholder="Enter Variable"
-            />
-            <Label for="scpool-ruleName">Rule Name</Label>
-            <Input
-              type="text"
-              id="scpool-ruleName"
-              name="name"
-              value={eachrule["name"]}
-              readOnly={this.state.edit_type===1 ? false : true}
-              onChange={(event) => this.handleRuleChange(index, event)}
-              placeholder="Enter Variable"
-            />
-            <Label for="scpool-ruleDtype">Rule Data Type</Label>
-            <Input
-              type="text"
-              id="scpool-ruleDype"
-              name="datatype"
-              value={eachrule["datatype"]}
-              readOnly={this.state.edit_type===1 ? false : true}
-              onChange={(event) => this.handleRuleChange(index, event)}
-              placeholder="Enter Variable"
-            />
+            <Label for="scpool-ruleId">Rule Variable</Label>
+            <select name="variable" value={eachrule["variable"]} onChange={(event) => this.handleRuleChange(index, event)}>
+              {varaible.map((element) => { return (
+                <option key={element["id"]} value = {element["id"]}>{element["name"]} (Dtype: {element["datatype"]})</option>
+              ); })}
+            </select>
             <Label for="scpool-ruleOperator">Rule Operator</Label>
             <Input
               type="text"
@@ -162,7 +140,7 @@ export default class CustomModal extends Component {
 
     return (
       <Modal isOpen={true} toggle={toggle}>
-        <ModalHeader toggle={toggle}>Score Card View</ModalHeader>
+        <ModalHeader toggle={toggle}>Add Score Card</ModalHeader>
         <ModalBody>
           {this.renderRule()}
         </ModalBody>

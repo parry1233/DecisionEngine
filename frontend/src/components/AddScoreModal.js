@@ -15,24 +15,33 @@ import {
 export default class CustomModal extends Component {
   constructor(props) {
     super(props);
+    //console.log(props);
     //console.log(props)
     this.state = {
-      activeItem: this.props.activeCard,
-      edit_type: this.props.active,
+      variable: this.props.existVariable,
+      activeItem: {
+        "fk" : this.props.fk,
+        "rule" : [{"variable": "", "operator": "", "value": ""}],
+        "weight" : 0,
+        "score": 0
+      }
     };
     //console.log(this.state.activeItem)
   }
 
-  handleRuleChange = (e) => {
+  handleRuleChange = (key,e) => {
     let { name, value } = e.target;
+    //console.log(name);
+    //console.log(value);
 
-    if (e.target.type === "checkbox") {
-      value = e.target.checked;
+    if (e.target.type === "select") {
+      //const index = this.state.variable.findIndex((variable) => variable["name"] === e.target.value);
+      //value = this.state.variable[index]["id"];
     }
 
     
     const activeItem = this.state.activeItem;
-    activeItem["rule"][0][name] = value
+    activeItem["rule"][key][name] = value
 
     this.setState({ activeItem });
   };
@@ -53,79 +62,39 @@ export default class CustomModal extends Component {
   
   renderRule() {
     const rule = this.state.activeItem
-    const etype = this.state.edit_type
+    const varaible = this.state.variable
     //console.log(rule);
     return(
       <Form key={rule["id"]}>
         <FormGroup>
-          <Label for="scpool-id">ID</Label>
-          <Input
-            type="text"
-            id="scpool-id"
-            name="id"
-            value={rule["id"]}
-            readOnly={true}
-            //onChange={this.handleChange}
-            placeholder="Enter ID"
-          />
+          <Label for="scpool-ruleId">Rule Variable</Label>
+          <select name="variable" value={this.state.activeItem["rule"][0]["id"]} onChange={(event) => this.handleRuleChange(0,event)}>
+            {varaible.map((element) => { return (
+              <option key={element["id"]} value = {element["id"]}>{element["name"]} (Dtype: {element["datatype"]})</option>
+            ); })}
+          </select>
         </FormGroup>
         <FormGroup>
-          <Label for="scpool-ruleVariable">Rule Variable</Label>
-          <Input
-            type="text"
-            id="scpool-ruleVariable"
-            name="variable"
-            value={rule["rule"][0]["variable"]}
-            readOnly={etype===1 ? true : false}
-            onChange={(event) => this.handleRuleChange(event)}
-            placeholder="Enter Variable"
-          />
-        </FormGroup>
-        <FormGroup>
-          <Label for="scpool-ruleName">Name</Label>
-          <Input
-            type="text"
-            id="scpool-ruleName"
-            name="name"
-            value={rule["rule"][0]["name"]}
-            readOnly={etype===1 ? false : true}
-            onChange={(event) => this.handleRuleChange(event)}
-            placeholder="Enter Name"
-          />
-        </FormGroup>
-        <FormGroup>
-          <Label for="scpool-ruleDtype">Data type</Label>
-          <Input
-            type="text"
-            id="scpool-ruleDtype"
-            name="datatype"
-            value={rule["rule"][0]["datatype"]}
-            readOnly={etype===1 ? false : true}
-            onChange={(event) => this.handleRuleChange(event)}
-            placeholder="Enter Data Type"
-          />
-        </FormGroup>
-        <FormGroup>
-          <Label for="scpool-ruleOperator">Operator</Label>
+          <Label for="scpool-ruleOperator">Rule Operator</Label>
           <Input
             type="text"
             id="scpool-ruleOperator"
             name="operator"
             value={rule["rule"][0]["operator"]}
-            readOnly={etype===1 ? true : false}
-            onChange={(event) => this.handleRuleChange(event)}
+            readOnly={false}
+            onChange={(event) => this.handleRuleChange(0,event)}
             placeholder="Enter Operator"
           />
         </FormGroup>
         <FormGroup>
-          <Label for="scpool-ruleValue">value</Label>
+          <Label for="scpool-ruleValue">Rule Value</Label>
           <Input
             type="text"
             id="scpool-ruleValue"
             name="value"
             value={rule["rule"][0]["value"]}
-            readOnly={etype===1 ? true : false}
-            onChange={(event) => this.handleRuleChange(event)}
+            readOnly={false}
+            onChange={(event) => this.handleRuleChange(0,event)}
             placeholder="Enter Value"
           />
         </FormGroup>
@@ -136,7 +105,7 @@ export default class CustomModal extends Component {
             id="scpool-weight"
             name="weight"
             value={rule["weight"]}
-            readOnly={etype===1 ? true : false}
+            readOnly={false}
             onChange={(event) => this.handleChange(event)}
             placeholder="Enter Weight"
           />
@@ -148,7 +117,7 @@ export default class CustomModal extends Component {
             id="scpool-score"
             name="score"
             value={rule["score"]}
-            readOnly={etype===1 ? true : false}
+            readOnly={false}
             onChange={(event) => this.handleChange(event)}
             placeholder="Enter Score"
           />
@@ -159,7 +128,7 @@ export default class CustomModal extends Component {
 
   render() {
     const { toggle } = this.props;
-    const { onSave } = this.props;
+    const { onAdd } = this.props;
 
     return (
       <Modal isOpen={true} toggle={toggle}>
@@ -170,9 +139,9 @@ export default class CustomModal extends Component {
         <ModalFooter>
           <Button
             color="success"
-            onClick={() => onSave(this.state.activeItem,this.state.edit_type)}
+            onClick={() => onAdd(this.state.activeItem)}
           >
-            Save (Currently unavailable)
+            Add
           </Button>
           <Button
             color="secondary"
