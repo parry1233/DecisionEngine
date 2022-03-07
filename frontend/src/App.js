@@ -2,9 +2,12 @@ import React from "react";
 import {BrowserRouter as Router, Routes, Route} from 'react-router-dom';
 import Home from  './Home';
 import ScoreLibrary from './ScoreLibrary';
-import Page2 from './Page2';
+import VariableLibrary from './VariableLibrary';
+import VariableAll from "./VariableAll";
+import Variable from "./Variable";
 import ScoreCard from "./ScoreCard";
 import ScoreCardAll from "./ScoreCardAll";
+
 
 class App extends React.Component{
     render(){
@@ -15,7 +18,9 @@ class App extends React.Component{
                     <Route path="/ScoreLibrary" element={<ScoreLibrary />} />
                     <Route path="/ScoreCard" element={<ScoreCard />} />
                     <Route path="/ScoreCardAll" element={<ScoreCardAll />} />
-                    <Route path="/Page2" element={<Page2 />} />
+                    <Route path="/VariableLibrary" element={<VariableLibrary />} />
+                    <Route path="/VariableAll" element={<VariableAll />} />
+                    <Route path="/Variable" element={<Variable />} />
                 </Routes>
             </Router>
         );

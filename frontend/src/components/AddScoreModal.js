@@ -68,7 +68,8 @@ export default class CustomModal extends Component {
       <Form key={rule["id"]}>
         <FormGroup>
           <Label for="scpool-ruleId">Rule Variable</Label>
-          <select name="variable" value={this.state.activeItem["rule"][0]["id"]} onChange={(event) => this.handleRuleChange(0,event)}>
+          <select name="variable" value={this.state.activeItem["rule"][0]["variable"]} onChange={(event) => this.handleRuleChange(0,event)}>
+              <option key={-1} value = {""}></option>
             {varaible.map((element) => { return (
               <option key={element["id"]} value = {element["id"]}>{element["name"]} (Dtype: {element["datatype"]})</option>
             ); })}

@@ -4,18 +4,18 @@ import ScoreModal from "./components/ScoreModal";
 import AddScoreModal from "./components/AddScoreModal";
 import axios from "axios";
 
-class ScoreCardAll extends React.Component{
+class VariableAll extends React.Component{
     
     //constructor
     constructor(props){
         super(props);
         //console.log(this.case_info);
+        this.case_info = -1;
         this.state = {  
-            cardList: [],
+            vList: [],
             modal: false,
             new_modal: false,
             activeCard:[],
-            type: -1
 
         }
     }
@@ -88,45 +88,7 @@ class ScoreCardAll extends React.Component{
 
     onSave = (item,type) => {
         //console.log(item,type);
-        if(type===1)
-        {
-          console.log("Edit Variable");
-          console.log(item)
-    
-          /*
-          //this part is currently a test version for specific id api, should be POST func
-          axios
-            .put(`/api/VariablePool/${item["id"]}`,
-            {
-                //here is body(data)
-                'name':item["rule"][0]["name"]
-            },
-            {
-                headers:{
-                    //here is headers for token and cookies
-                    'token':'try4sdgsdsafsd232a84sd'
-                }
-            }
-            )
-            .then((res) => {
-                //console.log(res.data["names"])
-                console.log(res.data)
-    
-                //this.setState({
-                //    activeCase: res.data,
-                //    modal: !this.state.modal });
-                //console.log(this.state.activeCase)
-            })
-            .catch((err) => console.log(err));
-          */
-        }
-        else if(type===2)
-        {
-          //console.log("Edit Score");
-          //console.log(item)
-    
-          //this part is currently a test version for specific id api, should be POST func
-          axios
+        axios
             .put(`/api/ScoreCardPool/${item["id"]}/`,
             {
                 //here is body(data)
@@ -136,10 +98,10 @@ class ScoreCardAll extends React.Component{
                 'score': `${item["score"]}`
             },
             {
-              headers:{
-                  //here is headers for token and cookies
-                  'token':'try4sdgsdsafsd232a84sd'
-              }
+                headers:{
+                    //here is headers for token and cookies
+                    'token':'try4sdgsdsafsd232a84sd'
+                }
             })
             .then((res) => {
                 //console.log(res.data["names"])
@@ -152,12 +114,11 @@ class ScoreCardAll extends React.Component{
                 //console.log(this.state.activeCase)
             })
             .catch((err) => console.log(err));
-        }
     };
 
     onDelete = (item) => {
         axios
-            .delete(`/api/ScoreCardPool/${item["id"]}/`,
+            .delete(`/api/VariablePool/${item["id"]}/`,
             {
                 //here is body(data)
             },
@@ -181,9 +142,9 @@ class ScoreCardAll extends React.Component{
 
     refreshList = () => {
         axios
-            .get(`/api/ScoreCardPool/`)
+            .get(`/api/VariablePool/`)
             .then((res => {
-                this.setState( { cardList:res.data } );
+                this.setState( { vList:res.data } );
             }))
             .catch((err) => console.log(err));
     };
@@ -193,44 +154,30 @@ class ScoreCardAll extends React.Component{
         this.refreshList();
     };
 
-    edit = (item,etype,id) => {
+    edit = (item,id) => {
         //console.log(item)
         //etype=1(edit varaible); etype=2(edit score)
-        this.setState( { activeCard: item, type: etype, case_id: id, modal: !this.state.modal } );
+        if(this.case_info!==-1)
+        {
+            this.setState( { activeCard: item, case_id: id, modal: !this.state.modal } );
+        }
+        else
+        {
+            alert("View All Variable Page Cannot Edit Variable (Need fk)")
+        }
+        
     };
 
     renderScoreCard = () => {
-        const cards = this.state.cardList;
+        const variables = this.state.vList;
 
-        return cards.map((eachCard)=>(
-            <tr key = {eachCard["id"]}>
-                <td> {eachCard["id"]} </td>
-                <tr>
-                    {eachCard["rule"].map((eachrule) => {return (
-                        <table>
-                            <thead>
-                                <th>variable</th>
-                                <th>name</th>
-                                <th>datatype</th>
-                                <th>operator</th>
-                                <th>value</th>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>{eachrule["variable"]}</td>
-                                    <td>{eachrule["name"]}</td>
-                                    <td>{eachrule["datatype"]}</td>
-                                    <td>{eachrule["operator"]}</td>
-                                    <td>{eachrule["value"].toString()}</td>
-                                </tr>
-                            </tbody> 
-                        </table>
-                    ); })}
-                </tr>
-                <td> {eachCard["weight"]} </td>
-                <td> {eachCard["score"]} </td>
+        return variables.map((eachVariable)=>(
+            <tr key = {eachVariable["id"]}>
+                <td> {eachVariable["id"]} </td>
+                <td> {eachVariable["name"]} </td>
+                <td> {eachVariable["datatype"]} </td>
                 <td>
-                    <button className="btn btn-danger mr-2" onClick={() => this.onDelete(eachCard)}>
+                    <button className="btn btn-danger mr-2" onClick={() => this.onDelete(eachVariable)}>
                         Delete
                     </button>
                 </td>
@@ -243,7 +190,7 @@ class ScoreCardAll extends React.Component{
     render(){
         return(
             <div>
-                <div>This is ScoreCard!</div>
+                <div>This is View All Variable Pool!</div>
                 <div>
                     <Link to="/" className="btn btn-secondary mr-2">
                         Home
@@ -261,9 +208,8 @@ class ScoreCardAll extends React.Component{
                         <thead>
                             <tr>
                                 <th>ID</th>
-                                <th>Rule</th>
-                                <th>weight</th>
-                                <th>score</th>
+                                <th>Name</th>
+                                <th>Data Type</th>
                                 <th>編輯</th>
                             </tr>
                         </thead>
@@ -293,4 +239,4 @@ class ScoreCardAll extends React.Component{
     }
 }
 
-export default ScoreCardAll;
+export default VariableAll;

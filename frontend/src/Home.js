@@ -18,8 +18,8 @@ class Home extends React.Component{
                     <Link to="/ScoreLibrary" className="btn btn-secondary mr-2">
                         Score Library
                     </Link>
-                    <Link to="/Page2" className="btn btn-secondary mr-2">
-                        Page 2
+                    <Link to="/VariableLibrary" className="btn btn-secondary mr-2">
+                        Variable Library
                     </Link>
                 </div>
             </div>
