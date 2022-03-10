@@ -185,6 +185,9 @@ class VariableLibrary extends React.Component{
                     <Link to="/VariableLibrary" className="btn btn-secondary mr-2">
                         Variable Library
                     </Link>
+                    <Link to="/RuleSetLibrary" className="btn btn-secondary mr-2">
+                        Rule Set Library
+                    </Link>
                 </div>
                 <main className="container">
                     <h1 className="text-black text-uppercase text-center my-4">Variable Library</h1>

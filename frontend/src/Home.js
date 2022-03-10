@@ -21,6 +21,9 @@ class Home extends React.Component{
                     <Link to="/VariableLibrary" className="btn btn-secondary mr-2">
                         Variable Library
                     </Link>
+                    <Link to="/RuleSetLibrary" className="btn btn-secondary mr-2">
+                        Rule Set Library
+                    </Link>
                 </div>
             </div>
             

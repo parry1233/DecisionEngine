@@ -7,6 +7,8 @@ import VariableAll from "./VariableAll";
 import Variable from "./Variable";
 import ScoreCard from "./ScoreCard";
 import ScoreCardAll from "./ScoreCardAll";
+import RuleSetLibrary from "./RuleSetLibrary";
+import RuleSetAll from "./RuleSetAll";
 
 
 class App extends React.Component{
@@ -21,6 +23,8 @@ class App extends React.Component{
                     <Route path="/VariableLibrary" element={<VariableLibrary />} />
                     <Route path="/VariableAll" element={<VariableAll />} />
                     <Route path="/Variable" element={<Variable />} />
+                    <Route path="/RuleSetLibrary" element={<RuleSetLibrary />} />
+                    <Route path="/RuleSetAll" element={<RuleSetAll />} />
                 </Routes>
             </Router>
         );
