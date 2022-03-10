@@ -243,7 +243,7 @@ class ScoreCardAll extends React.Component{
     render(){
         return(
             <div>
-                <div>This is ScoreCard!</div>
+                <div>This is View  All ScoreCard Pool!</div>
                 <div>
                     <Link to="/" className="btn btn-secondary mr-2">
                         Home
@@ -253,6 +253,9 @@ class ScoreCardAll extends React.Component{
                     </Link>
                     <Link to="/VariableLibrary" className="btn btn-secondary mr-2">
                         Variable Library
+                    </Link>
+                    <Link to="/RuleSetLibrary" className="btn btn-secondary mr-2">
+                        Rule Set Library
                     </Link>
                 </div>
 

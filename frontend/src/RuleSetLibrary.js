@@ -152,12 +152,9 @@ class RuleSetLibrary extends React.Component{
               {eachCase["name"]}
             </span>
             <span>
-              <Link className="btn btn-info mr-2" to={`/Variable`} state ={{id:eachCase["id"], name:eachCase["name"]}}>
-                Variable
+              <Link className="btn btn-info mr-2" to={`/RuleSet`} state ={{id:eachCase["id"], name:eachCase["name"]}}>
+                Rule Set
               </Link>
-              <button className="btn btn-success mr-2 disabled">
-                Tree
-              </button>
               <button className="btn btn-secondary mr-2" onClick={() => this.edit(eachCase["id"],eachCase["name"])}>
                 Edit
               </button>

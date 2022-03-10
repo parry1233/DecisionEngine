@@ -1,10 +1,9 @@
 import React from "react";
 import { Link,useLocation } from "react-router-dom";
-import ScoreModal from "./components/ScoreModal";
-import AddScoreModal from "./components/AddScoreModal";
+import RuleSetModal from "./components/RuleSetModal";
 import axios from "axios";
 
-class ScoreCard extends React.Component{
+class RuleSet extends React.Component{
     
     //constructor
     constructor(props){
@@ -14,8 +13,7 @@ class ScoreCard extends React.Component{
         this.state = {  
             cardList: [],
             modal: false,
-            new_modal: false,
-            activeCard:[],
+            activeCard:{},
             type: -1,
             allCardPool :[]
         }
@@ -42,13 +40,24 @@ class ScoreCard extends React.Component{
             }
             )
             .then((res) => {
-                //console.log(res.data["names"])
-                //console.log(res.data)
-    
                 this.setState({
                     allCardPool: res.data,
-                    new_modal: !this.state.new_modal });
-                //console.log(this.state.activeCase)
+                    activeCard: {
+                        "id":"-1",
+                        "rule":[
+                            {
+                                "variable" : "",
+                                "name" : "",
+                                "datatype" : "",
+                                "operator" : "",
+                                "value" : ""
+                            }
+                        ],
+                        "action":"",
+                        "naction":""
+                    },
+                    type:1,
+                    modal: !this.state.modal });
             })
             .catch((err) => console.log(err));
 
@@ -79,89 +88,40 @@ class ScoreCard extends React.Component{
         return rule
     };
 
-    onAdd = (item) => {
-        axios
-            .post(`/api/ScoreCardPool/`,
+    actionParse = (item) => {
+        //console.log(item);
+        
+        if(item.length>0)
+        {
+            try
             {
-                //here is body(data)
-                'fk': this.case_info.id,
-                'rule': this.ruleParse(item["rule"]),
-                'weight': `${item["weight"]}`,
-                'score': `${item["score"]}`
-            },
+                let action = item;
+                console.log(action);
+                //action = JSON.stringify(item);
+                //action = JSON.stringify(JSON.stringify(item));
+                console.log(action);
+                return action;
+            }
+            catch(e)
             {
-              headers:{
-                  //here is headers for token and cookies
-                  'token':'try4sdgsdsafsd232a84sd'
-              }
-            })
-            .then((res) => {
-                //console.log(res.data["names"])
-                //console.log(res.data)
-                if(res.data)
-                {
-                    if(res.data["error"])
-                    {
-                        alert(res.data["error"])
-                    }
-                }
-                this.new_toggle();
-                //this.setState({
-                //    activeCase: res.data,
-                //    modal: !this.state.modal });
-                //console.log(this.state.activeCase)
-            })
-            .catch((err) => console.log(err));
+                alert(e.message);
+            }
+        }
+        else
+        {
+            return "";
+        }
     };
 
-    onSave = (item,type) => {
-        //console.log(item,type);
-        if(type===1)
-        {
-          console.log("Edit Variable");
-          console.log(item)
-    
-          /*
-          //this part is currently a test version for specific id api, should be POST func
-          axios
-            .put(`/api/VariablePool/${item["id"]}`,
-            {
-                //here is body(data)
-                'name':item["rule"][0]["name"]
-            },
-            {
-                headers:{
-                    //here is headers for token and cookies
-                    'token':'try4sdgsdsafsd232a84sd'
-                }
-            }
-            )
-            .then((res) => {
-                //console.log(res.data["names"])
-                console.log(res.data)
-    
-                //this.setState({
-                //    activeCase: res.data,
-                //    modal: !this.state.modal });
-                //console.log(this.state.activeCase)
-            })
-            .catch((err) => console.log(err));
-          */
-        }
-        else if(type===2)
-        {
-          //console.log("Edit Score");
-          //console.log(item)
-    
-          //this part is currently a test version for specific id api, should be POST func
-          axios
-            .put(`/api/ScoreCardPool/${item["id"]}/`,
+    onAdd = (item) => {
+        axios
+            .post(`/api/RuleSetPool/`,
             {
                 //here is body(data)
                 'fk': this.case_info.id,
                 'rule': this.ruleParse(item["rule"]),
-                'weight': `${item["weight"]}`,
-                'score': `${item["score"]}`
+                'action': this.actionParse(item["action"]),
+                'naction': this.actionParse(item["naction"])
             },
             {
               headers:{
@@ -186,12 +146,42 @@ class ScoreCard extends React.Component{
                 //console.log(this.state.activeCase)
             })
             .catch((err) => console.log(err));
-        }
+    };
+
+    onSave = (item) => {
+        axios
+            .put(`/api/RuleSetPool/${item["id"]}/`,
+            {
+                //here is body(data)
+                'fk': this.case_info.id,
+                'rule': this.ruleParse(item["rule"]),
+                'action': this.actionParse(item["action"]),
+                'naction': this.actionParse(item["naction"])
+            },
+            {
+              headers:{
+                  //here is headers for token and cookies
+                  'token':'try4sdgsdsafsd232a84sd'
+              }
+            })
+            .then((res) => {
+                //console.log(res.data["names"])
+                //console.log(res.data)
+                if(res.data)
+                {
+                    if(res.data["error"])
+                    {
+                        alert(res.data["error"])
+                    }
+                }
+                this.toggle();
+            })
+            .catch((err) => console.log(err));
     };
 
     onDelete = (item) => {
         axios
-            .delete(`/api/ScoreCardPool/${item["id"]}/`,
+            .delete(`/api/RuleSetPool/${item["id"]}/`,
             {
                 //here is body(data)
             },
@@ -215,7 +205,7 @@ class ScoreCard extends React.Component{
 
     refreshList = () => {
         axios
-            .get(`/api/ScoreCardPool/link/${this.props.case_info.id}`)
+            .get(`/api/RuleSetPool/link/${this.props.case_info.id}`)
             .then((res => {
                 this.setState( { cardList:res.data } );
             }))
@@ -227,12 +217,7 @@ class ScoreCard extends React.Component{
         this.refreshList();
     };
 
-    new_toggle = () => {
-        this.setState({ new_modal: !this.state.new_modal });
-        this.refreshList();
-    };
-
-    edit = (item,etype) => {
+    edit = (item) => {
         axios
             .get(`/api/VariablePool/`,
             {
@@ -248,30 +233,34 @@ class ScoreCard extends React.Component{
             .then((res) => {
                 //console.log(res.data["names"])
                 //console.log(res.data)
+
+                let activeItem = {...item}
+                console.log(activeItem);
+                activeItem["action"] = activeItem["action"]===null? "" : JSON.stringify(item["action"]);
+                activeItem["naction"] = activeItem["naction"]===null? "" : JSON.stringify(item["naction"]);
+                console.log(activeItem);
     
                 this.setState({
                     allCardPool: res.data,
-                    activeCard: item,
-                    type: etype,
+                    activeCard: activeItem,
+                    type: 2,
                     modal: !this.state.modal
                 });
                 //console.log(this.state.activeCase)
             })
             .catch((err) => console.log(err));
         //console.log(item)
-        //etype=1(edit varaible); etype=2(edit score)
-        //this.setState( { activeCard: item, type: etype, modal: !this.state.modal } );
     };
 
-    renderScoreCard = () => {
+    renderRuleSet = () => {
         const cards = this.state.cardList;
 
         return cards.map((eachCard)=>(
             <tr key = {eachCard["id"]}>
                 <td> {eachCard["id"]} </td>
-                <tr>
+                <td>
                     {eachCard["rule"].map((eachrule) => {return (
-                        <table>
+                        <table key= {eachCard["id"]}>
                             <thead>
                                 <th>variable</th>
                                 <th>name</th>
@@ -290,15 +279,56 @@ class ScoreCard extends React.Component{
                             </tbody> 
                         </table>
                     ); })}
-                </tr>
-                <td> {eachCard["weight"]} </td>
-                <td> {eachCard["score"]} </td>
+                </td>
                 <td>
-                    <button className="btn btn-primary mr-2 disabled" onClick={() => this.edit(eachCard,1)}>
-                        Variable
-                    </button>
-                    <button className="btn btn-warning mr-2" onClick={() => this.edit(eachCard,2)}>
-                        Score
+                    {eachCard["action"] ? eachCard["action"].map((eachaction) => {
+                        return (
+                            <table key={eachCard["id"]}>
+                                <thead>
+                                    <th>method</th>
+                                    <th>content</th>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>{eachaction["method"]}</td>
+                                        <td>
+                                            <table>
+                                                <tr>{eachaction["content"]["id"] ? `id : ${eachaction["content"]["id"]}`:``}</tr>
+                                                <tr>{eachaction["content"]["value"] ? `val : ${eachaction["content"]["value"]}`:``}</tr>
+                                                <tr>{eachaction["content"]["log"] ? `log : ${eachaction["content"]["log"]}`:``}</tr>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                </tbody> 
+                            </table>
+                        );
+                    } ) : <td></td> }
+                </td>
+                <td>
+                    {eachCard["naction"] ? eachCard["naction"].map((eachaction) => {
+                        return (
+                            <table key={eachCard["id"]}>
+                                <thead>
+                                    <th>method</th>
+                                    <th>content</th>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>{eachaction["method"]}</td>
+                                        <td>
+                                            <tr>{eachaction["content"]["id"] ? `id : ${eachaction["content"]["id"]}`:``}</tr>
+                                            <tr>{eachaction["content"]["value"] ? `val : ${eachaction["content"]["value"]}`:``}</tr>
+                                            <tr>{eachaction["content"]["log"] ? `log : ${eachaction["content"]["log"]}`:``}</tr>
+                                        </td>
+                                    </tr>
+                                </tbody> 
+                            </table>
+                        );
+                    } ) : <td></td> }
+                </td>
+                <td>
+                    <button className="btn btn-warning mr-2" onClick={() => this.edit(eachCard)}>
+                        Edit
                     </button>
                     <button className="btn btn-danger mr-2" onClick={() => this.onDelete(eachCard)}>
                         Delete
@@ -313,7 +343,7 @@ class ScoreCard extends React.Component{
     render(){
         return(
             <div>
-                <div>This is ScoreCard!</div>
+                <div>This is Rule Set!</div>
                 <div>
                     <Link to="/" className="btn btn-secondary mr-2">
                         Home
@@ -335,13 +365,13 @@ class ScoreCard extends React.Component{
                             <tr>
                                 <th>ID</th>
                                 <th>Rule</th>
-                                <th>weight</th>
-                                <th>score</th>
+                                <th>Action</th>
+                                <th>Naction</th>
                                 <th>編輯</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {this.renderScoreCard()}
+                            {this.renderRuleSet()}
                         </tbody>
                     </table>
                     <button
@@ -352,20 +382,11 @@ class ScoreCard extends React.Component{
                     </button>
                 </div>
                 {this.state.modal ? (
-                        <ScoreModal
-                            activeCard={this.state.activeCard}
+                        <RuleSetModal
+                            activeCard={this.state.activeCard }
                             existVariable={this.state.allCardPool}
-                            active = {this.state.type}
                             toggle={this.toggle}
-                            onSave={this.onSave}
-                        />
-                    ) : null}
-                {this.state.new_modal ? (
-                        <AddScoreModal
-                            fk = {this.props.case_info.id}
-                            existVariable={this.state.allCardPool}
-                            toggle={this.new_toggle}
-                            onAdd={this.onAdd}
+                            onSave={this.state.type === 2 ? this.onSave : this.onAdd}
                         />
                     ) : null}
             </div>
@@ -378,5 +399,5 @@ export default function(props){
     const {state} = useLocation();
     //console.log(state);
 
-    return <ScoreCard {...props} case_info = {state} />;
+    return <RuleSet {...props} case_info = {state} />;
 };

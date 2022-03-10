@@ -116,15 +116,17 @@ class RuleSetAll extends React.Component{
                                     <tr>
                                         <td>{eachaction["method"]}</td>
                                         <td>
-                                            {eachaction["content"]["id"] ? ` id = ${eachaction["content"]["id"]}\n`:``}
-                                            {eachaction["content"]["value"] ? ` val = ${eachaction["content"]["value"]}\n`:``}
-                                            {eachaction["content"]["log"] ? ` log = ${eachaction["content"]["log"]}\n`:``}
+                                            <table>
+                                                <tr>{eachaction["content"]["id"] ? `id : ${eachaction["content"]["id"]}`:``}</tr>
+                                                <tr>{eachaction["content"]["value"] ? `val : ${eachaction["content"]["value"]}`:``}</tr>
+                                                <tr>{eachaction["content"]["log"] ? `log : ${eachaction["content"]["log"]}`:``}</tr>
+                                            </table>
                                         </td>
                                     </tr>
                                 </tbody> 
                             </table>
                         );
-                    } ) : <td>(null)</td> }
+                    } ) : <td></td> }
                 </td>
                 <td>
                     {eachCard["naction"] ? eachCard["naction"].map((eachaction) => {
@@ -138,15 +140,15 @@ class RuleSetAll extends React.Component{
                                     <tr>
                                         <td>{eachaction["method"]}</td>
                                         <td>
-                                            {eachaction["content"]["id"] ? ` id = ${eachaction["content"]["id"]}\n`:``}<br/>
-                                            {eachaction["content"]["value"] ? ` val = ${eachaction["content"]["value"]}\n`:``}
-                                            {eachaction["content"]["log"] ? ` log = ${eachaction["content"]["log"]}\n`:``}
+                                            <tr>{eachaction["content"]["id"] ? `id : ${eachaction["content"]["id"]}`:``}</tr>
+                                            <tr>{eachaction["content"]["value"] ? `val : ${eachaction["content"]["value"]}`:``}</tr>
+                                            <tr>{eachaction["content"]["log"] ? `log : ${eachaction["content"]["log"]}`:``}</tr>
                                         </td>
                                     </tr>
                                 </tbody> 
                             </table>
                         );
-                    } ) : <td>(null)</td> }
+                    } ) : <td></td> }
                 </td>
                 <td>
                     <button className="btn btn-danger mr-2" onClick={() => this.onDelete(eachCard)}>

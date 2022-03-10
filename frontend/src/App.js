@@ -9,6 +9,7 @@ import ScoreCard from "./ScoreCard";
 import ScoreCardAll from "./ScoreCardAll";
 import RuleSetLibrary from "./RuleSetLibrary";
 import RuleSetAll from "./RuleSetAll";
+import RuleSet from "./RuleSet";
 
 
 class App extends React.Component{
@@ -25,6 +26,7 @@ class App extends React.Component{
                     <Route path="/Variable" element={<Variable />} />
                     <Route path="/RuleSetLibrary" element={<RuleSetLibrary />} />
                     <Route path="/RuleSetAll" element={<RuleSetAll />} />
+                    <Route path="/RuleSet" element={<RuleSet />} />
                 </Routes>
             </Router>
         );
