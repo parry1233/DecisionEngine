@@ -1,24 +1,22 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { Button } from "reactstrap";
-import Modal from "./components/Modal";
 import LibraryModal from "./components/LibraryModal";
 import axios from "axios";
 
-class ScoreLibrary extends React.Component{
-
+class DecisionTreeLibrary extends React.Component{
+    
     //constructor
     constructor(props) {
         super(props);
         this.state = {
           systemList: [],
-          modal: false,
           libModal:false,
           activeCase: [],
           activeLib: {"id": -1, "name": ""},
         };
     }
-
+    
     componentDidMount() {
         this.refreshList();
     }
@@ -27,7 +25,7 @@ class ScoreLibrary extends React.Component{
     //function
     refreshList = () => {
         axios
-          .get("/api/ScoreCardLibrary/")
+          .get("/api/DecisionTreeLibrary/")
           .then((res) => {
               //console.log(res.data["names"])
               this.setState({ systemList: res.data });
@@ -36,77 +34,10 @@ class ScoreLibrary extends React.Component{
           .catch((err) => console.log(err));
     };
 
-    toggle = () => {
-        this.setState({ modal: !this.state.modal });
-    };
-
     new_Toggle = () => {
         this.setState({ libModal: !this.state.libModal });
         this.refreshList();
     };
-
-    Detail = (item) => {
-        //console.log(item)
-        axios
-          .get(`/api/ScoreCardPool/link/${item["id"]}`,
-          //{
-          //    //here is body(data)
-          //    'action':'get',
-          //    'name':item
-          //},
-          //{
-              //headers:{
-                  //here is headers for token and cookies
-                  //'token':'try4sdgsdsafsd232a84sd'
-              //}
-          //}
-          )
-          .then((res) => {
-              //console.log(res.data["names"])
-              //console.log(res.data)
-              
-              this.setState({
-                  activeCase: res.data,
-                  modal: !this.state.modal });
-              //console.log(this.state.activeCase)
-          })
-          .catch((err) => console.log(err));
-    };
-
-    handleSubmit = (item) => {
-        console.log(item)
-        //console.log(dataIn.id)
-        //console.log(item["id"])
-        //console.log(dataIn.rule[0].name)
-        //console.log(item["rule"][0]["name"])
-    
-        //this part is currently a test version for specific id api, should be POST func
-        axios
-          .get(`/api/ScoreCardPool/${item["id"]}`,
-          //{
-          //    //here is body(data)
-          //    'action':'get',
-          //    'name':item
-          //},
-          //{
-              //headers:{
-                  //here is headers for token and cookies
-                  //'token':'try4sdgsdsafsd232a84sd'
-              //}
-          //}
-          )
-          .then((res) => {
-              //console.log(res.data["names"])
-              
-              console.log(res.data)
-                  
-              //this.setState({
-              //    activeCase: res.data,
-              //    modal: !this.state.modal });
-              //console.log(this.state.activeCase)
-          })
-          .catch((err) => console.log(err));
-      };
 
     edit = (id,name) => {
         this.setState({
@@ -120,7 +51,7 @@ class ScoreLibrary extends React.Component{
         if(type === 1) // this is add
         {
             axios
-            .post(`/api/ScoreCardLibrary/`,
+            .post(`/api/DecisionTreeLibrary/`,
             {
                 //here is body(data)
                 'name': nameIn,
@@ -152,7 +83,7 @@ class ScoreLibrary extends React.Component{
         else if(type === 2) //this is edit
         {
             axios
-            .put(`/api/ScoreCardLibrary/${id}/`,
+            .put(`/api/DecisionTreeLibrary/${id}/`,
             {
                 //here is body(data)
                 'name': nameIn,
@@ -186,7 +117,7 @@ class ScoreLibrary extends React.Component{
 
     onDel = (id) => {
         axios
-        .delete(`/api/ScoreCardLibrary/${id}`,
+        .delete(`/api/DecisionTreeLibrary/${id}`,
         {
             //here is body(data)
         },
@@ -210,7 +141,6 @@ class ScoreLibrary extends React.Component{
         .catch((err) => console.log(err));
     }
 
-
     renderCase = () => {
         const cases = this.state.systemList;
         //console.log(cases)
@@ -221,12 +151,12 @@ class ScoreLibrary extends React.Component{
               {eachCase["name"]}
             </span>
             <span>
-              <Link className="btn btn-info mr-2" to={`/ScoreCard`} state ={{id:eachCase["id"], name:eachCase["name"]}}>
-                Score Card
-              </Link>
-              <button className="btn btn-success mr-2 disabled">
+              <Link className="btn btn-success mr-2" to={`/DecisionTree`} state ={{id:eachCase["id"], name:eachCase["name"]}}>
                 Tree
-              </button>
+              </Link>
+              <a href={`http://127.0.0.1:8000/DecisionTree/${eachCase["name"]}/`} className="btn btn-success mr-2" >
+                Link
+              </a>
               <button className="btn btn-secondary mr-2" onClick={() => this.edit(eachCase["id"],eachCase["name"])}>
                 Edit
               </button>
@@ -243,7 +173,7 @@ class ScoreLibrary extends React.Component{
     render(){
         return(
             <div>
-                <div>This is ScoreCardLibrary!</div>
+                <div>This is Decision Tree Library!</div>
                 <div>
                     <Link to="/" className="btn btn-secondary mr-2">
                         Home
@@ -262,7 +192,7 @@ class ScoreLibrary extends React.Component{
                     </Link>
                 </div>
                 <main className="container">
-                    <h1 className="text-black text-uppercase text-center my-4">Score Card Library</h1>
+                    <h1 className="text-black text-uppercase text-center my-4">Variable Library</h1>
                     <div className="row">
                         <div className="col-md-6 col-sm-10 mx-auto p-0">
                             <div className="card p-3">
@@ -273,11 +203,11 @@ class ScoreLibrary extends React.Component{
                                     >
                                         Add Library
                                     </button>
-                                    <Link to ="/ScoreCardAll"
+                                    <Link to ="/VariableAll"
                                         className="btn btn-warning mr-2"
                                         //onClick={this.createItem}
                                     >
-                                        View All Score Card
+                                        View All Decision
                                     </Link>
                                 </div>
                                 <ul className="list-group list-group-flush border-top-0">
@@ -286,13 +216,6 @@ class ScoreLibrary extends React.Component{
                             </div>
                         </div>
                     </div>
-                    {this.state.modal ? (
-                        <Modal
-                            activeItem={this.state.activeCase}
-                            toggle={this.toggle}
-                            onSave={this.handleSubmit}
-                        />
-                    ) : null}
                     {this.state.libModal ? (
                         <LibraryModal
                             libInfo={this.state.activeLib}
@@ -308,4 +231,4 @@ class ScoreLibrary extends React.Component{
     }
 }
 
-export default ScoreLibrary;
+export default DecisionTreeLibrary;

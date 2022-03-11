@@ -10,6 +10,8 @@ import ScoreCardAll from "./ScoreCardAll";
 import RuleSetLibrary from "./RuleSetLibrary";
 import RuleSetAll from "./RuleSetAll";
 import RuleSet from "./RuleSet";
+import DecisionTreeLibrary from "./DecisionTreeLibrary";
+import DecisionTree from "./DecisionTree";
 
 
 class App extends React.Component{
@@ -27,6 +29,8 @@ class App extends React.Component{
                     <Route path="/RuleSetLibrary" element={<RuleSetLibrary />} />
                     <Route path="/RuleSetAll" element={<RuleSetAll />} />
                     <Route path="/RuleSet" element={<RuleSet />} />
+                    <Route path="/DecisionTreeLibrary" element={<DecisionTreeLibrary />} />
+                    <Route path="/DecisionTree" element={<DecisionTree />} />
                 </Routes>
             </Router>
         );

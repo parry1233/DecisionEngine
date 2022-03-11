@@ -1,27 +1,32 @@
 import React from "react";
 import { Link,useLocation } from "react-router-dom";
-import VariableModal from "./components/VariableModal";
-import AddVariableModal from "./components/AddVariableModal";
+import ScoreModal from "./components/ScoreModal";
+import AddScoreModal from "./components/AddScoreModal";
 import axios from "axios";
 
-class Varaible extends React.Component{
+
+//this page need more modify
+
+class DecisionTree extends React.Component{
     
     //constructor
     constructor(props){
         super(props);
         this.case_info = this.props.case_info;
-        //console.log(this.case_info);
+        //console.log(this.case_info.name);
         this.state = {  
-            vList: [],
+            cardList: [],
             modal: false,
             new_modal: false,
             activeCard:[],
-            allDType :[]
+            type: -1,
+            allCardPool :[]
         }
     }
 
     componentDidMount() {
         //this.getParams();
+        window.open(`http://127.0.0.1:8000/DecisionTree/${this.case_info.name}`,'_blank')
         this.refreshList();
     }
 
@@ -29,7 +34,7 @@ class Varaible extends React.Component{
 
     openNew = (id) => {
         axios
-            .get(`/staticdt/datatype/`,
+            .get(`/api/VariablePool/`,
             {
                 //here is body(data)
             },
@@ -45,7 +50,7 @@ class Varaible extends React.Component{
                 //console.log(res.data)
     
                 this.setState({
-                    allDType: res.data,
+                    allCardPool: res.data,
                     new_modal: !this.state.new_modal });
                 //console.log(this.state.activeCase)
             })
@@ -54,14 +59,39 @@ class Varaible extends React.Component{
         //this.setState( { case_id: id, modal: !this.state.modal } );
     };
 
+    ruleParse = (item) => {
+        //console.log(item);
+        let rule = `[`
+        for(var i = 0; i<item.length;i++)
+        {
+            //console.log(item[i]);
+            rule+=(`{`
+                +`\"variable\":\"${item[i]["variable"]}\", `
+                +`\"operator\":\"${item[i]["operator"]}\", `
+                +`\"value\":\"${item[i]["value"]}\"`
+                +`}`)
+            
+            if(i+1<item.length) rule+=`,`
+        }
+        rule += `]`;
+
+        let ruleArr = []
+        item.forEach((element) => {
+            ruleArr.push(element)
+        });
+        //console.log(rule);
+        return rule
+    };
+
     onAdd = (item) => {
         axios
-            .post(`/api/VariablePool/`,
+            .post(`/api/ScoreCardPool/`,
             {
                 //here is body(data)
-                'name': `${item["name"]}`,
-                'datatype': `${item["datatype"]}`,
-                'fk': this.case_info.id
+                'fk': this.case_info.id,
+                'rule': this.ruleParse(item["rule"]),
+                'weight': `${item["weight"]}`,
+                'score': `${item["score"]}`
             },
             {
               headers:{
@@ -88,15 +118,54 @@ class Varaible extends React.Component{
             .catch((err) => console.log(err));
     };
 
-    onSave = (item) => {
-        //console.log(item);
-        axios
-            .put(`/api/VariablePool/${item["id"]}/`,
+    onSave = (item,type) => {
+        //console.log(item,type);
+        if(type===1)
+        {
+          console.log("Edit Variable");
+          console.log(item)
+    
+          /*
+          //this part is currently a test version for specific id api, should be POST func
+          axios
+            .put(`/api/VariablePool/${item["id"]}`,
+            {
+                //here is body(data)
+                'name':item["rule"][0]["name"]
+            },
+            {
+                headers:{
+                    //here is headers for token and cookies
+                    'token':'try4sdgsdsafsd232a84sd'
+                }
+            }
+            )
+            .then((res) => {
+                //console.log(res.data["names"])
+                console.log(res.data)
+    
+                //this.setState({
+                //    activeCase: res.data,
+                //    modal: !this.state.modal });
+                //console.log(this.state.activeCase)
+            })
+            .catch((err) => console.log(err));
+          */
+        }
+        else if(type===2)
+        {
+          //console.log("Edit Score");
+          //console.log(item)
+    
+          //this part is currently a test version for specific id api, should be POST func
+          axios
+            .put(`/api/ScoreCardPool/${item["id"]}/`,
             {
                 //here is body(data)
                 'fk': this.case_info.id,
-                'name': `${item["name"]}`,
-                'datatype': `${item["datatype"]}`
+                'rule': this.ruleParse(item["rule"]),
+                'weight': `${item["weight"]}`,
+                'score': `${item["score"]}`
             },
             {
               headers:{
@@ -121,11 +190,12 @@ class Varaible extends React.Component{
                 //console.log(this.state.activeCase)
             })
             .catch((err) => console.log(err));
+        }
     };
 
     onDelete = (item) => {
         axios
-            .delete(`/api/VariablePool/${item["id"]}/`,
+            .delete(`/api/ScoreCardPool/${item["id"]}/`,
             {
                 //here is body(data)
             },
@@ -149,9 +219,9 @@ class Varaible extends React.Component{
 
     refreshList = () => {
         axios
-            .get(`/api/VariablePool/link/${this.props.case_info.id}`)
+            .get(`/api/ScoreCardPool/link/${this.props.case_info.id}`)
             .then((res => {
-                this.setState( { vList:res.data } );
+                this.setState( { cardList:res.data } );
             }))
             .catch((err) => console.log(err));
     };
@@ -166,8 +236,7 @@ class Varaible extends React.Component{
         this.refreshList();
     };
 
-    edit = (item) => {
-        /*
+    edit = (item,etype) => {
         axios
             .get(`/api/VariablePool/`,
             {
@@ -193,25 +262,49 @@ class Varaible extends React.Component{
                 //console.log(this.state.activeCase)
             })
             .catch((err) => console.log(err));
-        */
         //console.log(item)
         //etype=1(edit varaible); etype=2(edit score)
-        this.setState( { activeCard: item, modal: !this.state.modal } );
+        //this.setState( { activeCard: item, type: etype, modal: !this.state.modal } );
     };
 
     renderScoreCard = () => {
-        const variables = this.state.vList;
+        const cards = this.state.cardList;
 
-        return variables.map((eachVariable)=>(
-            <tr key = {eachVariable["id"]}>
-                <td> {eachVariable["id"]} </td>
-                <td> {eachVariable["name"]} </td>
-                <td> {eachVariable["datatype"]} </td>
+        return cards.map((eachCard)=>(
+            <tr key = {eachCard["id"]}>
+                <td> {eachCard["id"]} </td>
+                <tr>
+                    {eachCard["rule"].map((eachrule) => {return (
+                        <table>
+                            <thead>
+                                <th>variable</th>
+                                <th>name</th>
+                                <th>datatype</th>
+                                <th>operator</th>
+                                <th>value</th>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>{eachrule["variable"]}</td>
+                                    <td>{eachrule["name"]}</td>
+                                    <td>{eachrule["datatype"]}</td>
+                                    <td>{eachrule["operator"]}</td>
+                                    <td>{eachrule["value"].toString()}</td>
+                                </tr>
+                            </tbody> 
+                        </table>
+                    ); })}
+                </tr>
+                <td> {eachCard["weight"]} </td>
+                <td> {eachCard["score"]} </td>
                 <td>
-                    <button className="btn btn-warning mr-2" onClick={() => this.edit(eachVariable)}>
-                        Edit
+                    <button className="btn btn-primary mr-2 disabled" onClick={() => this.edit(eachCard,1)}>
+                        Variable
                     </button>
-                    <button className="btn btn-danger mr-2" onClick={() => this.onDelete(eachVariable)}>
+                    <button className="btn btn-warning mr-2" onClick={() => this.edit(eachCard,2)}>
+                        Score
+                    </button>
+                    <button className="btn btn-danger mr-2" onClick={() => this.onDelete(eachCard)}>
                         Delete
                     </button>
                 </td>
@@ -219,12 +312,27 @@ class Varaible extends React.Component{
         ));
     };
 
+    getTree = () =>{
+        axios
+          .get(`/DecisionTree/${this.case_info.name}/`)
+          .then((res) => {
+              console.log(res.data)
+              return res.data;
+          })
+          .catch((err) => {
+              console.log(err)
+              return;
+            });
+    }
+
 
     //render html
     render(){
+        return (<div dangerouslySetInnerHTML={{__html:this.getTree()}} />)
+        /*
         return(
             <div>
-                <div>This is Varaible!</div>
+                <div>This is ScoreCard!</div>
                 <div>
                     <Link to="/" className="btn btn-secondary mr-2">
                         Home
@@ -248,8 +356,9 @@ class Varaible extends React.Component{
                         <thead>
                             <tr>
                                 <th>ID</th>
-                                <th>Name</th>
-                                <th>Data Type</th>
+                                <th>Rule</th>
+                                <th>weight</th>
+                                <th>score</th>
                                 <th>編輯</th>
                             </tr>
                         </thead>
@@ -265,17 +374,18 @@ class Varaible extends React.Component{
                     </button>
                 </div>
                 {this.state.modal ? (
-                        <VariableModal
+                        <ScoreModal
                             activeCard={this.state.activeCard}
-                            existDType={this.state.allDType}
+                            existVariable={this.state.allCardPool}
+                            active = {this.state.type}
                             toggle={this.toggle}
                             onSave={this.onSave}
                         />
                     ) : null}
                 {this.state.new_modal ? (
-                        <AddVariableModal
+                        <AddScoreModal
                             fk = {this.props.case_info.id}
-                            existDType={this.state.allDType}
+                            existVariable={this.state.allCardPool}
                             toggle={this.new_toggle}
                             onAdd={this.onAdd}
                         />
@@ -283,6 +393,7 @@ class Varaible extends React.Component{
             </div>
             
         );
+        */
     }
 }
 
@@ -290,5 +401,5 @@ export default function(props){
     const {state} = useLocation();
     //console.log(state);
 
-    return <Varaible {...props} case_info = {state} />;
+    return <DecisionTree {...props} case_info = {state} />;
 };

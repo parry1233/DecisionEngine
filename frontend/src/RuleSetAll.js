@@ -178,6 +178,9 @@ class RuleSetAll extends React.Component{
                     <Link to="/RuleSetLibrary" className="btn btn-secondary mr-2">
                         Rule Set Library
                     </Link>
+                    <Link to="/DecisionTreeLibrary" className="btn btn-secondary mr-2">
+                        Decision Tree Library
+                    </Link>
                 </div>
 
                 <div className="container py-3">
