@@ -297,9 +297,6 @@ class ScoreCard extends React.Component{
                     <button className="btn btn-primary mr-2 disabled" onClick={() => this.edit(eachCard,1)}>
                         Variable
                     </button>
-                    <button className="btn btn-warning mr-2" onClick={() => this.edit(eachCard,2)}>
-                        Score
-                    </button>
                     <button className="btn btn-danger mr-2" onClick={() => this.onDelete(eachCard)}>
                         Delete
                     </button>

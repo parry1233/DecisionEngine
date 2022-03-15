@@ -151,7 +151,7 @@ class DecisionTreeLibrary extends React.Component{
               {eachCase["name"]}
             </span>
             <span>
-              <Link className="btn btn-success mr-2" to={`/DecisionTree`} state ={{id:eachCase["id"], name:eachCase["name"]}}>
+              <Link className="btn btn-success mr-2 disabled" to={`/DecisionTree`} state ={{id:eachCase["id"], name:eachCase["name"]}}>
                 Tree
               </Link>
               <a href={`http://127.0.0.1:8000/DecisionTree/${eachCase["name"]}/`} className="btn btn-success mr-2" >
@@ -173,26 +173,31 @@ class DecisionTreeLibrary extends React.Component{
     render(){
         return(
             <div>
-                <div>This is Decision Tree Library!</div>
-                <div>
-                    <Link to="/" className="btn btn-secondary mr-2">
-                        Home
-                    </Link>
-                    <Link to="/ScoreLibrary" className="btn btn-secondary mr-2">
-                        Score Library
-                    </Link>
-                    <Link to="/VariableLibrary" className="btn btn-secondary mr-2">
-                        Variable Library
-                    </Link>
-                    <Link to="/RuleSetLibrary" className="btn btn-secondary mr-2">
-                        Rule Set Library
-                    </Link>
-                    <Link to="/DecisionTreeLibrary" className="btn btn-secondary mr-2">
-                        Decision Tree Library
-                    </Link>
+                <div className="header">
+                    <h2>Business Enginess</h2>
+                    <hr/>
+                </div>
+                <div className="menu-bar">
+                    <ul>
+                        <li>
+                            <a href="/">Home</a>
+                        </li>
+                        <li>
+                            <Link to="/ScoreLibrary">Score Card</Link>
+                        </li>
+                        <li>
+                            <Link to="/DecisionTreeLibrary">Decision Tree</Link>
+                        </li>
+                        <li>
+                            <Link to="/VariableLibrary">Variable</Link>
+                        </li>
+                        <li>
+                            <Link to="/RuleSetLibrary">Rule Set</Link>
+                        </li>
+                    </ul>
                 </div>
                 <main className="container">
-                    <h1 className="text-black text-uppercase text-center my-4">Variable Library</h1>
+                    <h1 className="text-black text-uppercase text-center my-4">Decision Tree Library</h1>
                     <div className="row">
                         <div className="col-md-6 col-sm-10 mx-auto p-0">
                             <div className="card p-3">
