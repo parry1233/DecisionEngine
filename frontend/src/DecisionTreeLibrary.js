@@ -2,6 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { Button } from "reactstrap";
 import LibraryModal from "./components/LibraryModal";
+import './template/title.css'
 import axios from "axios";
 
 class DecisionTreeLibrary extends React.Component{

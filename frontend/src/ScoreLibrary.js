@@ -3,8 +3,8 @@ import { Link } from "react-router-dom";
 import { Button } from "reactstrap";
 import Modal from "./components/Modal";
 import LibraryModal from "./components/LibraryModal";
+import './template/title.css'
 import axios from "axios";
-import './css/title.css'
 
 class ScoreLibrary extends React.Component{
 

@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import './css/title.css'
+import './template/title.css'
 import axios from "axios";
 
 class Home extends React.Component{
