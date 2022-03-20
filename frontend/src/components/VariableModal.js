@@ -36,9 +36,17 @@ export default class CustomModal extends Component {
     this.setState({ activeItem });
   };
 
+  renderKeys = () =>{
+    const datatype = this.state.dType
+    const keys = Object.keys(datatype)
+
+    return keys.map((key,index) => (
+      <option key={key} value={key}>{datatype[key]}</option>
+    ));
+  }
+
   renderVariable() {
     const variable = this.state.activeItem
-    const datatype = this.state.dType
     //console.log(rule);
     return(
       <Form key={"variable_add"}>
@@ -57,9 +65,7 @@ export default class CustomModal extends Component {
         <FormGroup>
           <Label for="vpool-dType">Variable Data Type</Label>
           <select id="vpool-dType" name="datatype" value={variable["datatype"]} onChange={(event) => this.handleChange(event)}>
-              <option key={"b"} value={"b"}>Bool</option>
-              <option key={"F"} value={"F"}>Float</option>
-              <option key={"I"} value={"I"}>Integer</option>
+              {this.renderKeys()}
           </select>
         </FormGroup>
       </Form>

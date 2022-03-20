@@ -196,10 +196,32 @@ class Varaible extends React.Component{
         */
         //console.log(item)
         //etype=1(edit varaible); etype=2(edit score)
-        this.setState( { activeCard: item, modal: !this.state.modal } );
+        axios
+            .get(`/staticdt/datatype/`,
+            {
+                //here is body(data)
+            },
+            {
+                headers:{
+                    //here is headers for token and cookies
+                    'token':'try4sdgsdsafsd232a84sd'
+                }
+            }
+            )
+            .then((res) => {
+                //console.log(res.data["names"])
+                //console.log(res.data)
+    
+                this.setState({
+                    allDType: res.data,
+                    activeCard: item, modal: !this.state.modal
+                });
+                //console.log(this.state.activeCase)
+            })
+            .catch((err) => console.log(err));
     };
 
-    renderScoreCard = () => {
+    renderVariable = () => {
         const variables = this.state.vList;
 
         return variables.map((eachVariable)=>(
@@ -254,7 +276,7 @@ class Varaible extends React.Component{
                             </tr>
                         </thead>
                         <tbody>
-                            {this.renderScoreCard()}
+                            {this.renderVariable()}
                         </tbody>
                     </table>
                     <button
