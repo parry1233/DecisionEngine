@@ -214,7 +214,8 @@ class Varaible extends React.Component{
     
                 this.setState({
                     allDType: res.data,
-                    activeCard: item, modal: !this.state.modal
+                    activeCard: item, 
+                    modal: !this.state.modal
                 });
                 //console.log(this.state.activeCase)
             })
