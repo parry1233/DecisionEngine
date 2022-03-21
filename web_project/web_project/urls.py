@@ -16,8 +16,6 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from django.conf.urls import include
-from django.views.generic import RedirectView
-from system import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -25,4 +23,5 @@ urlpatterns = [
     path("", include('system.urls'), name="home"),
     # path("ScoreCard/", include('system.urls'), name="ScoreCard"),
     # path("DecisionTree/", include('system.urls'), name="DecisionTree"),
+    #path('users/', views.UserView.as_view()),
 ]

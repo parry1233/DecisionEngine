@@ -1,0 +1,33 @@
+@host = http://127.0.0.1:8000/api
+
+GET {{host}}/VariablePool/
+
+###
+
+GET {{host}}/VariablePool/link/1
+
+###
+
+POST {{host}}/VariablePool/
+Content-Type: application/json
+
+{
+    "name":"test",
+    "datatype":"b",
+    "fk":"1"
+}
+
+###
+
+PUT {{host}}/VariablePool/25/
+Content-Type: application/json
+
+{
+    "fk":1,
+    "name":"sssss",
+    "datatype":"b"
+}
+
+###
+
+DELETE  {{host}}/VariablePool/26/

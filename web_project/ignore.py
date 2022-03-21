@@ -1,86 +1,17 @@
 import logging
 import json
 import clips
+from web_project.wsgi import *
+import system.models as models
+from system.models import Action, UAction
+from system import static
 
+# a = UAction(static.Method.PRINT, {"log": 111})
+# b = UAction(static.Method.ASSIGN, {"id": 1, "value": 1})
+# s= json.dumps([a,b], separators=(',', ':'), default=vars)
+# t = Action(s)
+# print(t.Partial())
 
-# env = clips.Environment()
-# logging.basicConfig(level=10, format='%(message)s')
-# router = clips.LoggingRouter()
-# env.add_router(router)
-
-
-# t_fact = """
-# (deftemplate fact
-#   (slot fulltime)
-#   (slot over3yrs)
-#   (slot over5yrs)
-#   (slot previous_loan)
-#   (slot repaid_on_time)
-# )
-# """
-# env.build(t_fact)
-
-# rulectr = -1
-
-
-# def addrule(fulltime=0, over3yrs=0, over5yrs=0, previous_loan=0, repaid_on_time=0, output=""):
-#     global rulectr, env
-#     rulectr = rulectr + 1
-#     r1 = f'''(defrule rule{rulectr}
-#   (fact
-#   (fulltime {fulltime})
-#   (over3yrs {over3yrs})
-#   (over5yrs {over5yrs})
-#   (previous_loan {previous_loan})
-#   (repaid_on_time {repaid_on_time})
-#   )
-#   =>
-#   (println {output})
-#   )
-#   '''
-#     env.build(r1)
-
-
-# addrule(fulltime=1, over3yrs=1, output="Grant Loan")
-# addrule(fulltime=1, over3yrs=0, previous_loan=1,
-#         repaid_on_time=1, output="Grant Loan")
-# addrule(fulltime=1, over3yrs=0, previous_loan=1,
-#         repaid_on_time=0, output="No Loan")
-# addrule(fulltime=1, over3yrs=0, previous_loan=0, output="No Loan")
-# addrule(fulltime=0, over5yrs=1, previous_loan=1,
-#         repaid_on_time=1, output="Grant Loan")
-# addrule(fulltime=0, over5yrs=1, previous_loan=1,
-#         repaid_on_time=0, output="No Loan")
-# addrule(fulltime=0, over5yrs=1, previous_loan=0, output="No Loan")
-# addrule(fulltime=0, over5yrs=0, output="No Loan")
-
-# isFulltime = isOver3Yrs = isOver5Yrs = isPreviousLoan = isRepaidOnTime = 0
-# if input("Are you a full time employee? y/n ") == "y":
-#     isFulltime = 1
-#     if input("Have they been with the bank over 3 years? y/n ") == "y":
-#         isOver3Yrs = 1
-#     else:
-#         if input("Have they had a previous loan? y/n ") == "y":
-#             isPreviousLoan = 1
-#             if input("And was that load repaid on time? y/n ") == "y":
-#                 isRepaidOnTime = 1
-# else:
-#     if input("Have they been with the bank over 5 years? y/n ") == "y":
-#         isOver5Yrs = 1
-#         if input("Have they had a previous loan? y/n ") == "y":
-#             isPreviousLoan = 1
-#             if input("And was that load repaid on time?? y/n ") == "y":
-#                 isRepaidOnTime = 1
-
-# template = env.find_template('fact')
-# template.assert_fact(fulltime=isFulltime,
-#                      over3yrs=isOver3Yrs,
-#                      over5yrs=isOver5Yrs,
-#                      previous_loan=isPreviousLoan,
-#                      repaid_on_time=isRepaidOnTime
-#                      )
-
-# iteration = env.run()
 env = clips.Environment()
 logging.basicConfig(level=10, format='%(message)s')
 router = clips.LoggingRouter()
@@ -135,68 +66,74 @@ def add(s):
 
 
 env.define_function(add)
-env.build('''
-(defrule Rule0
-            (declare (salience 9999))
-                (urule (name "r3")(value ?r3))
+# env.build('''
+# (defrule Rule5
+# (declare (salience 9994))
+#     (urule (name "r1")(value ?r1))
 
-            (test (< ?r3 10.0))
-            =>
-            (add 1)
-            )
-''')
-env.build('''
-(defrule Rule4
-                (declare (salience 9995))
-                    (urule (name "r1")(value ?r1))
-
-                    (urule (name "r3")(value ?r3))
-
-                    (urule (name "r3")(value ?r3))
-
-                (test (and (eq ?r1 TRUE) (> ?r3 59.0) (< ?r3 65.0)))
-                =>
-                (println 0)
-                )''')
-env.build('''
-(defrule Rule5
-                (declare (salience 9994))
-                    (urule (name "r1")(value ?r1))
-
-                    (urule (name "r3")(value ?r3))
-
-                (test (and (eq ?r1 TRUE) (> ?r3 64.0)))
-                =>
-                (record "a b")
-                (println 1)
-                )''')
+# (test (and (eq ?r1 "True") True))
+# =>
+# (println 1)
+# )''')
 # env.build('''
 # (defrule Rule0
 # (declare (salience 2))
 # (urule (name "a")(value ?value))
-# (test (neq ?value 0))
+# (test (eq ?value 0))
 # =>
-# (undefrule Rule1)
-# (if ( do-for-fact((?r urule)) (= (str-compare ?r:name "b") 0) (modify ?r (value 2) ) )
+# (if ( do-for-fact((?r urule)) (eq ?r:name "b") (modify ?r (value 2) ) )
 # then else
+# ( assert (urule (name "b")(value 1)) )
 # )
-# (println (and 0 FALSE))
+# (println 1)
 # )
 # ''')
 # env.build('''
-# (defrule Rule1
-# (declare (salience 1))
-# (urule (name "b")(value ?value))
-# (test (is_bigger ?value 0))
+# (defrule _
 # =>
-# ( assert (urule (name "a")(value 1)) )
-# (println fireR2 ?value)
+# (undefrule Rule0)
 # )
 # ''')
+env.build("(defglobal ?*Rule0* = TRUE)")
+env.build('''
+            (
+                defrule Rule0
+                (declare (salience 9999))
+                (urule (name "r3")(value ?r3))
+                (test (eq ?*Rule0* TRUE))
+                =>
+                (bind ?*Rule0* FALSE)
+                (println 3)
+                (
+                    if (eq ?r3 1.0)
+                    then
+                    (
+                        if ( do-for-fact((?r urule)) (eq ?r:name "r3") (modify ?r (value 2) ) )
+                        then else
+                        ( assert (urule (name "r3")(value 2)) )
+                    )
+                    (println "1")
+                    else
+                    (println "2")
+                )
+            )
+''')
+# env.build('''
+#             (defrule Rule0
+#             (declare (salience 9998))
+#                 (urule (name "r3")(value ?r3))
+
+#                 (test (not(eq ?r3 1.0)))
+#                 =>
+#             (println ?r3)
+#             )
+# ''')
 template = env.find_template('urule')
-template.assert_fact(name="r1", value=True)
-template.assert_fact(name="r3", value=65)
-template.assert_fact(name="r4", value=True)
+template.assert_fact(name="r3", value=1.2)
+
+# template.assert_fact(name="b", value="True")
+# template.assert_fact(name="r3", value=65)
+# template.assert_fact(name="r4", value=True)
 
 # template.assert_fact(name="a", value=20)
 # template.assert_fact(name="a", value=True)
@@ -206,5 +143,11 @@ template.assert_fact(name="r4", value=True)
 # a = set([1, 2, 3])
 # a.difference(set(1))
 # print(a)
-
 iteration = env.run()
+# for x in env.facts():
+#     print(x)
+# for x in env.rules():
+#     print(x)
+a=2
+a=1
+print(not a)

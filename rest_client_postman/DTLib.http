@@ -1,0 +1,25 @@
+@host = http://127.0.0.1:8000/api
+
+GET {{host}}/DecisionTreeLibrary/
+
+###
+
+POST {{host}}/DecisionTreeLibrary/
+Content-Type: application/json
+
+{
+    "name":"test"
+}
+
+###
+
+PUT {{host}}/DecisionTreeLibrary/5/
+Content-Type: application/json
+
+{
+    "name":"sssss"
+}
+
+###
+
+DELETE  {{host}}/DecisionTreeLibrary/5/
