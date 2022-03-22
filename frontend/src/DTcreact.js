@@ -18,23 +18,22 @@ class DTCreact extends React.Component {
                     editable: false, // [可选] 是否启用编辑
                     theme: 'orange' // [可选] 主题
                 },
-                _jm:null,
+                _jm:undefined,
+                toggle_editable_state:"enable editable",
+                mind:null,
+                treeID:null,
             };
             
         }
         //function
     componentDidMount(){
-        const { mind, options } = this.props;
-        const opt = {
-            options:this.state.options,
-            container: 'jsmind_container',
+        if (this.state._jm === undefined){
+            const opt = this.state.options;
+            const jm = new jsMind(opt);
+            this.setState({_jm: jm});
+            jm.show();     
         }
-        const jm = new jsMind(opt);
-        this.setState({_jm: jm});
-        this.state._jm.show(mind);
     }
-    
-
     get_selected_nodeid = () => {
         var selected_node = this.state._jm.get_selected_node();
         if (!!selected_node) {
@@ -46,7 +45,9 @@ class DTCreact extends React.Component {
     open_ajax = () => {
         var mind_url = 'data_example.json';
         jsMind.util.ajax.get(mind_url, function(mind) {
-            this.state._jm.show(mind);
+            var jm = this.state._jm
+            jm.show(mind);
+            this.setState({_jm: jm});
         });
     }
     save_file = () => {
@@ -63,7 +64,9 @@ class DTCreact extends React.Component {
             jsMind.util.file.read(file_data, function(jsmind_data, jsmind_name) {
                 var mind = jsMind.util.json.string2json(jsmind_data);
                 if (!!mind) {
-                    this.state._jm.show(mind);
+                    var jm = this.state._jm
+                    jm.show(mind);
+                    this.setState({_jm: jm});
                 } else {
                     alert('can not open this file as mindmap');
                 }
@@ -74,12 +77,17 @@ class DTCreact extends React.Component {
     }
     toggle_editable = (btn) => {
         var editable = this.state._jm.get_editable();
-        if (editable) {
-            this.state._jm.disable_edit();
-            btn.innerHTML = 'enable editable';
+        if (editable) { 
+            var jm = this.state._jm
+            jm.disable_edit();
+            this.setState({_jm: jm,toggle_editable_state:"enable editable"});
+               
+            
         } else {
-            this.state._jm.enable_edit();
-            btn.innerHTML = 'disable editable';
+            var jm = this.state._jm
+            jm.enable_edit();
+            this.setState({_jm: jm,toggle_editable_state:"disable editable"});
+            
         }
     }
     add_node = () => {
@@ -87,53 +95,97 @@ class DTCreact extends React.Component {
         if (!selected_node) { alert('please select a node first.'); return; }
         var nodeid = jsMind.util.uuid.newid();
         var topic = '* Node_' + nodeid.substr(nodeid.length - 6) + ' *';
-        var node = this.state._jm.add_node(selected_node, nodeid, topic);
+        var jm = this.state._jm
+        var node = jm.add_node(selected_node, nodeid, topic);
+        this.setState({_jm: jm});
     }
     remove_node = () => {
             var selected_id = this.get_selected_nodeid();
             if (!selected_id) { alert('please select a node first.'); return; }
-            this.state._jm.remove_node(selected_id);
+            var jm = this.state._jm
+            jm.remove_node(selected_id);
+            this.setState({_jm: jm});
         }
         //render heml
+    return_tree = () =>{
+        
+        return (
+            <div class="content">
+                <div class="content left">
+                <div class="content left var">
+                        <h3><b>Input value</b></h3>
+                        <br/>
+                        <table>
+                            <tr>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                        </table>
+                        <hr/>
+                    </div>
+                </div>
+                <div class="content left score">
+                    <h3><b>Class</b></h3>
+                    <br/>
+                    <table style="border: 0px;margin-left: 0%;">
+                        <tr style="border: 0px;">
+                            <td style="border: 0px;"><b>log :</b></td>
+                            <td style="border: 0px;"></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        );
+    }
     render() {
+        const style = {display:"none"};
         return ( 
             <div>
+                <div>
+                    
+                </div>
                 <div id = "jsmind_nav" >
-                    <br/>
                     <div> Open 
                         <div className = "flex_container" >
                             <div className = "flex_item" >
-                                <button className = "sub" onclick = {() => this.save_file() } > save file </button>  
+                                <button className = "sub" onClick = {() => this.save_file() } > save file </button>  
                             </div>  
                             <div className = "flex_item" >
-                                <input id = "file_input" className = "file_input" type = "file"/>
-                                <button className = "sub" onclick = {() => this.open_file() } > open file </button>  
+                                <input id = "file_input" className = "file_input" type = "file"></input>
+                                <button className = "sub" onClick = {() => this.open_file() } > open file </button>  
                             </div >  
                         </div> 
                     </div>   
                     <div> Edit 
                         <div className = "flex_container" >
                             <div className = "flex_item" >
-                                <button onclick = {() => this.toggle_editable(this) } > disable editable </button>  
+                                <button onClick = {() => this.toggle_editable(this) } > {this.state.toggle_editable_state} </button>  
                             </div>  
                             <div className = "flex_item" >
-                                <button onclick = {() => this.add_node() } > add a node </button>  
+                                <button onClick = {() => this.add_node() } > add a node </button>  
                             </div >  
                             <div className = "flex_item" >
-                                <button onclick = {() => this.remove_node() } > remove node </button>  
+                                <button onClick = {() => this.remove_node() } > remove node </button>  
                             </div>  
                         </div>   
-                    </div>   
+                    </div>  
+                    <div> Submit
+                        <div className = "flex_container" >
+                                <div className = "flex_item" >
+                                    <button onClick = {() => this.return_tree() } > try </button>  
+                                </div>  
+                                <div className = "flex_item" >
+                                    <button onClick = {() => this.add_node() } > add a node </button>  
+                                </div >   
+                        </div>  
+                    </div> 
                 </div> 
-
-                <div id = "jsmind_container" > 
-                
+                <div id = "jsmind_container" >    
                 </div>
-                
-                <div style = "display:none">
-                    <input classname = "file" type = "file" id = "image-chooser" accept = "image/*"/>
-                </div> 
-            </div>
+                <div style={style}>
+                    <input className="file" type="file" id="image-chooser" accept="image/*"/>
+                </div>
+            </div> 
         );
     }
 }

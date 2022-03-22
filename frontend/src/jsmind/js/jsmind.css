@@ -482,11 +482,6 @@ jmnodes.theme-asbestos jmexpander {}
 
 jmnodes.theme-asbestos jmexpander:hover {}
 
-li {
-    margin-top: 2px;
-    margin-bottom: 2px;
-}
-
 button {
     width: auto;
 }
@@ -508,10 +503,6 @@ select {
     flex-direction: row;
     flex-wrap: wrap;
     justify-content: center;
-}
-
-.file_input {
-    width: 100px;
 }
 
 button.sub {
@@ -543,51 +534,6 @@ button.sub {
     padding: 2px
 }
 
-.content {
-    text-align: center;
-}
-
-table {
-    overflow-x: auto;
-    border: 2px;
-    margin-left: 20%;
-    margin-right: 20%;
-    width: auto;
-    border-collapse: collapse;
-    border: 1px solid black;
-}
-
-tr td {
-    border: 1px solid black;
-    padding: 1px;
-}
-
-th {
-    border: 1px solid black;
-}
-
-tr:hover {
-    background-color: rgb(219, 238, 150);
-}
-
-.content.left {
-    display: flex;
-}
-
-.content.left.var {
-    margin-left: 25%;
-    flex: 1;
-}
-
-.content.left.score {
-    margin-right: 25%;
-    flex: 1;
-}
-
-hr {
-    margin: 0;
-}
-
 .jsmind li {
     margin-top: 2px;
     margin-bottom: 2px;
@@ -606,26 +552,10 @@ hr {
     height: 800px
 }
 
-#jsmind_nav {
-    width: 1230px;
-    height: 200px;
-    border: solid 1px #ccc;
-    overflow: auto;
-    float: left;
-}
-
 .file_input {
     width: 100px;
 }
 
 .jsmind button.sub {
     width: 100px;
-}
-
-#jsmind_container {
-    float: left;
-    width: 1000px;
-    height: 600px;
-    border: solid 1px #ccc;
-    background: #f4f4f4;
 }
