@@ -30,7 +30,7 @@ class UAction:
             value_check = {'b': lambda x: type(x) == bool,
                            'F': lambda x: utility.sfloat(x) is not None, 'I': lambda x: type(x) == int}
             value_cast = {'b': lambda x: bool(x),
-                          'F': lambda x: float(x), 'I': lambda x: float(int(x))}
+                          'F': lambda x: float(x), 'I': lambda x: int(x)}
             try:
                 if not value_check[obj.datatype](value):
                     raise RuntimeError(
@@ -39,7 +39,6 @@ class UAction:
             except:
                 raise RuntimeError(
                     f"cannot assign {value} to obj({target}, {static.CATAGORY_DICT[obj.datatype]})")
-
             self.method = method
             self.content = {"id": target, "value": value}
         else:
@@ -80,7 +79,7 @@ class UAction:
 
 
 class Action:
-    def __init__(self, lst=None):        
+    def __init__(self, lst=None):
         self.rlist = []
         if lst:
             try:
@@ -319,7 +318,7 @@ class RuleSetLibrary(models.Model):
         max_length=20, help_text='Enter name')
 
     def __str__(self):
-        return self.name
+        return f"{self.name} ({str(self.id)})"
 
 
 class RuleSetPool(models.Model):
@@ -328,3 +327,9 @@ class RuleSetPool(models.Model):
     rule = models.TextField(help_text='Rule', null=True)
     action = models.TextField(help_text='Action', blank=True, null=True)
     naction = models.TextField(help_text='nAction', blank=True, null=True)
+
+    def __str__(self):
+        words = [str(k) for k in Rule(self.rule).Load()]
+        text = ""
+        text += " , ".join(words)
+        return f"{self.fkey} | {text}"

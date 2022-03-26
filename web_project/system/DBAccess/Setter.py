@@ -53,29 +53,47 @@ from system import serializers
 
 # variable pool
 
+def IntCheck(k, errid):
+    k = sint(k)
+    if isinstance(k, int):
+        return k
+    else:
+        raise RuntimeError(ERRORMSG[errid])
+
+
+def FloatCheck(k, errid):
+    k = sfloat(k)
+    if isinstance(k, int):
+        return k
+    else:
+        raise RuntimeError(ERRORMSG[errid])
+
+
+def StringCheck(k):
+    k = str(k)
+    if k:
+        return k
+    else:
+        raise RuntimeError(ERRORMSG[0])
+
 
 def VARPL_Add(fkey, name, datatype):
-    (fkey, name, datatype) = (sint(fkey), str(name), str(datatype))
     try:
-        if isinstance(fkey, (int)):
-            if name:
-                if datatype in static.CATAGORY_DICT.keys():
-                    varlib = VariableLibrary.objects.filter(pk=fkey).first()
-                    if varlib is None:
-                        raise RuntimeError(
-                            ERRORMSG[3])
-                    variablepool = VariablePool()
-                    variablepool.fkey = varlib
-                    variablepool.name = name
-                    variablepool.datatype = datatype
-                    variablepool.save()
-                    return JsonResponse(serializers.VariablePoolSerializer(variablepool).data, safe=False, json_dumps_params={"ensure_ascii": False})
-                else:
-                    raise RuntimeError(ERRORMSG[4])
-            else:
-                raise RuntimeError(ERRORMSG[0])
+        (fkey, name, datatype) = (
+            IntCheck(fkey, 6), StringCheck(name), str(datatype))
+        if datatype in static.CATAGORY_DICT.keys():
+            varlib = VariableLibrary.objects.filter(pk=fkey).first()
+            if varlib is None:
+                raise RuntimeError(
+                    ERRORMSG[3])
+            variablepool = VariablePool()
+            variablepool.fkey = varlib
+            variablepool.name = name
+            variablepool.datatype = datatype
+            variablepool.save()
+            return JsonResponse(serializers.VariablePoolSerializer(variablepool).data, safe=False, json_dumps_params={"ensure_ascii": False})
         else:
-            raise RuntimeError(ERRORMSG[6])
+            raise RuntimeError(ERRORMSG[4])
     except RuntimeError as e:
         return JsonResponse({"error": str(e)}, safe=False)
 
@@ -104,14 +122,9 @@ def VARPL_Add(fkey, name, datatype):
 
 
 def VARPL_Update(fkey, id, name, datatype):
-    (fkey, id, name, datatype) = (sint(fkey), sint(id), str(name), str(datatype))
     try:
-        if fkey is None:
-            raise RuntimeError(ERRORMSG[6])
-        if id is None:
-            raise RuntimeError(ERRORMSG[1])
-        if not name:
-            raise RuntimeError(ERRORMSG[0])
+        (fkey, id, name, datatype) = (IntCheck(fkey, 6),
+                                      IntCheck(id, 1), StringCheck(name), str(datatype))
 
         varlib = VariableLibrary.objects.filter(pk=fkey).first()
         if varlib is None:
@@ -180,15 +193,9 @@ def VARPL_Update(fkey, id, name, datatype):
 
 
 def SCPL_Add(fkey, rule, weight, score):
-    (fkey, weight, score) = (sint(fkey), sfloat(weight), sfloat(score))
     try:
-        if fkey is None:
-            raise RuntimeError(ERRORMSG[6])
-        if weight is None:
-            raise RuntimeError(ERRORMSG[8])
-        if score is None:
-            raise RuntimeError(ERRORMSG[9])
-
+        (fkey, weight, score) = (IntCheck(fkey, 6),
+                                 FloatCheck(weight, 8), FloatCheck(score, 9))
         lib = ScoreCardLibrary.objects.filter(pk=fkey).first()
         if lib is None:
             raise RuntimeError(
@@ -230,17 +237,9 @@ def SCPL_Add(fkey, rule, weight, score):
 
 
 def SCPL_Update(fkey, id, rule, weight, score):
-    (fkey, id, weight, score) = (sint(fkey),
-                                 sint(id), sfloat(weight), sfloat(score))
     try:
-        if fkey is None:
-            raise RuntimeError(ERRORMSG[6])
-        if id is None:
-            raise RuntimeError(ERRORMSG[1])
-        if weight is None:
-            raise RuntimeError(ERRORMSG[8])
-        if score is None:
-            raise RuntimeError(ERRORMSG[9])
+        (fkey, id, weight, score) = (IntCheck(fkey, 6),
+                                     IntCheck(id, 1), FloatCheck(weight, 8), FloatCheck(score, 9))
 
         lib = ScoreCardLibrary.objects.filter(pk=fkey).first()
         if lib is None:
@@ -263,10 +262,8 @@ def SCPL_Update(fkey, id, rule, weight, score):
 
 
 def RSPL_Add(fkey, rule, action, naction):
-    fkey = sint(fkey)
     try:
-        if fkey is None:
-            raise RuntimeError(ERRORMSG[6])
+        fkey = IntCheck(fkey, 6)
 
         lib = RuleSetLibrary.objects.filter(pk=fkey).first()
         if lib is None:
@@ -286,10 +283,8 @@ def RSPL_Add(fkey, rule, action, naction):
 
 
 def RSPL_Update(fkey, id, rule, action, naction):
-    (fkey, id) = (sint(fkey), sint(id))
     try:
-        if fkey is None or id is None:
-            raise RuntimeError(ERRORMSG[6])
+        (fkey, id) = (IntCheck(fkey, 6), IntCheck(id, 1))
 
         lib = RuleSetLibrary.objects.filter(pk=fkey).first()
         if lib is None:
@@ -304,8 +299,9 @@ def RSPL_Update(fkey, id, rule, action, naction):
             ["variable", "datatype", "operator", "value"])
         obj.action = Action(action).PartialDump()
         obj.naction = Action(naction).PartialDump()
-        print(0)
         obj.save()
+        print(obj.rule)
+        print(obj.action)
         return JsonResponse(serializers.RuleSetPoolSerializer(obj).data, safe=False, json_dumps_params={"ensure_ascii": False})
 
     except RuntimeError as e:

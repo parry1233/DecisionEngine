@@ -4,10 +4,14 @@ GET {{host}}/RuleSetEngine/
 Content-Type: application/json
 
 {
-    "fk":2,
-    "circular":true,
+    "fk":4,
+    "circular":false,
     "varmap":{
-        "2": 1
+        "28": true,
+        "29": true,
+        "30": 240000,
+        "31": 20,
+        "32": true
     }
 }
 
