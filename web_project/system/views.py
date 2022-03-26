@@ -7,7 +7,7 @@ from django.http import Http404
 from django.views.decorators.csrf import csrf_exempt
 
 from . import static
-from .models import Rule,Action, RuleSetLibrary, RuleSetPool, URule, ScoreCardLibrary, ScoreCardPool, VariableLibrary, VariablePool, DecisionTreeLibrary, DecisionTreePool
+from .models import Rule, Action, RuleSetLibrary, RuleSetPool, URule, ScoreCardLibrary, ScoreCardPool, VariableLibrary, VariablePool, DecisionTreeLibrary, DecisionTreePool
 import json
 from system.InferenceEngine import SCEngine, DTEngine, RSEngine
 from system.DBAccess import Setter, Getter
@@ -16,8 +16,10 @@ from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.decorators import api_view
 
+
 def value_transform(kmap):
     # turn kmap to value according to it's datatype, also map kmap id to readable name in k2names
+    # print(kmap)
     kmap = {x.replace('r', ''): y for x, y in kmap.items()}
     k2names = {}
     for x in kmap.keys():
@@ -30,10 +32,11 @@ def value_transform(kmap):
                     'F': lambda x: float(x), 'I': lambda x: float(int(x))}
             kmap[x] = cast[datatype](kmap[x])
     kmap = {"r"+x: y for x, y in kmap.items()}
-    k2names = {"r"+x: (x,y) for x, y in k2names.items()}
-    vardata = {k2names[x][1]: (k2names[x][0],y) for x, y in kmap.items()}
+    k2names = {"r"+x: (x, y) for x, y in k2names.items()}
+    vardata = {k2names[x][1]: (k2names[x][0], y) for x, y in kmap.items()}
+
     # return (facts for clipspy, variable info for template)
-    return kmap, [{"id":y[0],"name":x, "value":y[1]} for x,y in vardata.items()]
+    return kmap, [{"id": y[0], "name":x, "value":y[1]} for x, y in vardata.items()]
 
 
 def index(request):
@@ -188,6 +191,8 @@ def ScoreCardEngine(request):
 
     _, vardata = value_transform(engine.info().varmap)
     return JsonResponse({"total": score, "satisfy": satisfy, "varmap": vardata}, safe=False, json_dumps_params={"ensure_ascii": False})
+
+
 @api_view(["GET"])
 def DecisionTreeEngine(request):
     get = (lambda x: request.data[x])
@@ -195,6 +200,7 @@ def DecisionTreeEngine(request):
     engine = DTEngine.DTE()
     rulelist = []
     id = get("fk")
+
     def IterateThrough(prev, rnext, rlog):
         rules = DecisionTreePool.objects.filter(
             fkey=id, prev=prev).all()
@@ -217,10 +223,10 @@ def DecisionTreeEngine(request):
     engine.defrule(rulelist)
     engine.assign(varmap)
     logs = engine.run()
-
     _, vardata = value_transform(engine.info().varmap)
-
+    print(engine.info().varmap)
     return JsonResponse({"log": logs, "varmap": vardata}, safe=False, json_dumps_params={"ensure_ascii": False})
+
 
 @api_view(["GET"])
 def RuleSetEngine(request):
@@ -235,6 +241,7 @@ def RuleSetEngine(request):
     engine.assign(varmap)
     log = engine.run()
     _, vardata = value_transform(engine.info().varmap)
+    print(vardata)
     return JsonResponse({"log": log, "varmap": vardata}, safe=False, json_dumps_params={"ensure_ascii": False})
 
 

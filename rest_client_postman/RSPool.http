@@ -4,7 +4,7 @@ GET {{host}}/RuleSetPool/
 
 ###
 
-GET {{host}}/RuleSetPool/link/2
+GET {{host}}/RuleSetPool/link/4
 
 ###
 
@@ -29,7 +29,6 @@ Content-Type: application/json
     "action":null,
     "naction":null
 }
-
 ###
 
 DELETE  {{host}}/RuleSetPool/7/

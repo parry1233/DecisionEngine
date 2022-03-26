@@ -118,5 +118,6 @@ class RSE:
 
         self.assign(unassign_map)
         self.env.run()
-        self.assign({x["name"]: x["value"] for x in self.env.facts()})
+        self.assign({x["name"]: x["value"] if x["value"] not in ["TRUE", "FALSE"]
+                     else x["value"] == "TRUE" for x in self.env.facts()})
         return self.log
