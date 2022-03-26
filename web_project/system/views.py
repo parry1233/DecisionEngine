@@ -176,7 +176,7 @@ def DecisionTreeView(request, id):
     return render(request, 'DecisionTree.html', context=context)
 
 
-@api_view(["GET"])
+@api_view(["POST"])
 def ScoreCardEngine(request):
     get = (lambda x: request.data[x])
     varmap, _ = value_transform(get("varmap"))
@@ -193,7 +193,7 @@ def ScoreCardEngine(request):
     return JsonResponse({"total": score, "satisfy": satisfy, "varmap": vardata}, safe=False, json_dumps_params={"ensure_ascii": False})
 
 
-@api_view(["GET"])
+@api_view(["POST"])
 def DecisionTreeEngine(request):
     get = (lambda x: request.data[x])
     varmap, _ = value_transform(get("varmap"))
@@ -228,7 +228,7 @@ def DecisionTreeEngine(request):
     return JsonResponse({"log": logs, "varmap": vardata}, safe=False, json_dumps_params={"ensure_ascii": False})
 
 
-@api_view(["GET"])
+@api_view(["POST"])
 def RuleSetEngine(request):
     get = (lambda x: request.data[x])
     varmap, _ = value_transform(get("varmap"))
