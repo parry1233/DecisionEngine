@@ -131,6 +131,9 @@ class Home extends React.Component{
                                 {this.renderRuleLib()}
                             </ul>
                         </li>
+                        <li>
+                            <Link to="/Engine">Engine</Link>
+                        </li>
                     </ul>
                 </div>
             </div>

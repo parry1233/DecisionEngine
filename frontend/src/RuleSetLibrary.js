@@ -2,6 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { Button } from "reactstrap";
 import LibraryModal from "./components/LibraryModal";
+import './template/title.css'
 import axios from "axios";
 
 class RuleSetLibrary extends React.Component{
@@ -191,6 +192,9 @@ class RuleSetLibrary extends React.Component{
                         </li>
                         <li>
                             <Link to="/RuleSetLibrary">Rule Set</Link>
+                        </li>
+                        <li>
+                            <Link to="/Engine">Engine</Link>
                         </li>
                     </ul>
                 </div>

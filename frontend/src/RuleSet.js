@@ -343,23 +343,31 @@ class RuleSet extends React.Component{
     render(){
         return(
             <div>
-                <div>This is Rule Set!</div>
-                <div>
-                    <Link to="/" className="btn btn-secondary mr-2">
-                        Home
-                    </Link>
-                    <Link to="/ScoreLibrary" className="btn btn-secondary mr-2">
-                        Score Library
-                    </Link>
-                    <Link to="/VariableLibrary" className="btn btn-secondary mr-2">
-                        Variable Library
-                    </Link>
-                    <Link to="/RuleSetLibrary" className="btn btn-secondary mr-2">
-                        Rule Set Library
-                    </Link>
-                    <Link to="/DecisionTreeLibrary" className="btn btn-secondary mr-2">
-                        Decision Tree Library
-                    </Link>
+               <div className="header">
+                    <h2>Business Enginess</h2>
+                    <hr/>
+                </div>
+                <div className="menu-bar">
+                    <ul>
+                        <li>
+                            <a href="/">Home</a>
+                        </li>
+                        <li>
+                            <Link to="/ScoreLibrary">Score Card</Link>
+                        </li>
+                        <li>
+                            <Link to="/DecisionTreeLibrary">Decision Tree</Link>
+                        </li>
+                        <li>
+                            <Link to="/VariableLibrary">Variable</Link>
+                        </li>
+                        <li>
+                            <Link to="/RuleSetLibrary">Rule Set</Link>
+                        </li>
+                        <li>
+                            <Link to="/Engine">Engine</Link>
+                        </li>
+                    </ul>
                 </div>
 
                 <div className="container py-3">

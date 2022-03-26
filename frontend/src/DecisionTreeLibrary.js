@@ -195,6 +195,9 @@ class DecisionTreeLibrary extends React.Component{
                         <li>
                             <Link to="/RuleSetLibrary">Rule Set</Link>
                         </li>
+                        <li>
+                            <Link to="/Engine">Engine</Link>
+                        </li>
                     </ul>
                 </div>
                 <main className="container">

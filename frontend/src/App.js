@@ -12,6 +12,7 @@ import RuleSetAll from "./RuleSetAll";
 import RuleSet from "./RuleSet";
 import DecisionTreeLibrary from "./DecisionTreeLibrary";
 import DecisionTree from "./DecisionTree";
+import Engine from "./Engine";
 
 
 class App extends React.Component{
@@ -31,6 +32,7 @@ class App extends React.Component{
                     <Route path="/RuleSet" element={<RuleSet />} />
                     <Route path="/DecisionTreeLibrary" element={<DecisionTreeLibrary />} />
                     <Route path="/DecisionTree" element={<DecisionTree />} />
+                    <Route path="/Engine" element={<Engine />} />
                 </Routes>
             </Router>
         );

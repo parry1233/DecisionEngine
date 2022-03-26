@@ -195,17 +195,8 @@ class VariableAll extends React.Component{
                     <Link to="/" className="btn btn-secondary mr-2">
                         Home
                     </Link>
-                    <Link to="/ScoreLibrary" className="btn btn-secondary mr-2">
-                        Score Library
-                    </Link>
                     <Link to="/VariableLibrary" className="btn btn-secondary mr-2">
-                        Variable Library
-                    </Link>
-                    <Link to="/RuleSetLibrary" className="btn btn-secondary mr-2">
-                        Rule Set Library
-                    </Link>
-                    <Link to="/DecisionTreeLibrary" className="btn btn-secondary mr-2">
-                        Decision Tree Library
+                        Back
                     </Link>
                 </div>
 
