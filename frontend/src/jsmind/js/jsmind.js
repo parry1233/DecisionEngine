@@ -487,9 +487,9 @@
             get_mind: function(source) {
                 var df = jm.format.node_tree;
                 var mind = new jm.mind();
-                mind.name = source.meta.name;
-                mind.author = source.meta.author;
-                mind.version = source.meta.version;
+                mind.name = source.meta.name || __name__;
+                mind.author = source.meta.author || __author__;
+                mind.version = source.meta.version || __version__;
                 df._parse(mind, source.data);
                 return mind;
             },
@@ -1697,7 +1697,7 @@
                     df = 'node_tree';
                 }
             } else {
-                df = 'freemind';
+                df = 'node_tree';
             }
 
             if (df == 'node_array') {

@@ -6,7 +6,7 @@
  *   https://github.com/hizzgdev/jsmind/
  */
 
-(function ($w) {
+(function($w) {
     'use strict';
     var $d = $w.document;
     var __name__ = 'jsMind';
@@ -15,9 +15,9 @@
     if (typeof jsMind.draggable != 'undefined') { return; }
 
     var jdom = jsMind.util.dom;
-    var clear_selection = 'getSelection' in $w ? function () {
+    var clear_selection = 'getSelection' in $w ? function() {
         $w.getSelection().removeAllRanges();
-    } : function () {
+    } : function() {
         $d.selection.empty();
     };
 
@@ -27,7 +27,7 @@
         lookup_interval: 80
     };
 
-    jsMind.draggable = function (jm) {
+    jsMind.draggable = function(jm) {
         this.jm = jm;
         this.e_canvas = null;
         this.canvas_ctx = null;
@@ -48,19 +48,19 @@
     };
 
     jsMind.draggable.prototype = {
-        init: function () {
+        init: function() {
             this._create_canvas();
             this._create_shadow();
             this._event_bind();
         },
 
-        resize: function () {
+        resize: function() {
             this.jm.view.e_nodes.appendChild(this.shadow);
             this.e_canvas.width = this.jm.view.size.w;
             this.e_canvas.height = this.jm.view.size.h;
         },
 
-        _create_canvas: function () {
+        _create_canvas: function() {
             var c = $d.createElement('canvas');
             this.jm.view.e_panel.appendChild(c);
             var ctx = c.getContext('2d');
@@ -68,7 +68,7 @@
             this.canvas_ctx = ctx;
         },
 
-        _create_shadow: function () {
+        _create_shadow: function() {
             var s = $d.createElement('jmnode');
             s.style.visibility = 'hidden';
             s.style.zIndex = '3';
@@ -77,7 +77,7 @@
             this.shadow = s;
         },
 
-        reset_shadow: function (el) {
+        reset_shadow: function(el) {
             var s = this.shadow.style;
             this.shadow.innerHTML = el.innerHTML;
             s.left = el.style.left;
@@ -92,17 +92,17 @@
 
         },
 
-        show_shadow: function () {
+        show_shadow: function() {
             if (!this.moved) {
                 this.shadow.style.visibility = 'visible';
             }
         },
 
-        hide_shadow: function () {
+        hide_shadow: function() {
             this.shadow.style.visibility = 'hidden';
         },
 
-        _magnet_shadow: function (node) {
+        _magnet_shadow: function(node) {
             if (!!node) {
                 this.canvas_ctx.lineWidth = options.line_width;
                 this.canvas_ctx.strokeStyle = 'rgba(0,0,0,0.3)';
@@ -112,18 +112,18 @@
             }
         },
 
-        _clear_lines: function () {
+        _clear_lines: function() {
             this.canvas_ctx.clearRect(0, 0, this.jm.view.size.w, this.jm.view.size.h);
         },
 
-        _canvas_lineto: function (x1, y1, x2, y2) {
+        _canvas_lineto: function(x1, y1, x2, y2) {
             this.canvas_ctx.beginPath();
             this.canvas_ctx.moveTo(x1, y1);
             this.canvas_ctx.lineTo(x2, y2);
             this.canvas_ctx.stroke();
         },
 
-        _lookup_close_node: function () {
+        _lookup_close_node: function() {
             var root = this.jm.get_root();
             var root_location = root.get_location();
             var root_size = root.get_size();
@@ -189,7 +189,7 @@
             return result_node;
         },
 
-        lookup_close_node: function () {
+        lookup_close_node: function() {
             var node_data = this._lookup_close_node();
             if (!!node_data) {
                 this._magnet_shadow(node_data);
@@ -198,42 +198,42 @@
             }
         },
 
-        _event_bind: function () {
+        _event_bind: function() {
             var jd = this;
             var container = this.jm.view.container;
-            jdom.add_event(container, 'mousedown', function (e) {
-                var evt = e || event;
+            jdom.add_event(container, 'mousedown', function(e) {
+                var evt = e || window.event;
                 jd.dragstart.call(jd, evt);
             });
-            jdom.add_event(container, 'mousemove', function (e) {
-                var evt = e || event;
+            jdom.add_event(container, 'mousemove', function(e) {
+                var evt = e || window.event;
                 jd.drag.call(jd, evt);
             });
-            jdom.add_event(container, 'mouseup', function (e) {
-                var evt = e || event;
+            jdom.add_event(container, 'mouseup', function(e) {
+                var evt = e || window.event;
                 jd.dragend.call(jd, evt);
             });
-            jdom.add_event(container, 'touchstart', function (e) {
-                var evt = e || event;
+            jdom.add_event(container, 'touchstart', function(e) {
+                var evt = e || window.event;
                 jd.dragstart.call(jd, evt);
             });
-            jdom.add_event(container, 'touchmove', function (e) {
-                var evt = e || event;
+            jdom.add_event(container, 'touchmove', function(e) {
+                var evt = e || window.event;
                 jd.drag.call(jd, evt);
             });
-            jdom.add_event(container, 'touchend', function (e) {
-                var evt = e || event;
+            jdom.add_event(container, 'touchend', function(e) {
+                var evt = e || window.event;
                 jd.dragend.call(jd, evt);
             });
         },
 
-        dragstart: function (e) {
+        dragstart: function(e) {
             if (!this.jm.get_editable()) { return; }
             if (this.capture) { return; }
             this.active_node = null;
 
             var jview = this.jm.view;
-            var el = e.target || event.srcElement;
+            var el = e.target || window.event.srcElement;
             if (el.tagName.toLowerCase() != 'jmnode') { return; }
             var nodeid = jview.get_binded_nodeid(el);
             if (!!nodeid) {
@@ -252,9 +252,9 @@
                         $w.clearInterval(this.hlookup_timer);
                     }
                     var jd = this;
-                    this.hlookup_delay = $w.setTimeout(function () {
+                    this.hlookup_delay = $w.setTimeout(function() {
                         jd.hlookup_delay = 0;
-                        jd.hlookup_timer = $w.setInterval(function () {
+                        jd.hlookup_timer = $w.setInterval(function() {
                             jd.lookup_close_node.call(jd);
                         }, options.lookup_interval);
                     }, options.lookup_delay);
@@ -263,7 +263,7 @@
             }
         },
 
-        drag: function (e) {
+        drag: function(e) {
             if (!this.jm.get_editable()) { return; }
             if (this.capture) {
                 e.preventDefault();
@@ -279,7 +279,7 @@
             }
         },
 
-        dragend: function (e) {
+        dragend: function(e) {
             if (!this.jm.get_editable()) { return; }
             if (this.capture) {
                 if (this.hlookup_delay != 0) {
@@ -304,7 +304,7 @@
             this.capture = false;
         },
 
-        move_node: function (src_node, target_node, target_direct) {
+        move_node: function(src_node, target_node, target_direct) {
             var shadow_h = this.shadow.offsetTop;
             if (!!target_node && !!src_node && !jsMind.node.inherited(src_node, target_node)) {
                 // lookup before_node
@@ -333,17 +333,17 @@
             this.target_direct = null;
         },
 
-        jm_event_handle: function (type, data) {
+        jm_event_handle: function(type, data) {
             if (type === jsMind.event_type.resize) {
                 this.resize();
             }
         }
     };
 
-    var draggable_plugin = new jsMind.plugin('draggable', function (jm) {
+    var draggable_plugin = new jsMind.plugin('draggable', function(jm) {
         var jd = new jsMind.draggable(jm);
         jd.init();
-        jm.add_event_listener(function (type, data) {
+        jm.add_event_listener(function(type, data) {
             jd.jm_event_handle.call(jd, type, data);
         });
     });

@@ -20,10 +20,10 @@ class DTCreact extends React.Component {
                 },
                 _jm:undefined,
                 toggle_editable_state:"enable editable",
-                mind:null,
-                treeID:null,
-            };
-            
+                nowmind:null,
+                treelist:null,
+                answer:null,
+            };            
         }
         //function
     componentDidMount(){
@@ -34,6 +34,16 @@ class DTCreact extends React.Component {
             jm.show();     
         }
     }
+    refreshList = () => {
+        axios
+          .get("/api/ScoreCardLibrary/")
+          .then((res) => {
+              //console.log(res.data["names"])
+              this.setState({ systemList: res.data });  
+          })
+          .catch((err) => console.log(err));
+    };
+
     get_selected_nodeid = () => {
         var selected_node = this.state._jm.get_selected_node();
         if (!!selected_node) {
@@ -44,7 +54,7 @@ class DTCreact extends React.Component {
     }
     open_ajax = () => {
         var mind_url = 'data_example.json';
-        jsMind.util.ajax.get(mind_url, function(mind) {
+        jsMind.util.ajax.get(mind_url, (mind) => {
             var jm = this.state._jm
             jm.show(mind);
             this.setState({_jm: jm});
@@ -61,7 +71,7 @@ class DTCreact extends React.Component {
         var files = file_input.files;
         if (files.length > 0) {
             var file_data = files[0];
-            jsMind.util.file.read(file_data, function(jsmind_data, jsmind_name) {
+            jsMind.util.file.read(file_data, (jsmind_data, jsmind_name) => {
                 var mind = jsMind.util.json.string2json(jsmind_data);
                 if (!!mind) {
                     var jm = this.state._jm
@@ -81,13 +91,11 @@ class DTCreact extends React.Component {
             var jm = this.state._jm
             jm.disable_edit();
             this.setState({_jm: jm,toggle_editable_state:"enable editable"});
-               
-            
+  
         } else {
             var jm = this.state._jm
             jm.enable_edit();
-            this.setState({_jm: jm,toggle_editable_state:"disable editable"});
-            
+            this.setState({_jm: jm,toggle_editable_state:"disable editable"});   
         }
     }
     add_node = () => {
@@ -107,8 +115,49 @@ class DTCreact extends React.Component {
             this.setState({_jm: jm});
         }
         //render heml
-    return_tree = () =>{
+    return_tree=()=>{
+        var mind_data = this.state._jm.get_data();
+        axios
+            .get("/api/DecisionTreeLibrary/",{
+                
+            }
+            .then((res) => {
+                //console.log(res.data["names"])
+                this.setState({ nowmind: res.data });
+                
+            })
+            .catch((err) => console.log(err));
+    }
         
+    trytree = () =>{
+        
+        axios
+            .get("/api/DecisionTreeLibrary/",{
+
+            }
+            .then((res) => {
+                //console.log(res.data["names"])
+                this.setState({ nowmind: res.data });
+                
+            })
+            .catch((err) => console.log(err));
+        //
+        axios
+        .put("/api/ScoreCardPool/55")
+        .then((res) => {
+            //console.log(res.data["names"])
+            this.setState({ nowmind: res.data });
+            
+        })
+        .catch((err) => console.log(err));
+        var mind = jsMind.util.json.string2json(this.state.nowmind);
+        if (!!mind) {
+            var jm = this.state._jm
+            jm.show(mind);
+            this.setState({_jm: jm});
+        } else {
+            alert('can not open this file as mindmap');
+        }
         return (
             <div class="content">
                 <div class="content left">
@@ -142,7 +191,7 @@ class DTCreact extends React.Component {
         return ( 
             <div>
                 <div>
-                    
+
                 </div>
                 <div id = "jsmind_nav" >
                     <div> Open 
@@ -169,14 +218,11 @@ class DTCreact extends React.Component {
                             </div>  
                         </div>   
                     </div>  
-                    <div> Submit
+                    <div> 
                         <div className = "flex_container" >
                                 <div className = "flex_item" >
-                                    <button onClick = {() => this.return_tree() } > try </button>  
+                                    <button onClick = {() => this.return_tree() } > Submit </button>  
                                 </div>  
-                                <div className = "flex_item" >
-                                    <button onClick = {() => this.add_node() } > add a node </button>  
-                                </div >   
                         </div>  
                     </div> 
                 </div> 
