@@ -157,10 +157,10 @@ class Engine extends React.Component{
                                 {this.state.results.total}
                             </td>
                             <td>
-                                <div className="col"> {this.state.results.satisfy?.map((s,index) => <div key={`sat_`+index} className="row m-2"><Badge className={`mr-2 ${s? `bg-success`:`bg-danger`}`}>{s.toString()}</Badge></div>)} </div>
+                                <div className="d-flex flex-column align-items-start">{this.state.results.satisfy?.map((s,index) => <span key={`sat_`+index} className={`badge mb-2 text-white ${s? `bg-success`:`bg-danger`}`}>{s.toString()}</span>)}</div>
                             </td>
                             <td>
-                                <div className="col"> {this.state.results.varmap?.map((v) => <div key={`varmap_`+v.id} className="row m-2"><Badge className="mr-2">{v.name} : {v.value.toString()}</Badge></div>)} </div>
+                                <div className="d-flex flex-column align-items-start">{this.state.results.varmap?.map((v) => <span key={`varmap_`+v.id} className={"badge mb-2 text-white bg-secondary"}>{v.name} : {v.value.toString()}</span>)}</div>
                             </td>
                         </tr>
                     </tbody>
@@ -183,7 +183,7 @@ class Engine extends React.Component{
                                 {this.state.results.log}
                             </td>
                             <td>
-                                <div className="col"> {this.state.results.varmap?.map((v) => <div key={`varmap_`+v.id} className="row m-2"><Badge className="mr-2">{v.name} : {v.value.toString()}</Badge></div>)} </div>
+                                <div className="d-flex flex-column align-items-start">{this.state.results.varmap?.map((v) => <span key={`varmap_`+v.id} className={"badge mb-2 text-white bg-secondary"}>{v.name} : {v.value.toString()}</span>)}</div>
                             </td>
                         </tr>
                     </tbody>
@@ -203,10 +203,10 @@ class Engine extends React.Component{
                     <tbody>
                         <tr>
                             <td>
-                                <div className="col"> {this.state.results.log?.map((l,index) => <div key={`log_`+index} className="row m-2"><Badge className={`mr-2 ${l.split(' ')[1]==='fire'? `bg-danger`:`bg-success`}`}>{l.toString()}</Badge></div>)} </div>
+                                <div className="d-flex flex-column align-items-start">{this.state.results.log?.map((l,index) => <span key={`rs_log_`+index} className={`badge mb-2 text-white ${l.split(' ')[1]==='fire'? `bg-danger`:`bg-success`}`}>{l.toString()}</span>)}</div>
                             </td>
                             <td>
-                                <div className="col"> {this.state.results.varmap?.map((v) => <div key={`varmap_`+v.id} className="row m-2"><Badge className="mr-2">{v.name} : {v.value.toString()}</Badge></div>)} </div>
+                                <div className="d-flex flex-column align-items-start">{this.state.results.varmap?.map((v) => <span key={`varmap_`+v.id} className={"badge mb-2 text-white bg-secondary"}>{v.name} : {v.value.toString()}</span>)}</div>
                             </td>
                         </tr>
                     </tbody>
