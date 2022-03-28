@@ -1,0 +1,7 @@
+@host = http://127.0.0.1:8000/
+GET {{host}}/DecisionTreePool/
+Content-Type: application/json
+
+{
+    "name":"case 2"
+}

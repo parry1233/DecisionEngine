@@ -28,6 +28,13 @@ Content-Type: application/json
 }
 
 ###
+GET {{host}}/DecisionTreeJsmind/
+Content-Type: application/json
+
+{
+    "fk":1
+}
+###
 
 GET {{host}}/DecisionTreeEngine/
 Content-Type: application/json

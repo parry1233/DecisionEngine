@@ -30,4 +30,6 @@ urlpatterns = [
          views.ScoreCardEngine, name=""),
     path("DecisionTreeEngine/",
          views.DecisionTreeEngine, name=""),
+    path("DecisionTreeJsmind/",
+         views.DecisionTreeViewJSMindStructure, name=""),
 ]

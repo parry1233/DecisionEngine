@@ -175,6 +175,55 @@ def DecisionTreeView(request, id):
 
 
 @api_view(["GET"])
+def DecisionTreeViewJSMindStructure(request):
+    get = (lambda x: request.data[x])
+    fkey = get("fk")
+    print(fkey)
+    idctr = 0
+
+    def JsmindNode(topic, parentid):
+        nonlocal idctr
+        idctr = idctr + 1
+        return {"id": str(idctr), "parentid": parentid, "isroot": idctr == 1, "topic": topic}
+
+    def JsmindAppendTo(data, pname, parentid):
+        rules = DecisionTreePool.objects.filter(
+            fkey=fkey, prev=pname).all()
+
+        parent = None
+        if len(rules) != 0:
+            x = rules[0]
+            lst = [x.ToReadable() for x in Rule(x.rule).GetRaw()]
+            xname = lst[0].name
+            parent = JsmindNode(xname, parentid)
+            data.append(parent)
+        for x in rules:
+            lst = [x.ToReadable() for x in Rule(x.rule).GetRaw()]
+            # print(lst)
+            only_rule = [x.rule for x in lst]
+            xrule = " and ".join(only_rule)
+            child = JsmindNode(xrule, parent["id"])
+            data.append(child)
+            if x.log != "":
+                data.append(JsmindNode(f"印出{x.log}", child["id"]))
+            JsmindAppendTo(data, x, child["id"])
+    jstree = []
+    JsmindAppendTo(jstree, None, "")
+
+    SCid = ScoreCardLibrary.objects.all()
+    scid_list = {i: rule.name for i, rule in enumerate(SCid)}
+    lib = DecisionTreeLibrary.objects.all()
+    dtid_list = {i: rule.name for i, rule in enumerate(lib)}
+
+    context = {
+        "link_list": json.dumps({"meta": {}, "format": "node_array", "data": jstree}, default=vars, ensure_ascii=False),
+        "scid": scid_list,
+        "dtid": dtid_list
+    }
+    return JsonResponse(context, safe=False, json_dumps_params={"ensure_ascii": False})
+
+
+@api_view(["GET"])
 def ScoreCardEngine(request):
     get = (lambda x: request.data[x])
     varmap, _ = value_transform(get("varmap"))
