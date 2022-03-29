@@ -177,8 +177,6 @@ def DecisionTreeView(request, id):
 
 
 @api_view(["POST"])
-<<<<<<< HEAD
-=======
 def DecisionTreeViewJSMindStructure(request):
     get = (lambda x: request.data[x])
     fkey = get("fk")
@@ -228,7 +226,6 @@ def DecisionTreeViewJSMindStructure(request):
 
 
 @api_view(["POST"])
->>>>>>> backend
 def ScoreCardEngine(request):
     get = (lambda x: request.data[x])
     varmap, _ = value_transform(get("varmap"))
