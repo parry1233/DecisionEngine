@@ -1,6 +1,6 @@
 @host = http://127.0.0.1:8000
 
-GET {{host}}/RuleSetEngine/
+POST {{host}}/RuleSetEngine/
 Content-Type: application/json
 
 {
@@ -17,7 +17,7 @@ Content-Type: application/json
 
 ###
 
-GET {{host}}/ScoreCardEngine/
+POST {{host}}/ScoreCardEngine/
 Content-Type: application/json
 
 {
@@ -28,7 +28,7 @@ Content-Type: application/json
 }
 
 ###
-GET {{host}}/DecisionTreeJsmind/
+POST {{host}}/DecisionTreeJsmind/
 Content-Type: application/json
 
 {
@@ -36,7 +36,7 @@ Content-Type: application/json
 }
 ###
 
-GET {{host}}/DecisionTreeEngine/
+POST {{host}}/DecisionTreeEngine/
 Content-Type: application/json
 
 {
