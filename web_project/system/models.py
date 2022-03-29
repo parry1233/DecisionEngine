@@ -287,7 +287,7 @@ class DecisionTreeLibrary(models.Model):
         max_length=20, help_text='Enter name')
 
     def __str__(self):
-        return self.name
+        return f"{self.name} ({str(self.id)})"
 
 
 class DecisionTreePool(models.Model):
