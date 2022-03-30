@@ -17,7 +17,8 @@ class Engine extends React.Component{
           varmap: {},
           results:{},
           activeLib: {"fk": -1, "type": ""},
-          allDType: {}
+          allDType: {},
+          cardList_transfer: []
         };
     }
     
@@ -144,7 +145,7 @@ class Engine extends React.Component{
 
     renderLib = () => {
         return this.state.libList.map((lib)=>(
-            <option key={lib["id"]} value = {lib["id"]}>{lib["name"]}</option>
+            <option key={'lib_'+lib["id"]} value = {lib["id"]}>{lib["name"]}</option>
         ));
     }
 
@@ -156,103 +157,33 @@ class Engine extends React.Component{
         else return dType
     }
 
-    renderVar = () => {
-        return this.state.variables.map((eachVariable,index)=>(
-            <tr key = {eachVariable["id"]}>
-                <td> {eachVariable["id"]} </td>
-                <td> {eachVariable["name"]} </td>
-                <td> {this.datatypeStr(eachVariable["datatype"])} </td>
-                <td>
-                    <Input
-                        type="text"
-                        id={"VAR"+eachVariable["id"]}
-                        name={eachVariable["id"]}
-                        value={eachVariable["operator"]}
-                        onChange={(event) => this.handleVarChange(event)}
-                        placeholder="輸入數值"
-                    />
-                </td>
-            </tr>
-        ));
-    };
-    renderResult = () => {
-        if(this.state.activeLib.type==="sc")
-        {
-            return (
-                <table className="table mt-4">
-                    <thead>
-                        <tr>
-                            <th>總分</th>
-                            <th>滿足</th>
-                            <th>參數</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>
-                                {this.state.results.total}
-                            </td>
-                            <td>
-                                <div className="d-flex flex-column align-items-start">{this.state.results.satisfy?.map((s,index) => <span key={`sat_`+index} className={`badge mb-2 text-white ${s? `bg-success`:`bg-danger`}`}>{s.toString()}</span>)}</div>
-                            </td>
-                            <td>
-                                <div className="d-flex flex-column align-items-start">{this.state.results.varmap?.map((v) => <span key={`varmap_`+v.id} className={"badge mb-2 text-white bg-secondary"}>{v.name} : {v.value.toString()}</span>)}</div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            );
-        }
-        else if(this.state.activeLib.type==="dt")
-        {
-            return (
-                <table className="table mt-4">
-                    <thead>
-                        <tr>
-                            <th>輸出</th>
-                            <th>參數</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>
-                                {this.state.results.log}
-                            </td>
-                            <td>
-                                <div className="d-flex flex-column align-items-start">{this.state.results.varmap?.map((v) => <span key={`varmap_`+v.id} className={"badge mb-2 text-white bg-secondary"}>{v.name} : {v.value.toString()}</span>)}</div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            );
-        }
-        else if(this.state.activeLib.type==="rs")
-        {
-            return (
-                <table className="table mt-4">
-                    <thead>
-                        <tr>
-                            <th>輸出</th>
-                            <th>參數</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>
-                                <div className="d-flex flex-column align-items-start">{this.state.results.log?.map((l,index) => <span key={`rs_log_`+index} className={`badge mb-2 text-white ${l.split(' ')[1]==='fire'? `bg-danger`:`bg-success`}`}>{l.toString()}</span>)}</div>
-                            </td>
-                            <td>
-                                <div className="d-flex flex-column align-items-start">{this.state.results.varmap?.map((v) => <span key={`varmap_`+v.id} className={"badge mb-2 text-white bg-secondary"}>{v.name} : {v.value.toString()}</span>)}</div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            );
-        }
-        else
-        {
-            return
-        }
+    operatorStr = (o) => {
+        if (o==="b") return '>'
+        else if (o==="e") return '='
+        else if (o==="s") return '<'
+        else if (o==="a") return '>='
+        else if (o==="s") return '<='
+        else return o
+    }
+
+    getSC = () => {
+        let cardList = [];
+        axios
+            .get(`/api/ScoreCardPool/link/${this.state.activeLib.fk}/`)
+            .then((res => {
+                console.log(res);
+                cardList = res.data;
+                let cardList_transfer = [];
+                cardList.forEach((card) => {
+                    card.rule.forEach((rule) => {
+                        cardList_transfer.push(`${rule.name} ${this.operatorStr(rule.operator)} ${rule.value}`);
+                    })
+                });
+
+                this.setState({ cardList_transfer: cardList_transfer });
+            }))
+            .catch((err) => console.log(err));
+        
     }
 
     result = () => {
@@ -269,12 +200,16 @@ class Engine extends React.Component{
         varKeys.map((key,index) => {
             if(varIn[key]!=="")
             {
-                varmap[key] = varIn[key];
+                varmap[key] =  new Number(varIn[key]);
             }
         })
 
         if((api==="/ScoreCardEngine/" || api ==="/DecisionTreeEngine/") && fk !== -1)
         {
+            if(api==="/ScoreCardEngine/")
+            {
+                this.getSC(fk);
+            }
             axios
             .post(`${api}`,
             {
@@ -337,6 +272,109 @@ class Engine extends React.Component{
     }
 
 
+    renderVar = () => {
+        return this.state.variables.map((eachVariable,index)=>(
+            <tr key = {'var_'+eachVariable["id"]}>
+                <td> {eachVariable["name"]} </td>
+                <td> {this.datatypeStr(eachVariable["datatype"])} </td>
+                <td>
+                    <Input
+                        type="number"
+                        id={"VAR"+eachVariable["id"]}
+                        name={eachVariable["id"]}
+                        value={eachVariable["operator"]}
+                        onChange={(event) => this.handleVarChange(event)}
+                        placeholder="輸入數值"
+                    />
+                </td>
+            </tr>
+        ));
+    };
+
+    renderResult = () => {
+        if(this.state.activeLib.type==="sc")
+        {
+            return (
+                <table className="table mt-4">
+                    <thead>
+                        <tr>
+                            <th>總分</th>
+                            <th>滿足</th>
+                            <th>參數</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                {this.state.results.total}
+                            </td>
+                            <td>
+                                <div className="d-flex flex-column align-items-start">
+                                    {this.state.results.satisfy?.map((s,index) => <span key={`sat_`+index} className={`badge mb-2 text-white ${s? `bg-success`:`bg-danger`}`}>{this.state.cardList_transfer[index]} → {s.toString()}</span>)}
+                                </div>
+                            </td>
+                            <td>
+                                <div className="d-flex flex-column align-items-start">
+                                    {this.state.results.varmap?.map((v) => <span key={`varmap_`+v.id} className={"badge mb-2 text-white bg-secondary"}>{v.name} : {v.value.toString()}</span>)}
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            );
+        }
+        else if(this.state.activeLib.type==="dt")
+        {
+            return (
+                <table className="table mt-4">
+                    <thead>
+                        <tr>
+                            <th>輸出</th>
+                            <th>參數</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                {this.state.results.log}
+                            </td>
+                            <td>
+                                <div className="d-flex flex-column align-items-start">{this.state.results.varmap?.map((v) => <span key={`varmap_`+v.id} className={"badge mb-2 text-white bg-secondary"}>{v.name} : {v.value.toString()}</span>)}</div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            );
+        }
+        else if(this.state.activeLib.type==="rs")
+        {
+            return (
+                <table className="table mt-4">
+                    <thead>
+                        <tr>
+                            <th>輸出</th>
+                            <th>參數</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <div className="d-flex flex-column align-items-start">{this.state.results.log?.map((l,index) => <span key={`rs_log_`+index} className={`badge mb-2 text-white ${l.split(' ')[1]==='fire'? `bg-danger`:`bg-success`}`}>{l.toString()}</span>)}</div>
+                            </td>
+                            <td>
+                                <div className="d-flex flex-column align-items-start">{this.state.results.varmap?.map((v) => <span key={`varmap_`+v.id} className={"badge mb-2 text-white bg-secondary"}>{v.name} : {v.value.toString()}</span>)}</div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            );
+        }
+        else
+        {
+            return
+        }
+    }
+
     //render html
     render(){
         return(
@@ -385,7 +423,6 @@ class Engine extends React.Component{
                     <table className="table mt-4">
                         <thead>
                             <tr>
-                                <th>ID</th>
                                 <th>名稱</th>
                                 <th>資料型別</th>
                                 <th>數值</th>
@@ -398,8 +435,8 @@ class Engine extends React.Component{
                     <Label for="rs_circular">Rule Set 循環 (使用 Rule Set Engine 時引用)</Label>
                     <select id="rs_circular" name="circular" value={this.state.circular} onChange={(event) => this.handleChange(event)}>
                         <option key={-1} value = {""}></option>
-                        <option key={0} value = {true}>TRUE</option>
-                        <option key={1} value = {false}>FALSE</option>
+                        <option key={0} value = {true}>是</option>
+                        <option key={1} value = {false}>否</option>
                     </select>
                 </div>
                 <div className="container py-3">

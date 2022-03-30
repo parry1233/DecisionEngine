@@ -302,12 +302,10 @@ class RuleSet extends React.Component{
 
         return cards.map((eachCard)=>(
             <tr key = {eachCard["id"]}>
-                <td> {eachCard["id"]} </td>
                 <td>
                     {eachCard["rule"].map((eachrule) => {return (
                         <table key= {eachCard["id"]}>
                             <thead>
-                                <th>variable</th>
                                 <th>name</th>
                                 <th>datatype</th>
                                 <th>operator</th>
@@ -315,7 +313,6 @@ class RuleSet extends React.Component{
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td>{eachrule["variable"]}</td>
                                     <td>{eachrule["name"]}</td>
                                     <td>{this.datatypeStr(eachrule["datatype"])}</td>
                                     <td>{this.operatorStr(eachrule["operator"])}</td>
@@ -419,7 +416,6 @@ class RuleSet extends React.Component{
                     <table className="table mt-4">
                         <thead>
                             <tr>
-                                <th>ID</th>
                                 <th>Rule</th>
                                 <th>Action</th>
                                 <th>Naction</th>

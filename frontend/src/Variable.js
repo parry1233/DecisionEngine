@@ -251,7 +251,6 @@ class Varaible extends React.Component{
 
         return variables.map((eachVariable)=>(
             <tr key = {eachVariable["id"]}>
-                <td> {eachVariable["id"]} </td>
                 <td> {eachVariable["name"]} </td>
                 <td> {this.datatypeStr(eachVariable["datatype"])} </td>
                 <td>
@@ -302,9 +301,8 @@ class Varaible extends React.Component{
                     <table className="table mt-4">
                         <thead>
                             <tr>
-                                <th>ID</th>
-                                <th>Name</th>
-                                <th>Data Type</th>
+                                <th>名稱</th>
+                                <th>資料型別</th>
                                 <th>編輯</th>
                             </tr>
                         </thead>

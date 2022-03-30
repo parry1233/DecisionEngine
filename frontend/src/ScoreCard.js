@@ -302,12 +302,10 @@ class ScoreCard extends React.Component{
 
         return cards.map((eachCard)=>(
             <tr key = {eachCard["id"]}>
-                <td> {eachCard["id"]} </td>
                 <tr>
                     {eachCard["rule"].map((eachrule) => {return (
                         <table>
                             <thead>
-                                <th>variable</th>
                                 <th>name</th>
                                 <th>datatype</th>
                                 <th>operator</th>
@@ -315,7 +313,6 @@ class ScoreCard extends React.Component{
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td>{eachrule["variable"]}</td>
                                     <td>{eachrule["name"]}</td>
                                     <td>{this.datatypeStr(eachrule["datatype"])}</td>
                                     <td>{this.operatorStr(eachrule["operator"])}</td>
@@ -375,10 +372,9 @@ class ScoreCard extends React.Component{
                     <table className="table mt-4">
                         <thead>
                             <tr>
-                                <th>ID</th>
-                                <th>Rule</th>
-                                <th>weight</th>
-                                <th>score</th>
+                                <th>規則</th>
+                                <th>權重</th>
+                                <th>分數</th>
                                 <th>編輯</th>
                             </tr>
                         </thead>
