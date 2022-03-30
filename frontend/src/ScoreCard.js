@@ -17,7 +17,8 @@ class ScoreCard extends React.Component{
             new_modal: false,
             activeCard:[],
             type: -1,
-            allCardPool :[]
+            allCardPool :[],
+            allDType: {}
         }
     }
 
@@ -215,6 +216,22 @@ class ScoreCard extends React.Component{
 
     refreshList = () => {
         axios
+            .get(`/staticdt/datatype/`,
+            {
+                //here is body(data)
+            },
+            {
+                headers:{
+                    //here is headers for token and cookies
+                    'token':'try4sdgsdsafsd232a84sd'
+                }
+            }
+            )
+            .then((res) => {
+                this.setState({ allDType: res.data});
+            })
+            .catch((err) => console.log(err));
+        axios
             .get(`/api/ScoreCardPool/link/${this.props.case_info.id}`)
             .then((res => {
                 this.setState( { cardList:res.data } );
@@ -263,6 +280,23 @@ class ScoreCard extends React.Component{
         //this.setState( { activeCard: item, type: etype, modal: !this.state.modal } );
     };
 
+    datatypeStr = (type) => {
+        let dType = this.state.allDType[type]
+        if (dType==="Bool") return '布林值'
+        else if (dType==="Float") return '浮點數'
+        else if (dType==="Integer") return '整數'
+        else return dType
+    }
+
+    operatorStr = (o) => {
+        if (o==="b") return '>'
+        else if (o==="e") return '='
+        else if (o==="s") return '<'
+        else if (o==="a") return '>='
+        else if (o==="s") return '<='
+        else return o
+    }
+
     renderScoreCard = () => {
         const cards = this.state.cardList;
 
@@ -283,8 +317,8 @@ class ScoreCard extends React.Component{
                                 <tr>
                                     <td>{eachrule["variable"]}</td>
                                     <td>{eachrule["name"]}</td>
-                                    <td>{eachrule["datatype"]}</td>
-                                    <td>{eachrule["operator"]}</td>
+                                    <td>{this.datatypeStr(eachrule["datatype"])}</td>
+                                    <td>{this.operatorStr(eachrule["operator"])}</td>
                                     <td>{eachrule["value"].toString()}</td>
                                 </tr>
                             </tbody> 
@@ -294,8 +328,8 @@ class ScoreCard extends React.Component{
                 <td> {eachCard["weight"]} </td>
                 <td> {eachCard["score"]} </td>
                 <td>
-                    <button className="btn btn-primary mr-2 disabled" onClick={() => this.edit(eachCard,1)}>
-                        Variable
+                    <button className="btn btn-info mr-2" onClick={() => this.edit(eachCard,2)}>
+                        Score
                     </button>
                     <button className="btn btn-danger mr-2" onClick={() => this.onDelete(eachCard)}>
                         Delete

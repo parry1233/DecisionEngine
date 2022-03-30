@@ -15,7 +15,8 @@ class RuleSet extends React.Component{
             modal: false,
             activeCard:{},
             type: -1,
-            allCardPool :[]
+            allCardPool :[],
+            allDType: {}
         }
     }
 
@@ -205,11 +206,34 @@ class RuleSet extends React.Component{
 
     refreshList = () => {
         axios
+            .get(`/api/VariablePool/`)
+            .then((res => {
+                this.setState( { allCardPool:res.data } );
+            }))
+            .catch((err) => console.log(err));
+           
+        axios
+            .get(`/staticdt/datatype/`,
+            {
+                //here is body(data)
+            },
+            {
+                headers:{
+                    //here is headers for token and cookies
+                    'token':'try4sdgsdsafsd232a84sd'
+                }
+            }
+            )
+            .then((res) => {
+                this.setState({ allDType: res.data});
+            })
+            .catch((err) => console.log(err));
+        axios
             .get(`/api/RuleSetPool/link/${this.props.case_info.id}`)
             .then((res => {
                 this.setState( { cardList:res.data } );
             }))
-            .catch((err) => console.log(err));
+            .catch((err) => console.log(err));      
     };
 
     toggle = () => {
@@ -252,6 +276,27 @@ class RuleSet extends React.Component{
         //console.log(item)
     };
 
+    findObjectByValue = (val) => {
+        return this.state.allCardPool.find(x => x.id === val);
+    };
+
+    datatypeStr = (type) => {
+        let dType = this.state.allDType[type]
+        if (dType==="Bool") return '布林值'
+        else if (dType==="Float") return '浮點數'
+        else if (dType==="Integer") return '整數'
+        else return dType
+    }
+
+    operatorStr = (o) => {
+        if (o==="b") return '>'
+        else if (o==="e") return '='
+        else if (o==="s") return '<'
+        else if (o==="a") return '>='
+        else if (o==="s") return '<='
+        else return o
+    }
+
     renderRuleSet = () => {
         const cards = this.state.cardList;
 
@@ -272,8 +317,8 @@ class RuleSet extends React.Component{
                                 <tr>
                                     <td>{eachrule["variable"]}</td>
                                     <td>{eachrule["name"]}</td>
-                                    <td>{eachrule["datatype"]}</td>
-                                    <td>{eachrule["operator"]}</td>
+                                    <td>{this.datatypeStr(eachrule["datatype"])}</td>
+                                    <td>{this.operatorStr(eachrule["operator"])}</td>
                                     <td>{eachrule["value"].toString()}</td>
                                 </tr>
                             </tbody> 
@@ -290,12 +335,12 @@ class RuleSet extends React.Component{
                                 </thead>
                                 <tbody>
                                     <tr>
-                                        <td>{eachaction["method"]}</td>
+                                        <td>{eachaction["method"]===1? `輸出`:`賦值`}</td>
                                         <td>
                                             <table>
-                                                <tr>{eachaction["content"]["id"] ? `id : ${eachaction["content"]["id"]}`:``}</tr>
-                                                <tr>{eachaction["content"]["value"] ? `val : ${eachaction["content"]["value"]}`:``}</tr>
-                                                <tr>{eachaction["content"]["log"] ? `log : ${eachaction["content"]["log"]}`:``}</tr>
+                                                <tr>{eachaction["content"]["id"] ? `變數 : ${this.findObjectByValue(eachaction["content"]["id"]).name}`:``}</tr>
+                                                <tr>{eachaction["content"]["value"] ? `變數值 : ${eachaction["content"]["value"]}`:``}</tr>
+                                                <tr>{eachaction["content"]["log"] ? `${eachaction["content"]["log"]}`:``}</tr>
                                             </table>
                                         </td>
                                     </tr>
@@ -314,11 +359,11 @@ class RuleSet extends React.Component{
                                 </thead>
                                 <tbody>
                                     <tr>
-                                        <td>{eachaction["method"]}</td>
+                                        <td>{eachaction["method"]===1? `輸出`:`賦值`}</td>
                                         <td>
-                                            <tr>{eachaction["content"]["id"] ? `id : ${eachaction["content"]["id"]}`:``}</tr>
-                                            <tr>{eachaction["content"]["value"] ? `val : ${eachaction["content"]["value"]}`:``}</tr>
-                                            <tr>{eachaction["content"]["log"] ? `log : ${eachaction["content"]["log"]}`:``}</tr>
+                                            <tr>{eachaction["content"]["id"] ? `變數 : ${this.findObjectByValue(eachaction["content"]["id"]).name}`:``}</tr>
+                                            <tr>{eachaction["content"]["value"] ? `變數值 : ${eachaction["content"]["value"]}`:``}</tr>
+                                            <tr>{eachaction["content"]["log"] ? `${eachaction["content"]["log"]}`:``}</tr>
                                         </td>
                                     </tr>
                                 </tbody> 

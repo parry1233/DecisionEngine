@@ -15,8 +15,8 @@ class ScoreCardAll extends React.Component{
             modal: false,
             new_modal: false,
             activeCard:[],
-            type: -1
-
+            type: -1,
+            allDType: {}
         }
     }
 
@@ -181,6 +181,22 @@ class ScoreCardAll extends React.Component{
 
     refreshList = () => {
         axios
+            .get(`/staticdt/datatype/`,
+            {
+                //here is body(data)
+            },
+            {
+                headers:{
+                    //here is headers for token and cookies
+                    'token':'try4sdgsdsafsd232a84sd'
+                }
+            }
+            )
+            .then((res) => {
+                this.setState({ allDType: res.data});
+            })
+            .catch((err) => console.log(err));
+        axios
             .get(`/api/ScoreCardPool/`)
             .then((res => {
                 this.setState( { cardList:res.data } );
@@ -198,6 +214,23 @@ class ScoreCardAll extends React.Component{
         //etype=1(edit varaible); etype=2(edit score)
         this.setState( { activeCard: item, type: etype, case_id: id, modal: !this.state.modal } );
     };
+
+    datatypeStr = (type) => {
+        let dType = this.state.allDType[type]
+        if (dType==="Bool") return '布林值'
+        else if (dType==="Float") return '浮點數'
+        else if (dType==="Integer") return '整數'
+        else return dType
+    }
+
+    operatorStr = (o) => {
+        if (o==="b") return '>'
+        else if (o==="e") return '='
+        else if (o==="s") return '<'
+        else if (o==="a") return '>='
+        else if (o==="s") return '<='
+        else return o
+    }
 
     renderScoreCard = () => {
         const cards = this.state.cardList;
@@ -219,8 +252,8 @@ class ScoreCardAll extends React.Component{
                                 <tr>
                                     <td>{eachrule["variable"]}</td>
                                     <td>{eachrule["name"]}</td>
-                                    <td>{eachrule["datatype"]}</td>
-                                    <td>{eachrule["operator"]}</td>
+                                    <td>{this.datatypeStr(eachrule["datatype"])}</td>
+                                    <td>{this.operatorStr(eachrule["operator"])}</td>
                                     <td>{eachrule["value"].toString()}</td>
                                 </tr>
                             </tbody> 

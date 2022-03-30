@@ -17,16 +17,44 @@ class Engine extends React.Component{
           varmap: {},
           results:{},
           activeLib: {"fk": -1, "type": ""},
+          allDType: {}
         };
     }
     
     componentDidMount() {
+        this.getDataType();
         this.getVariable();
     }
 
 
     //function
-    getVariable = (t) => {
+    getDataType = () => {
+        axios
+            .get(`/api/VariablePool/`)
+            .then((res => {
+                this.setState( { allCardPool:res.data } );
+            }))
+            .catch((err) => console.log(err));
+           
+        axios
+            .get(`/staticdt/datatype/`,
+            {
+                //here is body(data)
+            },
+            {
+                headers:{
+                    //here is headers for token and cookies
+                    'token':'try4sdgsdsafsd232a84sd'
+                }
+            }
+            )
+            .then((res) => {
+                this.setState({ allDType: res.data});
+            })
+            .catch((err) => console.log(err));
+    };
+
+    getVariable = () => {
         axios
             .get(`/api/VariablePool/`,
             {
@@ -120,12 +148,20 @@ class Engine extends React.Component{
         ));
     }
 
+    datatypeStr = (type) => {
+        let dType = this.state.allDType[type]
+        if (dType==="Bool") return '布林值'
+        else if (dType==="Float") return '浮點數'
+        else if (dType==="Integer") return '整數'
+        else return dType
+    }
+
     renderVar = () => {
         return this.state.variables.map((eachVariable,index)=>(
             <tr key = {eachVariable["id"]}>
                 <td> {eachVariable["id"]} </td>
                 <td> {eachVariable["name"]} </td>
-                <td> {eachVariable["datatype"]} </td>
+                <td> {this.datatypeStr(eachVariable["datatype"])} </td>
                 <td>
                     <Input
                         type="text"
@@ -133,7 +169,7 @@ class Engine extends React.Component{
                         name={eachVariable["id"]}
                         value={eachVariable["operator"]}
                         onChange={(event) => this.handleVarChange(event)}
-                        placeholder="Enter Variable Data"
+                        placeholder="輸入數值"
                     />
                 </td>
             </tr>
@@ -146,9 +182,9 @@ class Engine extends React.Component{
                 <table className="table mt-4">
                     <thead>
                         <tr>
-                            <th>Total</th>
-                            <th>Satisfy</th>
-                            <th>Varmap</th>
+                            <th>總分</th>
+                            <th>滿足</th>
+                            <th>參數</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -173,8 +209,8 @@ class Engine extends React.Component{
                 <table className="table mt-4">
                     <thead>
                         <tr>
-                            <th>Log</th>
-                            <th>Varmap</th>
+                            <th>輸出</th>
+                            <th>參數</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -196,8 +232,8 @@ class Engine extends React.Component{
                 <table className="table mt-4">
                     <thead>
                         <tr>
-                            <th>Log</th>
-                            <th>Varmap</th>
+                            <th>輸出</th>
+                            <th>參數</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -350,16 +386,16 @@ class Engine extends React.Component{
                         <thead>
                             <tr>
                                 <th>ID</th>
-                                <th>Name</th>
-                                <th>Data Type</th>
-                                <th>參數</th>
+                                <th>名稱</th>
+                                <th>資料型別</th>
+                                <th>數值</th>
                             </tr>
                         </thead>
                         <tbody>
                             {this.renderVar()}
                         </tbody>
                     </table>
-                    <Label for="rs_circular">Rule Set Circular (For Rule Set Engine)</Label>
+                    <Label for="rs_circular">Rule Set 循環 (使用 Rule Set Engine 時引用)</Label>
                     <select id="rs_circular" name="circular" value={this.state.circular} onChange={(event) => this.handleChange(event)}>
                         <option key={-1} value = {""}></option>
                         <option key={0} value = {true}>TRUE</option>

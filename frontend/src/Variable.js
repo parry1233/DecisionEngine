@@ -16,7 +16,7 @@ class Varaible extends React.Component{
             modal: false,
             new_modal: false,
             activeCard:[],
-            allDType :[]
+            allDType :{}
         }
     }
 
@@ -149,6 +149,22 @@ class Varaible extends React.Component{
 
     refreshList = () => {
         axios
+            .get(`/staticdt/datatype/`,
+            {
+                //here is body(data)
+            },
+            {
+                headers:{
+                    //here is headers for token and cookies
+                    'token':'try4sdgsdsafsd232a84sd'
+                }
+            }
+            )
+            .then((res) => {
+                this.setState({ allDType: res.data});
+            })
+            .catch((err) => console.log(err));
+        axios
             .get(`/api/VariablePool/link/${this.props.case_info.id}`)
             .then((res => {
                 this.setState( { vList:res.data } );
@@ -222,6 +238,14 @@ class Varaible extends React.Component{
             .catch((err) => console.log(err));
     };
 
+    datatypeStr = (type) => {
+        let dType = this.state.allDType[type]
+        if (dType==="Bool") return '布林值'
+        else if (dType==="Float") return '浮點數'
+        else if (dType==="Integer") return '整數'
+        else return dType
+    }
+
     renderVariable = () => {
         const variables = this.state.vList;
 
@@ -229,7 +253,7 @@ class Varaible extends React.Component{
             <tr key = {eachVariable["id"]}>
                 <td> {eachVariable["id"]} </td>
                 <td> {eachVariable["name"]} </td>
-                <td> {eachVariable["datatype"]} </td>
+                <td> {this.datatypeStr(eachVariable["datatype"])} </td>
                 <td>
                     <button className="btn btn-warning mr-2" onClick={() => this.edit(eachVariable)}>
                         Edit

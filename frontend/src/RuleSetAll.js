@@ -12,11 +12,10 @@ class RuleSetAll extends React.Component{
         //console.log(this.case_info);
         this.state = {  
             cardList: [],
-            modal: false,
-            new_modal: false,
             activeCard:[],
-            type: -1
-
+            type: -1,
+            allCardPool :[],
+            allDType: {}
         }
     }
 
@@ -58,6 +57,29 @@ class RuleSetAll extends React.Component{
 
     refreshList = () => {
         axios
+            .get(`/api/VariablePool/`)
+            .then((res => {
+                this.setState( { allCardPool:res.data } );
+            }))
+            .catch((err) => console.log(err));
+           
+        axios
+            .get(`/staticdt/datatype/`,
+            {
+                //here is body(data)
+            },
+            {
+                headers:{
+                    //here is headers for token and cookies
+                    'token':'try4sdgsdsafsd232a84sd'
+                }
+            }
+            )
+            .then((res) => {
+                this.setState({ allDType: res.data});
+            })
+            .catch((err) => console.log(err));
+        axios
             .get(`/api/RuleSetPool/`)
             .then((res => {
                 this.setState( { cardList:res.data } );
@@ -65,17 +87,27 @@ class RuleSetAll extends React.Component{
             .catch((err) => console.log(err));
     };
 
-    toggle = () => {
-        this.setState({ modal: !this.state.modal });
-        this.refreshList();
+    findObjectByValue = (val) => {
+        return this.state.allCardPool.find(x => x.id === val);
     };
 
-    edit = (item,etype,id) => {
-        //console.log(item)
-        //etype=1(edit varaible); etype=2(edit score)
-        this.setState( { activeCard: item, type: etype, case_id: id, modal: !this.state.modal } );
-    };
+    datatypeStr = (type) => {
+        let dType = this.state.allDType[type]
+        if (dType==="Bool") return '布林值'
+        else if (dType==="Float") return '浮點數'
+        else if (dType==="Integer") return '整數'
+        else return dType
+    }
 
+    operatorStr = (o) => {
+        if (o==="b") return '>'
+        else if (o==="e") return '='
+        else if (o==="s") return '<'
+        else if (o==="a") return '>='
+        else if (o==="s") return '<='
+        else return o
+    }
+    
     renderRuleSet = () => {
         const cards = this.state.cardList;
 
@@ -96,8 +128,8 @@ class RuleSetAll extends React.Component{
                                 <tr>
                                     <td>{eachrule["variable"]}</td>
                                     <td>{eachrule["name"]}</td>
-                                    <td>{eachrule["datatype"]}</td>
-                                    <td>{eachrule["operator"]}</td>
+                                    <td>{this.datatypeStr(eachrule["datatype"])}</td>
+                                    <td>{this.operatorStr(eachrule["operator"])}</td>
                                     <td>{eachrule["value"].toString()}</td>
                                 </tr>
                             </tbody> 
@@ -114,12 +146,12 @@ class RuleSetAll extends React.Component{
                                 </thead>
                                 <tbody>
                                     <tr>
-                                        <td>{eachaction["method"]}</td>
+                                        <td>{eachaction["method"]===1? `輸出`:`賦值`}</td>
                                         <td>
                                             <table>
-                                                <tr>{eachaction["content"]["id"] ? `id : ${eachaction["content"]["id"]}`:``}</tr>
-                                                <tr>{eachaction["content"]["value"] ? `val : ${eachaction["content"]["value"]}`:``}</tr>
-                                                <tr>{eachaction["content"]["log"] ? `log : ${eachaction["content"]["log"]}`:``}</tr>
+                                                <tr>{eachaction["content"]["id"] ? `變數 : ${this.findObjectByValue(eachaction["content"]["id"]).name}`:``}</tr>
+                                                <tr>{eachaction["content"]["value"] ? `變數值 : ${eachaction["content"]["value"]}`:``}</tr>
+                                                <tr>{eachaction["content"]["log"] ? `${eachaction["content"]["log"]}`:``}</tr>
                                             </table>
                                         </td>
                                     </tr>
@@ -138,11 +170,11 @@ class RuleSetAll extends React.Component{
                                 </thead>
                                 <tbody>
                                     <tr>
-                                        <td>{eachaction["method"]}</td>
+                                        <td>{eachaction["method"]===1? `輸出`:`賦值`}</td>
                                         <td>
-                                            <tr>{eachaction["content"]["id"] ? `id : ${eachaction["content"]["id"]}`:``}</tr>
-                                            <tr>{eachaction["content"]["value"] ? `val : ${eachaction["content"]["value"]}`:``}</tr>
-                                            <tr>{eachaction["content"]["log"] ? `log : ${eachaction["content"]["log"]}`:``}</tr>
+                                            <tr>{eachaction["content"]["id"] ? `變數 : ${this.findObjectByValue(eachaction["content"]["id"]).name}`:``}</tr>
+                                            <tr>{eachaction["content"]["value"] ? `變數值 : ${eachaction["content"]["value"]}`:``}</tr>
+                                            <tr>{eachaction["content"]["log"] ? `${eachaction["content"]["log"]}`:``}</tr>
                                         </td>
                                     </tr>
                                 </tbody> 
@@ -190,21 +222,6 @@ class RuleSetAll extends React.Component{
                         </tbody>
                     </table>
                 </div>
-                {this.state.modal ? (
-                        <ScoreModal
-                            activeCard={this.state.activeCard}
-                            active = {this.state.type}
-                            toggle={this.toggle}
-                            onSave={this.onSave}
-                        />
-                    ) : null}
-                {this.state.new_modal ? (
-                        <AddScoreModal
-                            existVariable={this.state.activeCard}
-                            toggle={this.toggle}
-                            onAdd={this.onAdd}
-                        />
-                    ) : null}
             </div>
             
         );

@@ -142,6 +142,22 @@ class VariableAll extends React.Component{
 
     refreshList = () => {
         axios
+            .get(`/staticdt/datatype/`,
+            {
+                //here is body(data)
+            },
+            {
+                headers:{
+                    //here is headers for token and cookies
+                    'token':'try4sdgsdsafsd232a84sd'
+                }
+            }
+            )
+            .then((res) => {
+                this.setState({ allDType: res.data});
+            })
+            .catch((err) => console.log(err));
+        axios
             .get(`/api/VariablePool/`)
             .then((res => {
                 this.setState( { vList:res.data } );
@@ -168,14 +184,22 @@ class VariableAll extends React.Component{
         
     };
 
-    renderScoreCard = () => {
+    datatypeStr = (type) => {
+        let dType = this.state.allDType[type]
+        if (dType==="Bool") return '布林值'
+        else if (dType==="Float") return '浮點數'
+        else if (dType==="Integer") return '整數'
+        else return dType
+    }
+
+    renderVariable = () => {
         const variables = this.state.vList;
 
         return variables.map((eachVariable)=>(
             <tr key = {eachVariable["id"]}>
                 <td> {eachVariable["id"]} </td>
                 <td> {eachVariable["name"]} </td>
-                <td> {eachVariable["datatype"]} </td>
+                <td> {this.datatypeStr(eachVariable["datatype"])} </td>
                 <td>
                     <button className="btn btn-danger mr-2" onClick={() => this.onDelete(eachVariable)}>
                         Delete
@@ -211,7 +235,7 @@ class VariableAll extends React.Component{
                             </tr>
                         </thead>
                         <tbody>
-                            {this.renderScoreCard()}
+                            {this.renderVariable()}
                         </tbody>
                     </table>
                 </div>
