@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <div class="header">
+        <h2>Business Enginess - Score Card method</h2>
+        <hr/>
+    </div>
+    <div class="menu-bar">
+        <ul>
+            <li>
+                <a href="{% url 'home' %}">Home</a>
+            </li>
+            <li>
+                <a>Score Card</a>
+                <!--系統-->
+                <ul>
+                    <!--對應例子的id-->
+
+                    {% for i,v in scid.items %}
+                    <li><a href="{% url 'ScoreCardView' id=v  %}">case {{i}}</a> </li>
+                    {% endfor %}
+                </ul>
+            </li>
+            <li>
+                <a>Decision Tree</a>
+                <ul>
+                    {% for i,v in dtid.items %}
+                    <li><a href="{% url 'DecisionTreeView' id=v  %}">case {{i}}</a> </li>
+                    {% endfor %}
+                </ul>
+            </li>
+        </ul>
+    </div>
+
+</body>
+
+</html>

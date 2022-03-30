@@ -115,7 +115,7 @@ class DTCreact extends React.Component {
             this.setState({_jm: jm});
         }
         //render heml
-    return_tree=()=>{
+/*    return_tree=()=>{
         var mind_data = this.state._jm.get_data();
         axios
             .get("/api/DecisionTreeLibrary/",{
@@ -127,9 +127,9 @@ class DTCreact extends React.Component {
                 
             })
             .catch((err) => console.log(err));
-    }
+    }*/
         
-    trytree = () =>{
+/*    trytree = () =>{
         
         axios
             .get("/api/DecisionTreeLibrary/",{
@@ -185,7 +185,7 @@ class DTCreact extends React.Component {
                 </div>
             </div>
         );
-    }
+    }*/
     render() {
         const style = {display:"none"};
         return ( 
