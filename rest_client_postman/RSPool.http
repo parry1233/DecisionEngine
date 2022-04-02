@@ -17,7 +17,17 @@ Content-Type: application/json
     "action":"[{\"method\":1,\"content\":{\"log\":5}}]",
     "naction":"[{\"method\":1,\"content\":{\"log\":2}}]"
 }
+###
 
+POST {{host}}/RuleSetPool/
+Content-Type: application/json
+
+{
+    "fk":5,
+    "rule":"[{\"variable\": \"33\", \"operator\": \"e\", \"value\": \"1\"}, {\"variable\": \"34\", \"operator\": \"s\", \"value\": \"18\"}]",
+    "action":"[{\"method\":1,\"content\":{\"log\":1}}]",
+    "naction":""
+}
 ###
 
 PUT {{host}}/RuleSetPool/14/

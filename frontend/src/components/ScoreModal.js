@@ -74,7 +74,7 @@ export default class CustomModal extends Component {
             placeholder="Enter ID"
           />
         </FormGroup>
-
+        <hr/>
         {rule["rule"].map((eachrule,index) => {return (
           <FormGroup key={index}>
             <Label for="scpool-ruleId">Rule Variable</Label>
@@ -91,7 +91,7 @@ export default class CustomModal extends Component {
               value={eachrule["operator"]}
               readOnly={this.state.edit_type===1 ? true : false}
               onChange={(event) => this.handleRuleChange(index, event)}
-              placeholder="Enter Variable"
+              placeholder="Enter Operator"
             />
             <Label for="scpool-ruleValue">Rule Value</Label>
             <Input
@@ -101,11 +101,23 @@ export default class CustomModal extends Component {
               value={eachrule["value"]}
               readOnly={this.state.edit_type===1 ? true : false}
               onChange={(event) => this.handleRuleChange(index, event)}
-              placeholder="Enter Variable"
+              placeholder="Enter Value"
             />
           </FormGroup>
         ); })}
-        
+        <hr/>
+        <FormGroup>
+          <Label for="scpool-description">Description</Label>
+          <Input
+            type="text"
+            id="scpool-description"
+            name="description"
+            value={rule["description"]}
+            readOnly={this.state.edit_type===1 ? true : false}
+            onChange={(event) => this.handleChange(event)}
+            placeholder="Enter Description"
+          />
+        </FormGroup>
         <FormGroup>
           <Label for="scpool-weight">weight</Label>
           <Input
@@ -149,7 +161,7 @@ export default class CustomModal extends Component {
             color="success"
             onClick={() => onSave(this.state.activeItem,this.state.edit_type)}
           >
-            Save (Currently unavailable)
+            Save
           </Button>
           <Button
             color="secondary"

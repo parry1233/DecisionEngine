@@ -293,7 +293,7 @@ class RuleSet extends React.Component{
         else if (o==="e") return '='
         else if (o==="s") return '<'
         else if (o==="a") return '>='
-        else if (o==="s") return '<='
+        else if (o==="p") return '<='
         else return o
     }
 

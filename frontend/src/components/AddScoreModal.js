@@ -99,6 +99,19 @@ export default class CustomModal extends Component {
             placeholder="Enter Value"
           />
         </FormGroup>
+        <hr/>
+        <FormGroup>
+          <Label for="scpool-description">Description</Label>
+          <Input
+            type="text"
+            id="scpool-description"
+            name="description"
+            value={rule["description"]}
+            readOnly={this.state.edit_type===1 ? true : false}
+            onChange={(event) => this.handleChange(event)}
+            placeholder="Enter Description"
+          />
+        </FormGroup>
         <FormGroup>
           <Label for="scpool-weight">weight</Label>
           <Input

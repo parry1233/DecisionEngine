@@ -228,7 +228,7 @@ class ScoreCardAll extends React.Component{
         else if (o==="e") return '='
         else if (o==="s") return '<'
         else if (o==="a") return '>='
-        else if (o==="s") return '<='
+        else if (o==="p") return '<='
         else return o
     }
 
@@ -238,25 +238,26 @@ class ScoreCardAll extends React.Component{
         return cards.map((eachCard)=>(
             <tr key = {eachCard["id"]}>
                 <tr>
-                    {eachCard["rule"].map((eachrule) => {return (
-                        <table>
-                            <thead>
-                                <th>name</th>
-                                <th>datatype</th>
-                                <th>operator</th>
-                                <th>value</th>
-                            </thead>
-                            <tbody>
+                    <table>
+                        <thead>
+                            <th>name</th>
+                            <th>datatype</th>
+                            <th>operator</th>
+                            <th>value</th>
+                        </thead>
+                        <tbody>
+                            {eachCard["rule"].map((eachrule) => {return (
                                 <tr>
                                     <td>{eachrule["name"]}</td>
                                     <td>{this.datatypeStr(eachrule["datatype"])}</td>
                                     <td>{this.operatorStr(eachrule["operator"])}</td>
                                     <td>{eachrule["value"].toString()}</td>
                                 </tr>
-                            </tbody> 
-                        </table>
-                    ); })}
+                             ); })}
+                        </tbody>
+                    </table>
                 </tr>
+                <td> {eachCard["description"]} </td>
                 <td> {eachCard["weight"]} </td>
                 <td> {eachCard["score"]} </td>
                 <td>
@@ -288,6 +289,7 @@ class ScoreCardAll extends React.Component{
                         <thead>
                             <tr>
                                 <th>規則</th>
+                                <th>描述</th>
                                 <th>權重</th>
                                 <th>分數</th>
                                 <th>編輯</th>

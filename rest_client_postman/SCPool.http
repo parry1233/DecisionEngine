@@ -4,7 +4,7 @@ GET {{host}}/ScoreCardPool/
 
 ###
 
-GET {{host}}/ScoreCardPool/link/1
+GET {{host}}/ScoreCardPool/link/5
 
 ###
 
@@ -12,10 +12,11 @@ POST {{host}}/ScoreCardPool/
 Content-Type: application/json
 
 {
-    "fk":2,
-    "rule":"[{\"variable\": \"3\", \"operator\": \"e\", \"value\": \"1\"}]",
-    "weight":"1",
-    "score":"1"
+    "fk":5,
+    "rule":"[{\"variable\": \"36\", \"operator\": \"a\", \"value\": \"13\"}]",
+    "weight": 1.0,
+    "score":1,
+    "description": null
 }
 
 ###

@@ -21,9 +21,9 @@ POST {{host}}/ScoreCardEngine/
 Content-Type: application/json
 
 {
-    "fk":2,
+    "fk":5,
     "varmap":{
-        "1": 1,"2":1.5,"3":50
+        "35": 1
     }
 }
 
@@ -32,7 +32,7 @@ POST {{host}}/DecisionTreeJsmind/
 Content-Type: application/json
 
 {
-    "fk":1
+    "fk":3
 }
 ###
 

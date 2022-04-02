@@ -1,0 +1,64 @@
+@host = http://127.0.0.1:8000
+
+###
+
+#Loan Process
+POST {{host}}/RuleSetEngine/
+Content-Type: application/json
+
+{
+    "fk":4,
+    "circular":false,
+    "varmap":{
+        "28": true,
+        "29": true,
+        "30": 240001,
+        "31": 20,
+        "32": true
+    }
+}
+
+###
+
+#Loan Process
+POST {{host}}/DecisionTreeEngine/
+Content-Type: application/json
+
+{
+    "fk":6,
+    "varmap":{
+    "28": true,
+    "29": true,
+    "30": 240001,
+    "31": 20,
+    "32": true
+    }
+}
+
+###
+
+#員工薪水
+POST {{host}}/RuleSetEngine/
+Content-Type: application/json
+
+{
+    "fk":5,
+    "circular":false,
+    "varmap":{
+        "33": true,
+        "34": 20
+    }
+}
+
+### 
+
+# score card
+POST {{host}}/ScoreCardEngine/
+Content-Type: application/json
+
+{
+    "fk":4,
+    "varmap":{
+        "14": true,"15":true,"16":true
+    }
+}
