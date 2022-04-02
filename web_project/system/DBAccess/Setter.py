@@ -63,7 +63,7 @@ def IntCheck(k, errid):
 
 def FloatCheck(k, errid):
     k = sfloat(k)
-    if isinstance(k, int):
+    if isinstance(k, float):
         return k
     else:
         raise RuntimeError(ERRORMSG[errid])
@@ -192,7 +192,7 @@ def VARPL_Update(fkey, id, name, datatype):
 # scorecard pool
 
 
-def SCPL_Add(fkey, rule, weight, score):
+def SCPL_Add(fkey, rule, weight, score, description):
     try:
         (fkey, weight, score) = (IntCheck(fkey, 6),
                                  FloatCheck(weight, 8), FloatCheck(score, 9))
@@ -206,6 +206,7 @@ def SCPL_Add(fkey, rule, weight, score):
             ["variable", "datatype", "operator", "value"])
         pool.weight = weight
         pool.score = score
+        pool.description = description
         pool.save()
         return JsonResponse(serializers.ScoreCardPoolSerializer(pool).data, safe=False, json_dumps_params={"ensure_ascii": False})
 
@@ -236,7 +237,8 @@ def SCPL_Add(fkey, rule, weight, score):
 #         return JsonResponse({"error": str(e)}, safe=False)
 
 
-def SCPL_Update(fkey, id, rule, weight, score):
+def SCPL_Update(fkey, id, rule, weight, score, description):
+    print(description)
     try:
         (fkey, id, weight, score) = (IntCheck(fkey, 6),
                                      IntCheck(id, 1), FloatCheck(weight, 8), FloatCheck(score, 9))
@@ -254,6 +256,7 @@ def SCPL_Update(fkey, id, rule, weight, score):
         obj.rule = r.PartialDump(["variable", "operator", "value"])
         obj.weight = weight
         obj.score = score
+        obj.description = description
         obj.save()
         return JsonResponse(serializers.ScoreCardPoolSerializer(obj).data, safe=False,  json_dumps_params={"ensure_ascii": False})
 

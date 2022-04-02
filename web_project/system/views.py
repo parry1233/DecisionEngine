@@ -55,14 +55,15 @@ def ScoreCardList(request):
 
 
 def ScoreCardView(request, id):
-    rules = ScoreCardPool.objects.filter(fkey__name=id).all()
 
-    varmap = {"1": 1, "2": 1.5, "3": 50}
+    varmap = {"35": 0, "36": 40, "37": 14, "38": 1, "39": 1, "40": -1, "41": 1005, "42": 2, "43": 2, "44": 2, "45": 52, "46": 1, "47": 1,
+              "48": 0, "49": 4, "50": 0, "51": 4, "52": 4, "53": 2, "54": 588}
     varmap, _ = value_transform(varmap)
-
-    engine = SCEngine.SCE()
+    rules = ScoreCardPool.objects.filter(fkey__name=id).all()
     rulelist = [(Rule(rule.rule), rule.score * rule.weight)
                 for rule in rules]
+
+    engine = SCEngine.SCE()
     engine.defrule(rulelist)
     engine.assign(varmap)
     score, satisfy = engine.run()
@@ -77,7 +78,7 @@ def ScoreCardView(request, id):
         line["w"] = rule.weight
         line["s"] = rule.score
         line["wxs"] = rule.score*rule.weight
-        line["satisfy"] = "pass" if satisfy[i] else "fire"
+        line["satisfy"] = "fired" if satisfy[i] else "refused"
         ruleresult.append(line)
 
     SCid = ScoreCardLibrary.objects.all()
@@ -178,7 +179,7 @@ def DecisionTreeView(request, id):
 def DecisionTreeViewJSMindStructure(request):
     get = (lambda x: request.data[x])
     fkey = get("fk")
-    print(fkey)
+
     idctr = 0
 
     def JsmindNode(topic, parentid):
@@ -234,6 +235,7 @@ def ScoreCardEngine(request):
     engine = SCEngine.SCE()
     engine.defrule(rulelist)
     engine.assign(varmap)
+
     score, satisfy = engine.run()
 
     _, vardata = value_transform(engine.info().varmap)
@@ -342,11 +344,11 @@ class ScoreCardPoolViewSet(viewsets.ModelViewSet):
 
     def create(self, validated_data):
         get = (lambda x: validated_data.data[x])
-        return Setter.SCPL_Add(get("fk"), get("rule"), get("weight"), get("score"))
+        return Setter.SCPL_Add(get("fk"), get("rule"), get("weight"), get("score"), get("description"))
 
     def update(self, request, pk):
         get = (lambda x: request.data[x])
-        return Setter.SCPL_Update(get("fk"), pk, get("rule"), get("weight"), get("score"))
+        return Setter.SCPL_Update(get("fk"), pk, get("rule"), get("weight"), get("score"), get("description"))
 
 
 class DecisionTreeLibViewSet(viewsets.ModelViewSet):

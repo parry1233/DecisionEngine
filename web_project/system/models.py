@@ -233,7 +233,7 @@ class Rule:
 
 class VariableLibrary(models.Model):
     name = models.CharField(
-        max_length=20, help_text='Enter name')
+        max_length=50, help_text='Enter name')
 
     def __str__(self):
         return self.name
@@ -241,7 +241,7 @@ class VariableLibrary(models.Model):
 
 class VariablePool(models.Model):
     name = models.CharField(
-        max_length=40, help_text='Enter name')
+        max_length=60, help_text='Enter name')
     datatype = models.CharField(
         max_length=1,
         choices=static.CATAGORY,
@@ -252,12 +252,12 @@ class VariablePool(models.Model):
         'VariableLibrary', on_delete=models.CASCADE)
 
     def __str__(self):
-        return self.name + "_" + str(self.id)
+        return f"{self.fkey.name} ({str(self.id)}) {self.name}"
 
 
 class ScoreCardLibrary(models.Model):
     name = models.CharField(
-        max_length=20, help_text='Enter name')
+        max_length=50, help_text='Enter name')
 
     def __str__(self):
         return f"{self.name} ({str(self.id)})"
@@ -275,17 +275,22 @@ class ScoreCardPool(models.Model):
         default='1',
         help_text='Score',
     )
+    description = models.TextField(help_text='Description', null=True)
 
     def __str__(self):
-        words = [str(k) for k in Rule(self.rule).Load()]
         text = ""
-        text += " , ".join(words)
+        try:
+            words = [str(k) for k in Rule(self.rule).Load()]
+            text = ""
+            text += " , ".join(words)
+        except RuntimeError as e:
+            text = str(e)
         return self.fkey.name + " | " + text
 
 
 class DecisionTreeLibrary(models.Model):
     name = models.CharField(
-        max_length=20, help_text='Enter name')
+        max_length=50, help_text='Enter name')
 
     def __str__(self):
         return f"{self.name} ({str(self.id)})"
@@ -307,9 +312,13 @@ class DecisionTreePool(models.Model):
     duplicate_event.short_description = "Duplicate selected record"
 
     def __str__(self):
-        words = [str(k) for k in Rule(self.rule).Load()]
         text = ""
-        text += " , ".join(words)
+        try:
+            words = [str(k) for k in Rule(self.rule).Load()]
+            text = ""
+            text += " , ".join(words)
+        except RuntimeError as e:
+            text = str(e)
         return f'''({self.id}) {self.fkey.name} | {text}'''
 
 
@@ -329,7 +338,11 @@ class RuleSetPool(models.Model):
     naction = models.TextField(help_text='nAction', blank=True, null=True)
 
     def __str__(self):
-        words = [str(k) for k in Rule(self.rule).Load()]
         text = ""
-        text += " , ".join(words)
+        try:
+            words = [str(k) for k in Rule(self.rule).Load()]
+            text = ""
+            text += " , ".join(words)
+        except RuntimeError as e:
+            text = str(e)
         return f"{self.fkey} | {text}"

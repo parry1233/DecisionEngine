@@ -2,12 +2,14 @@
 from rest_framework import serializers
 from .models import Rule, RuleSetLibrary, RuleSetPool, ScoreCardLibrary, ScoreCardPool, VariableLibrary, VariablePool, DecisionTreeLibrary, DecisionTreePool, Action
 import json
+from . import static
 
 
 class ReadableRule(serializers.CharField):
     def to_representation(self, value):
-        return Rule(value).Partial(
+        rule = Rule(value).Partial(
             ['variable', 'name', 'datatype', 'operator', 'value'])
+        return rule
 
 
 class ReadableAction(serializers.CharField):
@@ -40,7 +42,7 @@ class ScoreCardPoolSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ScoreCardPool
-        fields = ['id', 'rule', 'weight', 'score']
+        fields = ['id', 'rule', 'weight', 'score', 'description']
 
 
 class DecisionTreeLibrarySerializer(serializers.ModelSerializer):
