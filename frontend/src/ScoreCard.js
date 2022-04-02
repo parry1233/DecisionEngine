@@ -65,7 +65,7 @@ class ScoreCard extends React.Component{
             rule+=(`{`
                 +`\"variable\":\"${item[i]["variable"]}\", `
                 +`\"operator\":\"${item[i]["operator"]}\", `
-                +`\"value\":\"${item[i]["value"]}\"`
+                +`\"value\":${item[i]["value"]}`
                 +`}`)
             
             if(i+1<item.length) rule+=`,`
