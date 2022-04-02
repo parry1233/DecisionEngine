@@ -182,10 +182,14 @@ def DecisionTreeViewJSMindStructure(request):
 
     idctr = 0
 
-    def JsmindNode(topic, parentid):
+    def JsmindNode(topic, parentid, nodetype=None):
         nonlocal idctr
         idctr = idctr + 1
-        return {"id": str(idctr), "parentid": parentid, "isroot": idctr == 1, "topic": topic}
+        node = {"id": str(idctr), "parentid": parentid,
+                "topic": topic, "nodetype": nodetype}
+        if idctr == 1:
+            node["isroot"] = True
+        return node
 
     def JsmindAppendTo(data, pname, parentid):
         rules = DecisionTreePool.objects.filter(
@@ -194,19 +198,20 @@ def DecisionTreeViewJSMindStructure(request):
         parent = None
         if len(rules) != 0:
             x = rules[0]
-            lst = [x.ToReadable() for x in Rule(x.rule).GetRaw()]
-            xname = lst[0].name
-            parent = JsmindNode(xname, parentid)
+            rule = Rule(x.rule)
+            xname = rule.GetRaw()[0].ToReadable().name
+            parent = JsmindNode(xname, parentid, "question")
+            parent["retype"] = rule.GetRaw()[0].datatype
             data.append(parent)
         for x in rules:
             lst = [x.ToReadable() for x in Rule(x.rule).GetRaw()]
             # print(lst)
             only_rule = [x.rule for x in lst]
             xrule = " and ".join(only_rule)
-            child = JsmindNode(xrule, parent["id"])
+            child = JsmindNode(xrule, parent["id"], "rule")
             data.append(child)
             if x.log != "":
-                data.append(JsmindNode(f"印出{x.log}", child["id"]))
+                data.append(JsmindNode(f"{x.log}", child["id"], "log"))
             JsmindAppendTo(data, x, child["id"])
     jstree = []
     JsmindAppendTo(jstree, None, "")
@@ -217,7 +222,7 @@ def DecisionTreeViewJSMindStructure(request):
     dtid_list = {i: rule.name for i, rule in enumerate(lib)}
 
     context = {
-        "link_list": json.dumps({"meta": {}, "format": "node_array", "data": jstree}, default=vars, ensure_ascii=False),
+        "link_list": {"meta": {}, "format": "node_array", "data": jstree},
         "scid": scid_list,
         "dtid": dtid_list
     }

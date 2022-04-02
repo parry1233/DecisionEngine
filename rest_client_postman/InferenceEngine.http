@@ -32,7 +32,7 @@ POST {{host}}/DecisionTreeJsmind/
 Content-Type: application/json
 
 {
-    "fk":1
+    "fk":3
 }
 ###
 
