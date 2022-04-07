@@ -57,7 +57,7 @@ def ScoreCardList(request):
 def ScoreCardView(request, id):
 
     varmap = {"35": 0, "36": 40, "37": 14, "38": 1, "39": 1, "40": -1, "41": 1005, "42": 2, "43": 2, "44": 2, "45": 52, "46": 1, "47": 1,
-              "48": 0, "49": 4, "50": 0, "51": 4, "52": 4, "53": 2, "54": 588}
+              "48": 0, "49": 4, "50": 0, "51": 4, "52": 4, "53": 2, "54": 588, "55": 0, "56": 48, "57": 10, "58": 1, "59": 1, "60": 0, "61": 2, "62": 1, "63": 1, "64": 0, "65": 1}
     varmap, _ = value_transform(varmap)
     rules = ScoreCardPool.objects.filter(fkey__name=id).all()
     rulelist = [(Rule(rule.rule), rule.score * rule.weight)
