@@ -44,7 +44,7 @@ class RuleSet extends React.Component{
                 this.setState({
                     allCardPool: res.data,
                     activeCard: {
-                        "id":"-1",
+                        "id":-1,
                         "rule":[
                             {
                                 "variable" : "",
@@ -97,10 +97,10 @@ class RuleSet extends React.Component{
             try
             {
                 let action = item;
-                console.log(action);
+                //console.log(action);
                 //action = JSON.stringify(item);
                 //action = JSON.stringify(JSON.stringify(item));
-                console.log(action);
+                //console.log(action);
                 return action;
             }
             catch(e)
@@ -259,10 +259,10 @@ class RuleSet extends React.Component{
                 //console.log(res.data)
 
                 let activeItem = {...item}
-                console.log(activeItem);
+                //console.log(activeItem);
                 activeItem["action"] = activeItem["action"]===null? "" : JSON.stringify(item["action"]);
                 activeItem["naction"] = activeItem["naction"]===null? "" : JSON.stringify(item["naction"]);
-                console.log(activeItem);
+                //console.log(activeItem);
     
                 this.setState({
                     allCardPool: res.data,
@@ -335,9 +335,9 @@ class RuleSet extends React.Component{
                                         <td>{eachaction["method"]===1? `輸出`:`賦值`}</td>
                                         <td>
                                             <table>
-                                                <tr>{eachaction["content"]["id"] ? `變數 : ${this.findObjectByValue(eachaction["content"]["id"]).name}`:``}</tr>
-                                                <tr>{eachaction["content"]["value"] ? `變數值 : ${eachaction["content"]["value"]}`:``}</tr>
-                                                <tr>{eachaction["content"]["log"] ? `${eachaction["content"]["log"]}`:``}</tr>
+                                                <tr>{"id" in eachaction["content"] ? `變數 : ${this.findObjectByValue(eachaction["content"]["id"]).name}`:``}</tr>
+                                                <tr>{"value" in eachaction["content"] ? `變數值 : ${eachaction["content"]["value"]}`:``}</tr>
+                                                <tr>{"log" in eachaction["content"] ? `${eachaction["content"]["log"]}`:``}</tr>
                                             </table>
                                         </td>
                                     </tr>    
@@ -358,9 +358,9 @@ class RuleSet extends React.Component{
                                     <tr>
                                         <td>{eachaction["method"]===1? `輸出`:`賦值`}</td>
                                         <td>
-                                            <tr>{eachaction["content"]["id"] ? `變數 : ${this.findObjectByValue(eachaction["content"]["id"]).name}`:``}</tr>
-                                            <tr>{eachaction["content"]["value"] ? `變數值 : ${eachaction["content"]["value"]}`:``}</tr>
-                                            <tr>{eachaction["content"]["log"] ? `${eachaction["content"]["log"]}`:``}</tr>
+                                            <tr>{"id" in eachaction["content"] ? `變數 : ${this.findObjectByValue(eachaction["content"]["id"]).name}`:``}</tr>
+                                            <tr>{"value" in eachaction["content"] ? `變數值 : ${eachaction["content"]["value"]}`:``}</tr>
+                                            <tr>{"log" in eachaction["content"] ? `${eachaction["content"]["log"]}`:``}</tr>
                                         </td>
                                     </tr>
                                 );

@@ -63,12 +63,25 @@ export default class CustomModal extends Component {
 
     this.setState({ activeItem });
   };
+
+  onAddRule = () => {
+    let newRule = this.state.activeItem;
+    newRule["rule"].push({"variable":-1,"name":"","datatype":"","operaotr":"","value":""})
+    this.setState({ activeItem: newRule});
+  };
+
+  onDelRule = (index) => {
+    let newRule = this.state.activeItem;
+    if(newRule["rule"].length-1>0) newRule["rule"].splice(index,1);
+    else alert("不能再刪除了!");
+    this.setState({ activeItem: newRule});
+  };
   
   renderRuleSet() {
     const item = this.state.activeItem
     const varaible = this.state.variable
     //const etype = this.state.edit_type
-    console.log(item);
+    //console.log(item);
     return(
       <Form key={item["id"]}>
         <FormGroup>
@@ -83,7 +96,7 @@ export default class CustomModal extends Component {
             placeholder="Enter ID"
           />
         </FormGroup>
-
+        <hr/>
         {item["rule"].map((eachrule,index) => {return (
           <FormGroup key={index}>
             <Label for="pool-ruleId">Rule</Label>
@@ -93,6 +106,7 @@ export default class CustomModal extends Component {
                 <option key={element["id"]} value = {element["id"]}>{element["name"]} (Dtype: {element["datatype"]})</option>
               ); })}
             </select>
+            <br/>
             <Label for="pool-ruleOperator">Rule Operator</Label>
             <Input
               type="text"
@@ -111,9 +125,16 @@ export default class CustomModal extends Component {
               onChange={(event) => this.handleRuleChange(index, event)}
               placeholder="Enter Value"
             />
+            <br/>
+            <Button
+              color="secondary"
+              onClick={() => this.onDelRule(index)}
+            >
+              Delete
+            </Button>
           </FormGroup>
         ); })}
-
+          <hr/>
           <FormGroup>
             <Label for="pool-action">Action</Label>
             <Input
@@ -149,11 +170,17 @@ export default class CustomModal extends Component {
 
     return (
       <Modal isOpen={true} toggle={toggle}>
-        <ModalHeader toggle={toggle}>Add Score Card</ModalHeader>
+        <ModalHeader toggle={toggle}>{this.state.activeItem["id"]!==-1? `Edit Rule Set`:`Add RuleSet`}</ModalHeader>
         <ModalBody>
           {this.renderRuleSet()}
         </ModalBody>
         <ModalFooter>
+          <Button
+            color="primary"
+            onClick={() => this.onAddRule()}
+          >
+            New Variable
+          </Button>
           <Button
             color="success"
             onClick={() => onSave(this.state.activeItem)}

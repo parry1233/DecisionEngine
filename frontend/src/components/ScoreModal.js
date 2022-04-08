@@ -54,6 +54,19 @@ export default class CustomModal extends Component {
 
     this.setState({ activeItem });
   };
+
+  onAddRule = () => {
+    let newRule = this.state.activeItem;
+    newRule["rule"].push({"variable":-1,"name":"","datatype":"","operaotr":"","value":""})
+    this.setState({ activeItem: newRule});
+  };
+
+  onDelRule = (index) => {
+    let newRule = this.state.activeItem;
+    if(newRule["rule"].length-1>0) newRule["rule"].splice(index,1);
+    else alert("不能再刪除了!");
+    this.setState({ activeItem: newRule});
+  };
   
   renderRule() {
     const rule = this.state.activeItem
@@ -83,6 +96,7 @@ export default class CustomModal extends Component {
                 <option key={element["id"]} value = {element["id"]}>{element["name"]} (Dtype: {element["datatype"]})</option>
               ); })}
             </select>
+            <br/>
             <Label for="scpool-ruleOperator">Rule Operator</Label>
             <Input
               type="text"
@@ -103,7 +117,15 @@ export default class CustomModal extends Component {
               onChange={(event) => this.handleRuleChange(index, event)}
               placeholder="Enter Value"
             />
+            <br/>
+            <Button
+              color="secondary"
+              onClick={() => this.onDelRule(index)}
+            >
+              Delete
+            </Button>
           </FormGroup>
+          
         ); })}
         <hr/>
         <FormGroup>
@@ -152,11 +174,17 @@ export default class CustomModal extends Component {
 
     return (
       <Modal isOpen={true} toggle={toggle}>
-        <ModalHeader toggle={toggle}>Add Score Card</ModalHeader>
+        <ModalHeader toggle={toggle}>Edit Score Card</ModalHeader>
         <ModalBody>
           {this.renderRule()}
         </ModalBody>
         <ModalFooter>
+          <Button
+            color="primary"
+            onClick={() => this.onAddRule()}
+          >
+            New Variable
+          </Button>
           <Button
             color="success"
             onClick={() => onSave(this.state.activeItem,this.state.edit_type)}

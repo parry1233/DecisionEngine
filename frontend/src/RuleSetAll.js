@@ -146,9 +146,9 @@ class RuleSetAll extends React.Component{
                                         <td>{eachaction["method"]===1? `輸出`:`賦值`}</td>
                                         <td>
                                             <table>
-                                                <tr>{eachaction["content"]["id"] ? `變數 : ${this.findObjectByValue(eachaction["content"]["id"]).name}`:``}</tr>
-                                                <tr>{eachaction["content"]["value"] ? `變數值 : ${eachaction["content"]["value"]}`:``}</tr>
-                                                <tr>{eachaction["content"]["log"] ? `${eachaction["content"]["log"]}`:``}</tr>
+                                                <tr>{"id" in eachaction["content"] ? `變數 : ${this.findObjectByValue(eachaction["content"]["id"]).name}`:``}</tr>
+                                                <tr>{"value" in eachaction["content"] ? `變數值 : ${eachaction["content"]["value"]}`:``}</tr>
+                                                <tr>{"log" in eachaction["content"] ? `${eachaction["content"]["log"]}`:``}</tr>
                                             </table>
                                         </td>
                                     </tr>
@@ -169,9 +169,9 @@ class RuleSetAll extends React.Component{
                                     <tr>
                                         <td>{eachaction["method"]===1? `輸出`:`賦值`}</td>
                                         <td>
-                                            <tr>{eachaction["content"]["id"] ? `變數 : ${this.findObjectByValue(eachaction["content"]["id"]).name}`:``}</tr>
-                                            <tr>{eachaction["content"]["value"] ? `變數值 : ${eachaction["content"]["value"]}`:``}</tr>
-                                            <tr>{eachaction["content"]["log"] ? `${eachaction["content"]["log"]}`:``}</tr>
+                                            <tr>{"id" in eachaction["content"] ? `變數 : ${this.findObjectByValue(eachaction["content"]["id"]).name}`:``}</tr>
+                                            <tr>{"value" in eachaction["content"] ? `變數值 : ${eachaction["content"]["value"]}`:``}</tr>
+                                            <tr>{"log" in eachaction["content"] ? `${eachaction["content"]["log"]}`:``}</tr>
                                         </td>
                                     </tr> 
                                 );
