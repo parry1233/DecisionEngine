@@ -303,34 +303,34 @@ class RuleSet extends React.Component{
         return cards.map((eachCard)=>(
             <tr key = {eachCard["id"]}>
                 <td>
-                    {eachCard["rule"].map((eachrule) => {return (
-                        <table key= {eachCard["id"]}>
-                            <thead>
-                                <th>name</th>
-                                <th>datatype</th>
-                                <th>operator</th>
-                                <th>value</th>
-                            </thead>
-                            <tbody>
+                    <table key= {`rule_`+eachCard["id"]}>
+                        <thead>
+                            <th>name</th>
+                            <th>datatype</th>
+                            <th>operator</th>
+                            <th>value</th>
+                        </thead>
+                        <tbody>
+                            {eachCard["rule"].map((eachrule) => {return (
                                 <tr>
                                     <td>{eachrule["name"]}</td>
                                     <td>{this.datatypeStr(eachrule["datatype"])}</td>
                                     <td>{this.operatorStr(eachrule["operator"])}</td>
                                     <td>{eachrule["value"].toString()}</td>
-                                </tr>
-                            </tbody> 
-                        </table>
-                    ); })}
+                                </tr>   
+                            ); })}
+                        </tbody> 
+                    </table>
                 </td>
                 <td>
-                    {eachCard["action"] ? eachCard["action"].map((eachaction) => {
-                        return (
-                            <table key={eachCard["id"]}>
-                                <thead>
-                                    <th>method</th>
-                                    <th>content</th>
-                                </thead>
-                                <tbody>
+                    <table key={`action_`+eachCard["id"]}>
+                        <thead>
+                            <th>method</th>
+                            <th>content</th>
+                        </thead>
+                        <tbody>
+                            {eachCard["action"] ? eachCard["action"].map((eachaction) => {
+                                return (
                                     <tr>
                                         <td>{eachaction["method"]===1? `輸出`:`賦值`}</td>
                                         <td>
@@ -340,21 +340,21 @@ class RuleSet extends React.Component{
                                                 <tr>{eachaction["content"]["log"] ? `${eachaction["content"]["log"]}`:``}</tr>
                                             </table>
                                         </td>
-                                    </tr>
-                                </tbody> 
-                            </table>
-                        );
-                    } ) : <td></td> }
+                                    </tr>    
+                                );
+                            } ) : <td></td> }
+                        </tbody> 
+                    </table>
                 </td>
                 <td>
-                    {eachCard["naction"] ? eachCard["naction"].map((eachaction) => {
-                        return (
-                            <table key={eachCard["id"]}>
-                                <thead>
-                                    <th>method</th>
-                                    <th>content</th>
-                                </thead>
-                                <tbody>
+                    <table key={`naction`+eachCard["id"]}>
+                        <thead>
+                            <th>method</th>
+                            <th>content</th>
+                        </thead>
+                        <tbody>
+                            {eachCard["naction"] ? eachCard["naction"].map((eachaction) => {
+                                return (
                                     <tr>
                                         <td>{eachaction["method"]===1? `輸出`:`賦值`}</td>
                                         <td>
@@ -363,10 +363,10 @@ class RuleSet extends React.Component{
                                             <tr>{eachaction["content"]["log"] ? `${eachaction["content"]["log"]}`:``}</tr>
                                         </td>
                                     </tr>
-                                </tbody> 
-                            </table>
-                        );
-                    } ) : <td></td> }
+                                );
+                            } ) : <td></td> }
+                        </tbody> 
+                    </table>
                 </td>
                 <td>
                     <button className="btn btn-warning mr-2" onClick={() => this.edit(eachCard)}>
@@ -413,6 +413,7 @@ class RuleSet extends React.Component{
                 </div>
 
                 <div className="container py-3">
+                    <h1 className="text-black text-uppercase text-center my-4">{this.case_info.name}</h1>
                     <table className="table mt-4">
                         <thead>
                             <tr>

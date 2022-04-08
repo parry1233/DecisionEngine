@@ -359,7 +359,7 @@ class Engine extends React.Component{
                     <tbody>
                         <tr>
                             <td>
-                                <div className="d-flex flex-column align-items-start">{this.state.results.log?.map((l,index) => <span key={`rs_log_`+index} className={`badge mb-2 text-white ${l.split(' ')[1]==='fire'? `bg-danger`:`bg-success`}`}>{l.toString()}</span>)}</div>
+                                <div className="d-flex flex-column align-items-start">{this.state.results.log?.map((l,index) => <span key={`rs_log_`+index} className={`badge mb-2 text-white ${l==='grant'? `bg-success`:`bg-danger`}`}>{l.toString()}</span>)}</div>
                             </td>
                             <td>
                                 <div className="d-flex flex-column align-items-start">{this.state.results.varmap?.map((v) => <span key={`varmap_`+v.id} className={"badge mb-2 text-white bg-secondary"}>{v.name} : {v.value.toString()}</span>)}</div>

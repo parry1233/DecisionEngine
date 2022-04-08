@@ -209,12 +209,6 @@ class DecisionTreeLibrary extends React.Component{
                                     >
                                         Add Library
                                     </button>
-                                    <Link to ="/VariableAll"
-                                        className="btn btn-warning mr-2"
-                                        //onClick={this.createItem}
-                                    >
-                                        View All Decision
-                                    </Link>
                                 </div>
                                 <ul className="list-group list-group-flush border-top-0">
                                     {this.renderCase()}
