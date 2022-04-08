@@ -77,6 +77,15 @@ class UAction:
             )
             '''
 
+    def __str__(self):
+        if self.method == static.METHOD.PRINT:
+            log = self.content["log"]
+            return f"print({log})"
+        elif self.method == static.METHOD.ASSIGN:
+            id = self.content["id"]
+            value = self.content["value"]
+            return f"({id}={value})"
+
 
 class Action:
     def __init__(self, lst=None):
@@ -112,6 +121,10 @@ class Action:
 
     def PartialDump(self, lst=None):
         return json.dumps(self.Partial(lst), separators=(',', ':'), default=vars)
+
+    def ToString(self):
+        lst = [str(k) for k in self.rlist]
+        return " and ".join(lst)
 
 
 class URule:
@@ -339,10 +352,12 @@ class RuleSetPool(models.Model):
 
     def __str__(self):
         text = ""
+        log = ""
         try:
             words = [str(k) for k in Rule(self.rule).Load()]
             text = ""
             text += " , ".join(words)
+            log = Action(self.action).ToString()
         except RuntimeError as e:
             text = str(e)
-        return f"{self.fkey} | {text}"
+        return f"{self.fkey} | {text} | {log}"

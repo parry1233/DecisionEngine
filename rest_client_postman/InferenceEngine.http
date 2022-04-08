@@ -4,7 +4,7 @@ POST {{host}}/RuleSetEngine/
 Content-Type: application/json
 
 {
-    "fk":4,
+    "fk":6,
     "circular":false,
     "varmap":{
         "28": true,
