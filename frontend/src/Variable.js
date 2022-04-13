@@ -298,6 +298,7 @@ class Varaible extends React.Component{
                 </div>
 
                 <div className="container py-3">
+                    <h1 className="text-black text-uppercase text-center my-4">{this.case_info.name}</h1>
                     <table className="table mt-4">
                         <thead>
                             <tr>

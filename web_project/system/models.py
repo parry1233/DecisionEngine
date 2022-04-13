@@ -76,6 +76,15 @@ class UAction:
             )
             '''
 
+    def __str__(self):
+        if self.method == static.METHOD.PRINT:
+            log = self.content["log"]
+            return f"print({log})"
+        elif self.method == static.METHOD.ASSIGN:
+            id = self.content["id"]
+            value = self.content["value"]
+            return f"({id}={value})"
+
 
 class Action:
     def __init__(self, lst=None):
@@ -111,6 +120,10 @@ class Action:
 
     def PartialDump(self, lst=None):
         return json.dumps(self.Partial(lst), separators=(',', ':'), default=vars)
+
+    def ToString(self):
+        lst = [str(k) for k in self.rlist]
+        return " and ".join(lst)
 
 
 class URule:
@@ -232,7 +245,7 @@ class Rule:
 
 class VariableLibrary(models.Model):
     name = models.CharField(
-        max_length=20, help_text='Enter name')
+        max_length=50, help_text='Enter name')
 
     def __str__(self):
         return self.name
@@ -240,7 +253,7 @@ class VariableLibrary(models.Model):
 
 class VariablePool(models.Model):
     name = models.CharField(
-        max_length=40, help_text='Enter name')
+        max_length=60, help_text='Enter name')
     datatype = models.CharField(
         max_length=1,
         choices=static.CATAGORY,
@@ -251,12 +264,12 @@ class VariablePool(models.Model):
         'VariableLibrary', on_delete=models.CASCADE)
 
     def __str__(self):
-        return self.name + "_" + str(self.id)
+        return f"{self.fkey.name} ({str(self.id)}) {self.name}"
 
 
 class ScoreCardLibrary(models.Model):
     name = models.CharField(
-        max_length=20, help_text='Enter name')
+        max_length=50, help_text='Enter name')
 
     def __str__(self):
         return f"{self.name} ({str(self.id)})"
@@ -274,17 +287,22 @@ class ScoreCardPool(models.Model):
         default='1',
         help_text='Score',
     )
+    description = models.TextField(help_text='Description', null=True)
 
     def __str__(self):
-        words = [str(k) for k in Rule(self.rule).Load()]
         text = ""
-        text += " , ".join(words)
-        return self.fkey.name + " | " + text
+        try:
+            words = [str(k) for k in Rule(self.rule).Load()]
+            text = ""
+            text += " , ".join(words)
+        except RuntimeError as e:
+            text = str(e)
+        return f"{self.fkey.name} | {text} | {self.score}"
 
 
 class DecisionTreeLibrary(models.Model):
     name = models.CharField(
-        max_length=20, help_text='Enter name')
+        max_length=50, help_text='Enter name')
 
     def __str__(self):
         return f"{self.name} ({str(self.id)})"
@@ -306,9 +324,13 @@ class DecisionTreePool(models.Model):
     duplicate_event.short_description = "Duplicate selected record"
 
     def __str__(self):
-        words = [str(k) for k in Rule(self.rule).Load()]
         text = ""
-        text += " , ".join(words)
+        try:
+            words = [str(k) for k in Rule(self.rule).Load()]
+            text = ""
+            text += " , ".join(words)
+        except RuntimeError as e:
+            text = str(e)
         return f'''({self.id}) {self.fkey.name} | {text}'''
 
 
@@ -328,7 +350,13 @@ class RuleSetPool(models.Model):
     naction = models.TextField(help_text='nAction', blank=True, null=True)
 
     def __str__(self):
-        words = [str(k) for k in Rule(self.rule).Load()]
         text = ""
-        text += " , ".join(words)
-        return f"{self.fkey} | {text}"
+        log = ""
+        try:
+            words = [str(k) for k in Rule(self.rule).Load()]
+            text = ""
+            text += " , ".join(words)
+            log = Action(self.action).ToString()
+        except RuntimeError as e:
+            text = str(e)
+        return f"{self.fkey} | {text} | {log}"

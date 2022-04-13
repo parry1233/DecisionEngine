@@ -44,7 +44,7 @@ class RuleSet extends React.Component{
                 this.setState({
                     allCardPool: res.data,
                     activeCard: {
-                        "id":"-1",
+                        "id":-1,
                         "rule":[
                             {
                                 "variable" : "",
@@ -97,10 +97,10 @@ class RuleSet extends React.Component{
             try
             {
                 let action = item;
-                console.log(action);
+                //console.log(action);
                 //action = JSON.stringify(item);
                 //action = JSON.stringify(JSON.stringify(item));
-                console.log(action);
+                //console.log(action);
                 return action;
             }
             catch(e)
@@ -259,10 +259,10 @@ class RuleSet extends React.Component{
                 //console.log(res.data)
 
                 let activeItem = {...item}
-                console.log(activeItem);
+                //console.log(activeItem);
                 activeItem["action"] = activeItem["action"]===null? "" : JSON.stringify(item["action"]);
                 activeItem["naction"] = activeItem["naction"]===null? "" : JSON.stringify(item["naction"]);
-                console.log(activeItem);
+                //console.log(activeItem);
     
                 this.setState({
                     allCardPool: res.data,
@@ -293,7 +293,7 @@ class RuleSet extends React.Component{
         else if (o==="e") return '='
         else if (o==="s") return '<'
         else if (o==="a") return '>='
-        else if (o==="s") return '<='
+        else if (o==="p") return '<='
         else return o
     }
 
@@ -303,70 +303,70 @@ class RuleSet extends React.Component{
         return cards.map((eachCard)=>(
             <tr key = {eachCard["id"]}>
                 <td>
-                    {eachCard["rule"].map((eachrule) => {return (
-                        <table key= {eachCard["id"]}>
-                            <thead>
-                                <th>name</th>
-                                <th>datatype</th>
-                                <th>operator</th>
-                                <th>value</th>
-                            </thead>
-                            <tbody>
+                    <table key= {`rule_`+eachCard["id"]}>
+                        <thead>
+                            <th>name</th>
+                            <th>datatype</th>
+                            <th>operator</th>
+                            <th>value</th>
+                        </thead>
+                        <tbody>
+                            {eachCard["rule"].map((eachrule) => {return (
                                 <tr>
                                     <td>{eachrule["name"]}</td>
                                     <td>{this.datatypeStr(eachrule["datatype"])}</td>
                                     <td>{this.operatorStr(eachrule["operator"])}</td>
                                     <td>{eachrule["value"].toString()}</td>
-                                </tr>
-                            </tbody> 
-                        </table>
-                    ); })}
+                                </tr>   
+                            ); })}
+                        </tbody> 
+                    </table>
                 </td>
                 <td>
-                    {eachCard["action"] ? eachCard["action"].map((eachaction) => {
-                        return (
-                            <table key={eachCard["id"]}>
-                                <thead>
-                                    <th>method</th>
-                                    <th>content</th>
-                                </thead>
-                                <tbody>
+                    <table key={`action_`+eachCard["id"]}>
+                        <thead>
+                            <th>method</th>
+                            <th>content</th>
+                        </thead>
+                        <tbody>
+                            {eachCard["action"] ? eachCard["action"].map((eachaction) => {
+                                return (
                                     <tr>
                                         <td>{eachaction["method"]===1? `輸出`:`賦值`}</td>
                                         <td>
                                             <table>
-                                                <tr>{eachaction["content"]["id"] ? `變數 : ${this.findObjectByValue(eachaction["content"]["id"]).name}`:``}</tr>
-                                                <tr>{eachaction["content"]["value"] ? `變數值 : ${eachaction["content"]["value"]}`:``}</tr>
-                                                <tr>{eachaction["content"]["log"] ? `${eachaction["content"]["log"]}`:``}</tr>
+                                                <tr>{"id" in eachaction["content"] ? `變數 : ${this.findObjectByValue(eachaction["content"]["id"]).name}`:``}</tr>
+                                                <tr>{"value" in eachaction["content"] ? `變數值 : ${eachaction["content"]["value"]}`:``}</tr>
+                                                <tr>{"log" in eachaction["content"] ? `${eachaction["content"]["log"]}`:``}</tr>
                                             </table>
                                         </td>
-                                    </tr>
-                                </tbody> 
-                            </table>
-                        );
-                    } ) : <td></td> }
+                                    </tr>    
+                                );
+                            } ) : <td></td> }
+                        </tbody> 
+                    </table>
                 </td>
                 <td>
-                    {eachCard["naction"] ? eachCard["naction"].map((eachaction) => {
-                        return (
-                            <table key={eachCard["id"]}>
-                                <thead>
-                                    <th>method</th>
-                                    <th>content</th>
-                                </thead>
-                                <tbody>
+                    <table key={`naction`+eachCard["id"]}>
+                        <thead>
+                            <th>method</th>
+                            <th>content</th>
+                        </thead>
+                        <tbody>
+                            {eachCard["naction"] ? eachCard["naction"].map((eachaction) => {
+                                return (
                                     <tr>
                                         <td>{eachaction["method"]===1? `輸出`:`賦值`}</td>
                                         <td>
-                                            <tr>{eachaction["content"]["id"] ? `變數 : ${this.findObjectByValue(eachaction["content"]["id"]).name}`:``}</tr>
-                                            <tr>{eachaction["content"]["value"] ? `變數值 : ${eachaction["content"]["value"]}`:``}</tr>
-                                            <tr>{eachaction["content"]["log"] ? `${eachaction["content"]["log"]}`:``}</tr>
+                                            <tr>{"id" in eachaction["content"] ? `變數 : ${this.findObjectByValue(eachaction["content"]["id"]).name}`:``}</tr>
+                                            <tr>{"value" in eachaction["content"] ? `變數值 : ${eachaction["content"]["value"]}`:``}</tr>
+                                            <tr>{"log" in eachaction["content"] ? `${eachaction["content"]["log"]}`:``}</tr>
                                         </td>
                                     </tr>
-                                </tbody> 
-                            </table>
-                        );
-                    } ) : <td></td> }
+                                );
+                            } ) : <td></td> }
+                        </tbody> 
+                    </table>
                 </td>
                 <td>
                     <button className="btn btn-warning mr-2" onClick={() => this.edit(eachCard)}>
@@ -413,6 +413,7 @@ class RuleSet extends React.Component{
                 </div>
 
                 <div className="container py-3">
+                    <h1 className="text-black text-uppercase text-center my-4">{this.case_info.name}</h1>
                     <table className="table mt-4">
                         <thead>
                             <tr>

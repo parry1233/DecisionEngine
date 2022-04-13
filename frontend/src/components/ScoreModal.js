@@ -54,6 +54,19 @@ export default class CustomModal extends Component {
 
     this.setState({ activeItem });
   };
+
+  onAddRule = () => {
+    let newRule = this.state.activeItem;
+    newRule["rule"].push({"variable":-1,"name":"","datatype":"","operaotr":"","value":""})
+    this.setState({ activeItem: newRule});
+  };
+
+  onDelRule = (index) => {
+    let newRule = this.state.activeItem;
+    if(newRule["rule"].length-1>0) newRule["rule"].splice(index,1);
+    else alert("不能再刪除了!");
+    this.setState({ activeItem: newRule});
+  };
   
   renderRule() {
     const rule = this.state.activeItem
@@ -74,7 +87,7 @@ export default class CustomModal extends Component {
             placeholder="Enter ID"
           />
         </FormGroup>
-
+        <hr/>
         {rule["rule"].map((eachrule,index) => {return (
           <FormGroup key={index}>
             <Label for="scpool-ruleId">Rule Variable</Label>
@@ -83,6 +96,7 @@ export default class CustomModal extends Component {
                 <option key={element["id"]} value = {element["id"]}>{element["name"]} (Dtype: {element["datatype"]})</option>
               ); })}
             </select>
+            <br/>
             <Label for="scpool-ruleOperator">Rule Operator</Label>
             <Input
               type="text"
@@ -91,7 +105,7 @@ export default class CustomModal extends Component {
               value={eachrule["operator"]}
               readOnly={this.state.edit_type===1 ? true : false}
               onChange={(event) => this.handleRuleChange(index, event)}
-              placeholder="Enter Variable"
+              placeholder="Enter Operator"
             />
             <Label for="scpool-ruleValue">Rule Value</Label>
             <Input
@@ -101,11 +115,31 @@ export default class CustomModal extends Component {
               value={eachrule["value"]}
               readOnly={this.state.edit_type===1 ? true : false}
               onChange={(event) => this.handleRuleChange(index, event)}
-              placeholder="Enter Variable"
+              placeholder="Enter Value"
             />
+            <br/>
+            <Button
+              color="secondary"
+              onClick={() => this.onDelRule(index)}
+            >
+              Delete
+            </Button>
           </FormGroup>
+          
         ); })}
-        
+        <hr/>
+        <FormGroup>
+          <Label for="scpool-description">Description</Label>
+          <Input
+            type="text"
+            id="scpool-description"
+            name="description"
+            value={rule["description"]}
+            readOnly={this.state.edit_type===1 ? true : false}
+            onChange={(event) => this.handleChange(event)}
+            placeholder="Enter Description"
+          />
+        </FormGroup>
         <FormGroup>
           <Label for="scpool-weight">weight</Label>
           <Input
@@ -140,16 +174,22 @@ export default class CustomModal extends Component {
 
     return (
       <Modal isOpen={true} toggle={toggle}>
-        <ModalHeader toggle={toggle}>Add Score Card</ModalHeader>
+        <ModalHeader toggle={toggle}>Edit Score Card</ModalHeader>
         <ModalBody>
           {this.renderRule()}
         </ModalBody>
         <ModalFooter>
           <Button
+            color="primary"
+            onClick={() => this.onAddRule()}
+          >
+            New Variable
+          </Button>
+          <Button
             color="success"
             onClick={() => onSave(this.state.activeItem,this.state.edit_type)}
           >
-            Save (Currently unavailable)
+            Save
           </Button>
           <Button
             color="secondary"

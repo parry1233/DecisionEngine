@@ -21,7 +21,8 @@ export default class CustomModal extends Component {
       variable: this.props.existVariable,
       activeItem: {
         "fk" : this.props.fk,
-        "rule" : [{"variable": "", "operator": "", "value": ""}],
+        "rule" : [{"variable": -1, "operator": "", "value": ""}],
+        "description":"",
         "weight" : 0,
         "score": 0
       }
@@ -59,6 +60,19 @@ export default class CustomModal extends Component {
 
     this.setState({ activeItem });
   };
+
+  onAddRule = () => {
+    let newRule = this.state.activeItem;
+    newRule["rule"].push({"variable":-1,"name":"","datatype":"","operaotr":"","value":""})
+    this.setState({ activeItem: newRule});
+  };
+
+  onDelRule = (index) => {
+    let newRule = this.state.activeItem;
+    if(newRule["rule"].length-1>0) newRule["rule"].splice(index,1);
+    else alert("不能再刪除了!");
+    this.setState({ activeItem: newRule});
+  };
   
   renderRule() {
     const rule = this.state.activeItem
@@ -66,37 +80,57 @@ export default class CustomModal extends Component {
     //console.log(rule);
     return(
       <Form key={rule["id"]}>
+        {rule["rule"].map((eachrule,index) => {return (
+          <FormGroup key={index}>
+            <Label for="scpool-ruleId">Rule Variable</Label>
+            <select name="variable" value={eachrule["variable"]} onChange={(event) => this.handleRuleChange(index, event)}>
+              <option key={-1} value = {""}/>
+              {varaible.map((element) => { return (
+                <option key={element["id"]} value = {element["id"]}>{element["name"]} (Dtype: {element["datatype"]})</option>
+              ); })}
+            </select>
+            <br/>
+            <Label for="scpool-ruleOperator">Rule Operator</Label>
+            <Input
+              type="text"
+              id="scpool-ruleOperator"
+              name="operator"
+              value={eachrule["operator"]}
+              readOnly={this.state.edit_type===1 ? true : false}
+              onChange={(event) => this.handleRuleChange(index, event)}
+              placeholder="Enter Operator"
+            />
+            <Label for="scpool-ruleValue">Rule Value</Label>
+            <Input
+              type="text"
+              id="scpool-ruleValue"
+              name="value"
+              value={eachrule["value"]}
+              readOnly={this.state.edit_type===1 ? true : false}
+              onChange={(event) => this.handleRuleChange(index, event)}
+              placeholder="Enter Value"
+            />
+            <br/>
+            <Button
+              color="secondary"
+              onClick={() => this.onDelRule(index)}
+            >
+              Delete
+            </Button>
+          </FormGroup>
+          
+        ); })}
+        <hr/>
         <FormGroup>
-          <Label for="scpool-ruleId">Rule Variable</Label>
-          <select name="variable" value={this.state.activeItem["rule"][0]["variable"]} onChange={(event) => this.handleRuleChange(0,event)}>
-              <option key={-1} value = {""}></option>
-            {varaible.map((element) => { return (
-              <option key={element["id"]} value = {element["id"]}>{element["name"]} (Dtype: {element["datatype"]})</option>
-            ); })}
-          </select>
-        </FormGroup>
-        <FormGroup>
-          <Label for="scpool-ruleOperator">Rule Operator</Label>
+          <Label for="scpool-description">Description</Label>
           <Input
             type="text"
-            id="scpool-ruleOperator"
-            name="operator"
-            value={rule["rule"][0]["operator"]}
-            readOnly={false}
-            onChange={(event) => this.handleRuleChange(0,event)}
-            placeholder="Enter Operator"
-          />
-        </FormGroup>
-        <FormGroup>
-          <Label for="scpool-ruleValue">Rule Value</Label>
-          <Input
-            type="text"
-            id="scpool-ruleValue"
-            name="value"
-            value={rule["rule"][0]["value"]}
-            readOnly={false}
-            onChange={(event) => this.handleRuleChange(0,event)}
-            placeholder="Enter Value"
+            id="scpool-description"
+            name="description"
+            value={rule["description"]}
+            readOnly={this.state.edit_type===1 ? true : false}
+            onChange={(event) => this.handleChange(event)}
+            placeholder="Enter Description"
           />
         </FormGroup>
         <FormGroup>
@@ -133,11 +167,17 @@ export default class CustomModal extends Component {
 
     return (
       <Modal isOpen={true} toggle={toggle}>
-        <ModalHeader toggle={toggle}>Score Card View</ModalHeader>
+        <ModalHeader toggle={toggle}>Add Score Card</ModalHeader>
         <ModalBody>
           {this.renderRule()}
         </ModalBody>
         <ModalFooter>
+          <Button
+            color="primary"
+            onClick={() => this.onAddRule()}
+          >
+            New Variable
+          </Button>
           <Button
             color="success"
             onClick={() => onAdd(this.state.activeItem)}

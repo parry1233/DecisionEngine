@@ -65,7 +65,7 @@ class ScoreCard extends React.Component{
             rule+=(`{`
                 +`\"variable\":\"${item[i]["variable"]}\", `
                 +`\"operator\":\"${item[i]["operator"]}\", `
-                +`\"value\":\"${item[i]["value"]}\"`
+                +`\"value\":${item[i]["value"]}`
                 +`}`)
             
             if(i+1<item.length) rule+=`,`
@@ -88,7 +88,8 @@ class ScoreCard extends React.Component{
                 'fk': this.case_info.id,
                 'rule': this.ruleParse(item["rule"]),
                 'weight': `${item["weight"]}`,
-                'score': `${item["score"]}`
+                'score': `${item["score"]}`,
+                'description': `${item["description"]}`
             },
             {
               headers:{
@@ -162,7 +163,8 @@ class ScoreCard extends React.Component{
                 'fk': this.case_info.id,
                 'rule': this.ruleParse(item["rule"]),
                 'weight': `${item["weight"]}`,
-                'score': `${item["score"]}`
+                'score': `${item["score"]}`,
+                'description': `${item["description"]}`
             },
             {
               headers:{
@@ -293,7 +295,7 @@ class ScoreCard extends React.Component{
         else if (o==="e") return '='
         else if (o==="s") return '<'
         else if (o==="a") return '>='
-        else if (o==="s") return '<='
+        else if (o==="p") return '<='
         else return o
     }
 
@@ -303,25 +305,26 @@ class ScoreCard extends React.Component{
         return cards.map((eachCard)=>(
             <tr key = {eachCard["id"]}>
                 <tr>
-                    {eachCard["rule"].map((eachrule) => {return (
-                        <table>
-                            <thead>
-                                <th>name</th>
-                                <th>datatype</th>
-                                <th>operator</th>
-                                <th>value</th>
-                            </thead>
-                            <tbody>
+                    <table>
+                        <thead>
+                            <th>name</th>
+                            <th>datatype</th>
+                            <th>operator</th>
+                            <th>value</th>
+                        </thead>
+                        <tbody>
+                            {eachCard["rule"].map((eachrule) => {return (
                                 <tr>
                                     <td>{eachrule["name"]}</td>
                                     <td>{this.datatypeStr(eachrule["datatype"])}</td>
                                     <td>{this.operatorStr(eachrule["operator"])}</td>
                                     <td>{eachrule["value"].toString()}</td>
                                 </tr>
-                            </tbody> 
-                        </table>
-                    ); })}
+                             ); })}
+                        </tbody>
+                    </table>
                 </tr>
+                <td> {eachCard["description"]} </td>
                 <td> {eachCard["weight"]} </td>
                 <td> {eachCard["score"]} </td>
                 <td>
@@ -369,10 +372,12 @@ class ScoreCard extends React.Component{
                 </div>
 
                 <div className="container py-3">
+                    <h1 className="text-black text-uppercase text-center my-4">{this.case_info.name}</h1>
                     <table className="table mt-4">
                         <thead>
                             <tr>
                                 <th>規則</th>
+                                <th>描述</th>
                                 <th>權重</th>
                                 <th>分數</th>
                                 <th>編輯</th>

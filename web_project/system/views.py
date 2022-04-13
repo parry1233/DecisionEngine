@@ -5,7 +5,6 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from django.http import Http404
 from django.views.decorators.csrf import csrf_exempt
-
 from . import static
 from .models import Rule, Action, RuleSetLibrary, RuleSetPool, URule, ScoreCardLibrary, ScoreCardPool, VariableLibrary, VariablePool, DecisionTreeLibrary, DecisionTreePool
 import json
@@ -57,14 +56,14 @@ def ScoreCardList(request):
 
 def ScoreCardView(request, id):
 
-    rules = ScoreCardPool.objects.filter(fkey__name=id).all()
-
-    varmap = {"1": 1, "2": 1.5, "3": 50}
+    varmap = {"35": 0, "36": 40, "37": 14, "38": 1, "39": 1, "40": -1, "41": 1005, "42": 2, "43": 2, "44": 2, "45": 52, "46": 1, "47": 1,
+              "48": 0, "49": 4, "50": 0, "51": 4, "52": 4, "53": 2, "54": 588, "55": 0, "56": 48, "57": 10, "58": 1, "59": 1, "60": 0, "61": 2, "62": 1, "63": 1, "64": 0, "65": 1}
     varmap, _ = value_transform(varmap)
-
-    engine = SCEngine.SCE()
+    rules = ScoreCardPool.objects.filter(fkey__name=id).all()
     rulelist = [(Rule(rule.rule), rule.score * rule.weight)
                 for rule in rules]
+
+    engine = SCEngine.SCE()
     engine.defrule(rulelist)
     engine.assign(varmap)
     score, satisfy = engine.run()
@@ -79,7 +78,7 @@ def ScoreCardView(request, id):
         line["w"] = rule.weight
         line["s"] = rule.score
         line["wxs"] = rule.score*rule.weight
-        line["satisfy"] = "pass" if satisfy[i] else "fire"
+        line["satisfy"] = "fired" if satisfy[i] else "refused"
         ruleresult.append(line)
 
     SCid = ScoreCardLibrary.objects.all()
@@ -180,13 +179,17 @@ def DecisionTreeView(request, id):
 def DecisionTreeViewJSMindStructure(request):
     get = (lambda x: request.data[x])
     fkey = get("fk")
-    print(fkey)
+
     idctr = 0
 
-    def JsmindNode(topic, parentid):
+    def JsmindNode(topic, parentid, nodetype=None):
         nonlocal idctr
         idctr = idctr + 1
-        return {"id": str(idctr), "parentid": parentid, "isroot": idctr == 1, "topic": topic}
+        node = {"id": str(idctr), "parentid": parentid,
+                "topic": topic, "nodetype": nodetype}
+        if idctr == 1:
+            node["isroot"] = True
+        return node
 
     def JsmindAppendTo(data, pname, parentid):
         rules = DecisionTreePool.objects.filter(
@@ -195,19 +198,20 @@ def DecisionTreeViewJSMindStructure(request):
         parent = None
         if len(rules) != 0:
             x = rules[0]
-            lst = [x.ToReadable() for x in Rule(x.rule).GetRaw()]
-            xname = lst[0].name
-            parent = JsmindNode(xname, parentid)
+            rule = Rule(x.rule)
+            xname = rule.GetRaw()[0].ToReadable().name
+            parent = JsmindNode(xname, parentid, "question")
+            parent["retype"] = rule.GetRaw()[0].datatype
             data.append(parent)
         for x in rules:
             lst = [x.ToReadable() for x in Rule(x.rule).GetRaw()]
             # print(lst)
             only_rule = [x.rule for x in lst]
             xrule = " and ".join(only_rule)
-            child = JsmindNode(xrule, parent["id"])
+            child = JsmindNode(xrule, parent["id"], "rule")
             data.append(child)
             if x.log != "":
-                data.append(JsmindNode(f"印出{x.log}", child["id"]))
+                data.append(JsmindNode(f"{x.log}", child["id"], "log"))
             JsmindAppendTo(data, x, child["id"])
     jstree = []
     JsmindAppendTo(jstree, None, "")
@@ -218,7 +222,7 @@ def DecisionTreeViewJSMindStructure(request):
     dtid_list = {i: rule.name for i, rule in enumerate(lib)}
 
     context = {
-        "link_list": json.dumps({"meta": {}, "format": "node_array", "data": jstree}, default=vars, ensure_ascii=False),
+        "link_list": {"meta": {}, "format": "node_array", "data": jstree},
         "scid": scid_list,
         "dtid": dtid_list
     }
@@ -236,6 +240,7 @@ def ScoreCardEngine(request):
     engine = SCEngine.SCE()
     engine.defrule(rulelist)
     engine.assign(varmap)
+
     score, satisfy = engine.run()
 
     _, vardata = value_transform(engine.info().varmap)
@@ -344,11 +349,11 @@ class ScoreCardPoolViewSet(viewsets.ModelViewSet):
 
     def create(self, validated_data):
         get = (lambda x: validated_data.data[x])
-        return Setter.SCPL_Add(get("fk"), get("rule"), get("weight"), get("score"))
+        return Setter.SCPL_Add(get("fk"), get("rule"), get("weight"), get("score"), get("description"))
 
     def update(self, request, pk):
         get = (lambda x: request.data[x])
-        return Setter.SCPL_Update(get("fk"), pk, get("rule"), get("weight"), get("score"))
+        return Setter.SCPL_Update(get("fk"), pk, get("rule"), get("weight"), get("score"), get("description"))
 
 
 class DecisionTreeLibViewSet(viewsets.ModelViewSet):
