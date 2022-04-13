@@ -23,6 +23,8 @@ class DTCreact extends React.Component {
                 nowmind:null,
                 treelist:null,
                 answer:null,
+                lastid:1,
+                
             };            
         }
         //function
@@ -101,11 +103,12 @@ class DTCreact extends React.Component {
     add_node = () => {
         var selected_node = this.state._jm.get_selected_node(); // as parent of new node
         if (!selected_node) { alert('please select a node first.'); return; }
-        var nodeid = jsMind.util.uuid.newid();
+        var nodeid = this.state.lastid + 1;
+        
         var topic = '* Node_' + nodeid.substr(nodeid.length - 6) + ' *';
         var jm = this.state._jm
         var node = jm.add_node(selected_node, nodeid, topic);
-        this.setState({_jm: jm});
+        this.setState({_jm: jm,lastid:nodeid});
     }
     remove_node = () => {
             var selected_id = this.get_selected_nodeid();

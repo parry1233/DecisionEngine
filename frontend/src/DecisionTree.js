@@ -32,14 +32,16 @@ class DecisionTree extends React.Component{
             _jm:undefined,
             nowmind:null,
             treelist:null,
-            answer:null,
+            past_node:[],
+            now_q_id:0,
+            now_r_id:0,
+            ans_type:null,
         }
     }
 
     componentDidMount() {
         //this.getParams();
         this.getTree(this.case_info.id);
-//        this.refreshList();
     }
 
     //function
@@ -230,19 +232,253 @@ class DecisionTree extends React.Component{
     }*/
 
     refreshList = () => {
-        if (this.state._jm === undefined){
-        //    console.log(treedata["link_list"]) 
-            var jm = new jsMind(this.state.options);  
-            var mind = this.state.nowmind;     
-            console.log(mind);
-            if (!!mind) {
-                jm.show(mind);
-                this.setState({_jm: jm});
-            } else {
-                alert('can not open this file as mindmap');
-            }    
+        var jm = undefined;  
+        var mind = undefined; 
+        var id =undefined;       
+        if (this.state._jm != undefined){
+            mind = jsMind.util.json.string2json(this.state.nowmind);
+            jm = this.state._jm
+            if (this.state.now_q_id == 0 ){
+                this.next_question('');
+            }else{
+                this.next_question(this.state.now_r_id);
+            }
+            jm.enable_edit();
+            
+            
+            this.state.past_node.forEach(function(e,i){
+                jm.select_node(mind["data"][e]['id']);
+                
+                id = jm.get_selected_node();
+                console.log (id);
+                jm.set_node_color(id.id , "#DAA520", null);
+            })
+            jm.disable_edit();
+            jm.show();
+            this.setState({_jm: jm});
+        }
+        
+    };
+    compare_num = (rule, ans)=>{
+        var r = rule.split(' ');
+        var o = [">",">=","=>","<","<=","=<","=","=="]
+        var num = [];
+        var state = [];
+        var pass = false;
+        r.forEach(function(e,i){
+            num.push(Number(e));
+            if (Number.isNaN(Number(e)) ){
+                if (o.indexOf(r[i])>=0){
+                    state.push(1);
+                }else{
+                    state.push(10);
+                }
+            }else {
+                state.push(0);
+            }
+        });
+        var o_temp = -1;
+        var n_temp = -1;
+        state.forEach(function(e,i){
+
+            if (e == 0){
+                n_temp = i;
+            }else if (e == 1){
+                o_temp = i;
+            }
+            if (o_temp >= 0 && n_temp >= 0){
+                if (o_temp > n_temp){
+                    pass = this.count_num(ans,num[n_temp],r[o_temp]);
+                    n_temp = -1;
+                    o_temp = -1;
+                }else if (o_temp < n_temp){
+                    pass = this.count_num(num[n_temp],ans,r[o_temp]);
+                    n_temp = -1;
+                    o_temp = -1;
+                }else {
+                    alert('error');
+                }
+            }
+            
+        });
+        return pass ;
+    }
+
+    count_num=(a,b,o)=>{
+        switch (o) {
+            case ">":
+                if (a>b){
+                    return true;
+                }else{
+                    return false;
+                };
+                break;
+            case ">=" || "=>":
+                if (a>=b){
+                    return true;
+                }else{
+                    return false;
+                };
+                break;
+            case "<":
+                if (a<b){
+                    return true;
+                }else{
+                    return false;
+                };
+                break;
+            case "<="||"=<":
+                if (a<=b){
+                    return true;
+                }else{
+                    return false;
+                };
+                break;
+            case "="||"==":
+                if (a==b){
+                    return true;
+                }else{
+                    return false;
+                };
+                break;
+            default:
+                alert('沒有符合的條件');
+                return undefined;
+        }
+    }
+
+    judge = ()=>{
+        var done = true;
+        var mind = jsMind.util.json.string2json(this.state.nowmind);
+        var pos = 1; 
+        var ans = undefined;
+        var rule = undefined;
+        var past = this.state.past_node;
+        var parentid=undefined;
+        while( done ) {
+            parentid = mind["data"][pos]["parentid"];
+            if (mind["data"][pos]["parentid"] == String(this.state.now_q_id) && mind["data"][pos]["nodetype"] == "rule"){
+                rule = mind["data"][pos]["topic"];
+                if (this.state.ans_type == "number"){
+                    ans =  document.getElementById('ans_input');
+                    if (this.compare_num(rule,ans)){
+                        this.setState({now_r_id:Number(mind["data"][pos]['id'])});
+                        past.push(pos);
+                        this.setState({past_node:past});
+                        done = false;
+                    }
+                }else if (this.state.ans_type == "boolean"){
+                    ans = document.querySelector('input[name="ans"]:checked').value;
+                    if (rule.indexOf('True')>=0 && ans == "true"){
+                        this.setState({now_r_id:Number(mind["data"][pos]['id'])});
+                        past.push(pos);
+                        this.setState({past_node:past});
+                        done = false;
+                    }else if (rule.indexOf('False')>=0 && ans == "false"){
+                        this.setState({now_r_id:Number(mind["data"][pos]['id'])});
+                        past.push(pos);
+                        this.setState({past_node:past});
+                        done = false;
+                    }
+                };
+            }
+            pos++;
+        }
+        this.refreshList() ;
+
+    }
+    next_question = (q_id) =>{
+        var done = true;
+        var mind = jsMind.util.json.string2json(this.state.nowmind);
+        var pos = this.state.now_r_id; 
+        var past = this.state.past_node;
+        console.log(mind["data"][pos]["parentid"]);
+        var question="";
+        while( done ) {
+            if (pos==0){
+                console.log("try root");
+                question = mind["data"][pos]["topic"];
+                this.setState({now_q_id:Number(mind["data"][pos]["id"])});
+                past.push(pos);
+                this.setState({past_node:past});
+                if ( mind["data"][pos]["retype"] == "I" || mind["data"][pos]["retype"] == "F"){
+                    this.setState({ans_type:"number"});
+                    return (
+                        <div >
+                            <table>
+                                <tr>
+                                    <td>{question}</td>
+                                    <td>
+                                        <input id = "ans_input" className = "file_input" type = "number"></input>
+                                        <button className = "sub" onClick = {() => this.judge() } > next </button>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>  
+                    );
+                }else if ( mind["data"][pos]["retype"] == "b"){
+                    this.setState({ans_type:"boolean"});
+                    return (
+                        <div >
+                            <table>
+                                <tr>
+                                    <td>{question}</td>
+                                    <td>
+                                        <input  type="radio" name="ans" value="true"> true</input>
+                                        <input  type="radio" name="ans" value="false">false</input>
+                                        <button className = "sub" onClick = {() => this.judge() } > next </button>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div> 
+                    );
+                }; 
+                break;  
+            }else if (mind["data"][pos]["parentid"] == String(q_id) && mind["data"][pos]["nodetype"] == "question"){
+                question = mind["data"][pos]["topic"];
+                this.setState({now_q_id:Number(mind["data"][pos]["id"])});
+                past.push(pos);
+                this.setState({past_node:past});
+                if ( mind["data"][pos]["retype"] == "I" || mind["data"][pos]["retype"] == "F"){
+                    this.setState({ans_type:"number"});
+                    return (
+                        <div >
+                            <table>
+                                <tr>
+                                    <td>{question}</td>
+                                    <td>
+                                        <input id = "ans_input" className = "file_input" type = "number"></input>
+                                        <button className = "sub" onClick = {() => this.judge() } > next </button>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>  
+                    );
+                }else if ( mind["data"][pos]["retype"] == "b"){
+                    this.setState({ans_type:"boolean"});
+                    return (
+                        <div >
+                            <table>
+                                <tr>
+                                    <td>{question}</td>
+                                    <td>
+                                        <input  type="radio" name="ans" value="true"> true</input>
+                                        <input  type="radio" name="ans" value="false">false</input>
+                                        <button className = "sub" onClick = {() => this.judge() } > next </button>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div> 
+                    );
+                }; 
+            } 
+            pos++;
         }
     };
+
+
+
+
 
 /*    toggle = () => {
         this.setState({ modal: !this.state.modal });
@@ -286,6 +522,7 @@ class DecisionTree extends React.Component{
     };*/
 
     getTree = (id) =>{
+        
         axios
           .post(`/DecisionTreeJsmind/`,{
             'fk': id,
@@ -297,10 +534,12 @@ class DecisionTree extends React.Component{
                 //    console.log(treedata["link_list"]) 
                     var jm = new jsMind(this.state.options);  
                     var mind = jsMind.util.json.string2json(this.state.nowmind);   
+                    
                     jm.show(mind);  
                     this.setState({_jm: jm});
-   
+                    this.refreshList();
                 }
+            
           })
           .catch((err) => {
               console.log(err)
@@ -340,7 +579,7 @@ class DecisionTree extends React.Component{
                         </li>
                     </ul>
                 </div>
-
+                <div> {this.refreshList()} </div>
                 <div id = "jsmind_container" >    
                 </div>
                 <div style={style}>
