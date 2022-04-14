@@ -6,6 +6,7 @@ import * as jsMind_draggable from "./jsmind/js/jsmind.draggable.js"
 import axios from "axios";
 import "./jsmind/js/jsmind.css"
 import './template/title.css'
+import DTModal from "./components/dtmodal";
 
 
 //this page need more modify
@@ -18,7 +19,6 @@ class DecisionTree extends React.Component{
         this.case_info = this.props.case_info;
         //console.log(this.case_info.name);
         this.state = {  
-            cardList: [],
             modal: false,
             new_modal: false,
             activeCard:[],
@@ -29,236 +29,72 @@ class DecisionTree extends React.Component{
                 editable: false, // [可选] 是否启用编辑
                 theme: 'orange' // [可选] 主题
             },
-            _jm:undefined,
-            nowmind:null,
+            _jm: null,
+            nowmind: null,
             treelist:null,
-            past_node:[],
-            now_q_id:0,
-            now_r_id:0,
+            past_node: [],
+            now_q_id:-1,
+            now_r_id:-1,
             ans_type:null,
-        }
-    }
-
-    componentDidMount() {
-        //this.getParams();
-        this.getTree(this.case_info.id);
-    }
-
-    //function
-
-/*    openNew = (id) => {
-        axios
-            .get(`/api/VariablePool/`,
-            {
-                //here is body(data)
-            },
-            {
-                headers:{
-                    //here is headers for token and cookies
-                    'token':'try4sdgsdsafsd232a84sd'
-                }
-            }
-            )
-            .then((res) => {
-                //console.log(res.data["names"])
-                //console.log(res.data)
-    
-                this.setState({
-                    allCardPool: res.data,
-                    new_modal: !this.state.new_modal });
-                //console.log(this.state.activeCase)
-            })
-            .catch((err) => console.log(err));
-
-        //this.setState( { case_id: id, modal: !this.state.modal } );
-    };
-
-    ruleParse = (item) => {
-        //console.log(item);
-        let rule = `[`
-        for(var i = 0; i<item.length;i++)
-        {
-            //console.log(item[i]);
-            rule+=(`{`
-                +`\"variable\":\"${item[i]["variable"]}\", `
-                +`\"operator\":\"${item[i]["operator"]}\", `
-                +`\"value\":\"${item[i]["value"]}\"`
-                +`}`)
+            debug:0,
+            Question_list:[],
+            now_Question:{},
+            finish:false,
+            answerValue:"",
+            is_pass:false,
+            has_next:false,
+            bottom_show:"next",
             
-            if(i+1<item.length) rule+=`,`
-        }
-        rule += `]`;
-
-        let ruleArr = []
-        item.forEach((element) => {
-            ruleArr.push(element)
-        });
-        //console.log(rule);
-        return rule
-    };
-
-    onAdd = (item) => {
-        axios
-            .post(`/api/ScoreCardPool/`,
-            {
-                //here is body(data)
-                'fk': this.case_info.id,
-                'rule': this.ruleParse(item["rule"]),
-                'weight': `${item["weight"]}`,
-                'score': `${item["score"]}`
-            },
-            {
-              headers:{
-                  //here is headers for token and cookies
-                  'token':'try4sdgsdsafsd232a84sd'
-              }
-            })
-            .then((res) => {
-                //console.log(res.data["names"])
-                //console.log(res.data)
-                if(res.data)
-                {
-                    if(res.data["error"])
-                    {
-                        alert(res.data["error"])
-                    }
-                }
-                this.new_toggle();
-                //this.setState({
-                //    activeCase: res.data,
-                //    modal: !this.state.modal });
-                //console.log(this.state.activeCase)
-            })
-            .catch((err) => console.log(err));
-    };
-
-    onSave = (item,type) => {
-        //console.log(item,type);
-        if(type===1)
-        {
-          console.log("Edit Variable");
-          console.log(item)
     
-          /*
-          //this part is currently a test version for specific id api, should be POST func
-          axios
-            .put(`/api/VariablePool/${item["id"]}`,
-            {
-                //here is body(data)
-                'name':item["rule"][0]["name"]
-            },
-            {
-                headers:{
-                    //here is headers for token and cookies
-                    'token':'try4sdgsdsafsd232a84sd'
-                }
-            }
-            )
-            .then((res) => {
-                //console.log(res.data["names"])
-                console.log(res.data)
-    
-                //this.setState({
-                //    activeCase: res.data,
-                //    modal: !this.state.modal });
-                //console.log(this.state.activeCase)
-            })
-            .catch((err) => console.log(err));
-          *//*
         }
-        else if(type===2)
-        {
-          //console.log("Edit Score");
-          //console.log(item)
-    
-          //this part is currently a test version for specific id api, should be POST func
-          axios
-            .put(`/api/ScoreCardPool/${item["id"]}/`,
-            {
-                //here is body(data)
-                'fk': this.case_info.id,
-                'rule': this.ruleParse(item["rule"]),
-                'weight': `${item["weight"]}`,
-                'score': `${item["score"]}`
-            },
-            {
-              headers:{
-                  //here is headers for token and cookies
-                  'token':'try4sdgsdsafsd232a84sd'
-              }
-            })
-            .then((res) => {
-                //console.log(res.data["names"])
-                //console.log(res.data)
-                if(res.data)
-                {
-                    if(res.data["error"])
-                    {
-                        alert(res.data["error"])
-                    }
-                }
-                this.toggle();
-                //this.setState({
-                //    activeCase: res.data,
-                //    modal: !this.state.modal });
-                //console.log(this.state.activeCase)
-            })
-            .catch((err) => console.log(err));
-        }
+        this.handleChange = this.handleChange.bind(this);
+        this.handleSubmit = this.handleSubmit.bind(this);
+        this.handleRadioChange = this.handleRadioChange.bind(this);
+
+    }
+    handleChange(event) {
+        this.setState({answerValue: event.target.value});
     };
+    handleRadioChange(event) {
+        // set the new value of checked radion button to state using setState function which is async funtion
+      this.setState({
+        answerValue: event.target.value
+      });
+    };
+    handleSubmit = (event) => {
+        this.setState({answerValue: String(this.value)});
+        event.preventDefault();
+    };
+    componentDidMount() {
+        this.getTree(this.case_info.id);
+        this.refreshTree();
+    }
 
-    onDelete = (item) => {
-        axios
-            .delete(`/api/ScoreCardPool/${item["id"]}/`,
-            {
-                //here is body(data)
-            },
-            {
-              headers:{
-                  //here is headers for token and cookies
-                  'token':'try4sdgsdsafsd232a84sd'
-              }
-            })
-            .then((res) => {
-                //console.log(res.data["names"])
-                //console.log(res.data)
-                this.refreshList();
-                //this.setState({
-                //    activeCase: res.data,
-                //    modal: !this.state.modal });
-                //console.log(this.state.activeCase)
-            })
-            .catch((err) => console.log(err));
-    }*/
-
-    refreshList = () => {
+    refreshquestion = ()=>{}
+    refreshTree = ()=>{
         var jm = undefined;  
         var mind = undefined; 
-        var id =undefined;       
-        if (this.state._jm != undefined){
-            mind = jsMind.util.json.string2json(this.state.nowmind);
-            jm = this.state._jm
-            if (this.state.now_q_id == 0 ){
-                this.next_question('');
-            }else{
-                this.next_question(this.state.now_r_id);
+        var node =undefined; 
+        console.log(this.state.past_node.length);
+        if (this.state.past_node.length > 0){
+            mind = this.state.nowmind["data"];
+            if (!!this.has_next){
+                this.printlog();
             }
+            jm = this.state._jm;
             jm.enable_edit();
-            
-            
-            this.state.past_node.forEach(function(e,i){
-                jm.select_node(mind["data"][e]['id']);
-                
-                id = jm.get_selected_node();
-                console.log (id);
-                jm.set_node_color(id.id , "#DAA520", null);
+            this.state.past_node.forEach(function(e){
+                jm.select_node(mind[e]['id']);
+                node = jm.get_selected_node();
+                console.log (node);
+                jm.set_node_color(node.id , "#20B2AA", null);
             })
             jm.disable_edit();
-            jm.show();
-            this.setState({_jm: jm});
+
+    //        this.setState({_jm: jm});
         }
-        
-    };
+    }
+
     compare_num = (rule, ans)=>{
         var r = rule.split(' ');
         var o = [">",">=","=>","<","<=","=<","=","=="]
@@ -279,6 +115,9 @@ class DecisionTree extends React.Component{
         });
         var o_temp = -1;
         var n_temp = -1;
+        var a = -1;
+        var b = -1;
+        var os = -1;
         state.forEach(function(e,i){
 
             if (e == 0){
@@ -288,194 +127,383 @@ class DecisionTree extends React.Component{
             }
             if (o_temp >= 0 && n_temp >= 0){
                 if (o_temp > n_temp){
-                    pass = this.count_num(ans,num[n_temp],r[o_temp]);
+                    os = o.indexOf(r[o_temp]);
+                    a = num[n_temp];
+                    b = ans;
                     n_temp = -1;
                     o_temp = -1;
                 }else if (o_temp < n_temp){
-                    pass = this.count_num(num[n_temp],ans,r[o_temp]);
+                    os = o.indexOf(r[o_temp]);
+                    a = ans;
+                    b = num[n_temp];
                     n_temp = -1;
-                    o_temp = -1;
+                    o_temp = -1; 
+                    
                 }else {
                     alert('error');
+                }
+                console.log(a+"  "+os+" "+b);
+                if (os == 0){
+                        if (a>b){
+                            pass = true;
+                        }else{
+                            pass = false;
+                        };
+                }else if (os == 1 || os == 2){
+                        if (a>=b){
+                            pass = true;
+                        }else{
+                            pass = false;
+                        };
+                }else if (os == 3 ){
+                        if (a<b){
+                            pass = true;
+                        }else{
+                            pass = false;
+                        };
+                }else if (os == 4 || os == 5){
+                        if (a<=b){
+                            pass = true;
+                        }else{
+                            pass = false;
+                        };
+                }else if (os == 6 || os == 7){
+                        if (a==b){
+                            pass = true;
+                        }else{
+                            pass = false;
+                        };
+                }else{
+                        console.log('沒有符合的條件');
                 }
             }
             
         });
-        return pass ;
-    }
-
-    count_num=(a,b,o)=>{
-        switch (o) {
-            case ">":
-                if (a>b){
-                    return true;
-                }else{
-                    return false;
-                };
-                break;
-            case ">=" || "=>":
-                if (a>=b){
-                    return true;
-                }else{
-                    return false;
-                };
-                break;
-            case "<":
-                if (a<b){
-                    return true;
-                }else{
-                    return false;
-                };
-                break;
-            case "<="||"=<":
-                if (a<=b){
-                    return true;
-                }else{
-                    return false;
-                };
-                break;
-            case "="||"==":
-                if (a==b){
-                    return true;
-                }else{
-                    return false;
-                };
-                break;
-            default:
-                alert('沒有符合的條件');
-                return undefined;
-        }
+        console.log(pass);
+        this.setState({is_pass: pass});
+        console.log(this.state.is_pass );
+        return pass;
+        
     }
 
     judge = ()=>{
-        var done = true;
-        var mind = jsMind.util.json.string2json(this.state.nowmind);
-        var pos = 1; 
-        var ans = undefined;
+        var done = this.state.has_next;
+        var mind = this.state.nowmind;
+        var pos = this.state.now_q_id ; 
+        var ans = this.state.answerValue;
         var rule = undefined;
         var past = this.state.past_node;
-        var parentid=undefined;
-        while( done ) {
-            parentid = mind["data"][pos]["parentid"];
-            if (mind["data"][pos]["parentid"] == String(this.state.now_q_id) && mind["data"][pos]["nodetype"] == "rule"){
-                rule = mind["data"][pos]["topic"];
-                if (this.state.ans_type == "number"){
-                    ans =  document.getElementById('ans_input');
-                    if (this.compare_num(rule,ans)){
-                        this.setState({now_r_id:Number(mind["data"][pos]['id'])});
-                        past.push(pos);
-                        this.setState({past_node:past});
-                        done = false;
-                    }
-                }else if (this.state.ans_type == "boolean"){
-                    ans = document.querySelector('input[name="ans"]:checked').value;
-                    if (rule.indexOf('True')>=0 && ans == "true"){
-                        this.setState({now_r_id:Number(mind["data"][pos]['id'])});
-                        past.push(pos);
-                        this.setState({past_node:past});
-                        done = false;
-                    }else if (rule.indexOf('False')>=0 && ans == "false"){
-                        this.setState({now_r_id:Number(mind["data"][pos]['id'])});
-                        past.push(pos);
-                        this.setState({past_node:past});
-                        done = false;
-                    }
-                };
-            }
-            pos++;
-        }
-        this.refreshList() ;
+        var question_list = this.state.Question_list;
+        var q = this.state.now_Question;
+        var r_id = -1;
+        var h_next = true;
+        var jm = this.state._jm;
+        var question={};
+        var node =undefined; 
+        if (done){  
+            //var mind = jsMind.util.json.string2json(this.state.nowmind);   
+            jm.show(this.state.nowmind); 
+            past = [] ;
+            pos = 0;
+            past.push(pos);
+            question["question"] = mind["data"][pos]["topic"];
+            if ( mind["data"][pos]["retype"] == "I" || mind["data"][pos]["retype"] == "F"){
+                question["retype"] = "n";
 
+                this.setState({_jm: jm,
+                                ans_type:"number",
+                                now_q_id:Number(mind["data"][pos]["id"]),
+                                now_r_id:-1,
+                                now_Question:question,
+                                Question_list:[],
+                                has_next:false,
+                                bottom_show:"next",
+                                past_node:past});
+                
+            }else if ( mind["data"][pos]["retype"] == "b"){
+                question["retype"] = "b";
+                this.setState({_jm: jm,
+                                ans_type:"boolean",
+                                now_q_id:Number(mind["data"][pos]["id"]),
+                                now_r_id:-1,
+                                now_Question:question,
+                                Question_list:[],
+                                has_next:false,
+                                finish:false,
+                                bottom_show:"next",
+                                past_node:past});
+            };                 
+            jm.enable_edit();
+            console.log (mind["data"][pos]['id']);
+            jm.select_node(mind["data"][pos]['id']);
+            node = jm.get_selected_node();
+            console.log (node);
+            jm.set_node_color(node.id , "#20B2AA", null);
+            jm.disable_edit();
+            console.log("restar" + past);
+//            this.refreshTree();
+        }else {
+            console.log(this.state.past_node+"de 0");
+            console.log(this.state.answerValue+" ans");
+            //判斷結果
+            for(var pos=this.state.now_q_id ;pos<mind["data"].length;pos++){
+            
+                if (mind["data"][pos]["parentid"] === String(this.state.now_q_id) && mind["data"][pos]["nodetype"] == "rule"){ 
+                    console.log(mind["data"][pos]["parentid"]+" "+typeof(mind["data"][pos]["parentid"]));
+                    rule = String(mind["data"][pos]["topic"]);
+                    if (this.state.ans_type == "number"){
+                        q["answer"]= ans;
+                        ;
+                        if (this.compare_num(rule,Number(ans)) == true){
+                            
+                            past.push(pos);
+                            question_list.push(q);
+                            r_id = Number(mind["data"][pos]['id']);
+                            console.log(past);
+                            break;
+                        }
+                    }else if (this.state.ans_type == "boolean"){
+                        
+                        q["answer"]= ans;
+                        if (rule.indexOf('True')>=0 && ans == "true"){
+                            past.push(pos);
+                            question_list.push(q);
+                            r_id = Number(mind["data"][pos]['id']);
+
+                            break;
+                        }else if (rule.indexOf('False')>=0 && ans == "false"){
+                            past.push(pos);
+                            question_list.push(q);
+                            r_id = Number(mind["data"][pos]['id']);
+                            break;
+                        }
+                    };
+                }
+            }
+            console.log("判斷結果 "+r_id);
+            //    console.log(mind["data"][pos]["parentid"]);
+            question={};
+            //下個問題
+            for(var pos=r_id ;pos<mind["data"].length;pos++){
+
+                if (mind["data"][pos]["parentid"] == String(r_id) && mind["data"][pos]["nodetype"] == "question"){
+                    question["question"] = mind["data"][pos]["topic"];
+                    past.push(pos);
+                    console.log(past);
+                    if ( mind["data"][pos]["retype"] == "I" || mind["data"][pos]["retype"] == "F"){
+                        question["retype"] = "n";
+                        h_next = false;
+                        this.setState({ans_type:"number",
+                                        now_q_id:Number(mind["data"][pos]["id"]),
+                                        past_node:past,
+                                        now_Question:question,
+                                        now_r_id:r_id ,
+                                        Question_list:question_list,
+                                        has_next : h_next
+                                    });
+
+                        break;
+                        
+                    }else if ( mind["data"][pos]["retype"] == "b"){
+                        question["retype"] = "b";
+                        h_next = false;
+                        this.setState({ans_type:"boolean",
+                                    now_q_id:Number(mind["data"][pos]["id"]),
+                                    past_node:past,
+                                    now_Question:question,
+                                    now_r_id:r_id ,
+                                    Question_list:question_list,
+                                    has_next : h_next
+                                });
+                        console.log(this.state.now_Question);        
+                        break;
+                    }; 
+                } 
+            }
+            //是否到底
+            if (h_next){
+                console.log("到底啦");    
+                q=  {};
+                for(var pos=this.state.now_r_id ;pos<mind["data"].length;pos++){
+                    if (mind["data"][pos]["parentid"] == String(r_id) && mind["data"][pos]["nodetype"] == "log"){
+                        q["question"] = "輸出結果"
+                        q["retype"] = "Log : ";
+                        q["answer"] =mind["data"][pos]["topic"];
+                        question_list.push(q)
+                        past.push(pos);
+                        this.setState({
+                                        past_node:past,
+                                        now_Question:q,
+                                        Question_list:question_list,
+                                        now_r_id:r_id ,
+                                        has_next : h_next,
+                                        finish : true,
+                                        bottom_show:"try again",
+                                    });
+                        break;
+                    } 
+                    pos++;
+                }
+                console.log()
+            }
+            this.refreshTree();
+        }
+          
     }
-    next_question = (q_id) =>{
-        var done = true;
-        var mind = jsMind.util.json.string2json(this.state.nowmind);
-        var pos = this.state.now_r_id; 
+    first_question = () =>{
+    //    var mind = jsMind.util.json.string2json(this.state.nowmind);
+        var mind = this.state.nowmind;
+        var pos = 0;
+        var question={};
         var past = this.state.past_node;
-        console.log(mind["data"][pos]["parentid"]);
-        var question="";
-        while( done ) {
-            if (pos==0){
-                console.log("try root");
-                question = mind["data"][pos]["topic"];
-                this.setState({now_q_id:Number(mind["data"][pos]["id"])});
+        past.push(pos);
+        question["question"] = mind["data"][pos]["topic"];
+        if ( mind["data"][pos]["retype"] == "I" || mind["data"][pos]["retype"] == "F"){
+            question["retype"] = "n";
+            this.setState({ans_type:"number",
+                            now_q_id:Number(mind["data"][pos]["id"]),
+                            now_Question:question,
+                            past_node:past});
+            
+        }else if ( mind["data"][pos]["retype"] == "b"){
+            question["retype"] = "b";
+            this.setState({ans_type:"boolean",
+                            now_q_id:Number(mind["data"][pos]["id"]),
+                            now_Question:question,
+                            past_node:past});
+        }; 
+        
+        this.refreshTree();
+            
+    };
+ /*   next_question = () =>{
+        var done = true;
+    //    var mind = jsMind.util.json.string2json(this.state.nowmind);
+        var mind = this.state.nowmind;
+
+        var past = this.state.past_node;
+    //    console.log(mind["data"][pos]["parentid"]);
+        var question={};
+        for(var pos=this.state.now_r_id ;pos<mind["data"].length;pos++){
+
+            if (mind["data"][pos]["parentid"] == String(this.state.now_r_id) && mind["data"][pos]["nodetype"] == "question"){
+                question["question"] = mind["data"][pos]["topic"];
                 past.push(pos);
-                this.setState({past_node:past});
+                
                 if ( mind["data"][pos]["retype"] == "I" || mind["data"][pos]["retype"] == "F"){
-                    this.setState({ans_type:"number"});
-                    return (
-                        <div >
-                            <table>
-                                <tr>
-                                    <td>{question}</td>
-                                    <td>
-                                        <input id = "ans_input" className = "file_input" type = "number"></input>
-                                        <button className = "sub" onClick = {() => this.judge() } > next </button>
-                                    </td>
-                                </tr>
-                            </table>
-                        </div>  
-                    );
+                    question["retype"] = "n";
+                    this.setState({ans_type:"number",
+                                    now_q_id:Number(mind["data"][pos]["id"]),
+                                    past_node:past,
+                                    now_Question:question});
+                    break;
+                    
                 }else if ( mind["data"][pos]["retype"] == "b"){
-                    this.setState({ans_type:"boolean"});
-                    return (
-                        <div >
-                            <table>
-                                <tr>
-                                    <td>{question}</td>
-                                    <td>
-                                        <input  type="radio" name="ans" value="true"> true</input>
-                                        <input  type="radio" name="ans" value="false">false</input>
-                                        <button className = "sub" onClick = {() => this.judge() } > next </button>
-                                    </td>
-                                </tr>
-                            </table>
-                        </div> 
-                    );
+                    question["retype"] = "b";
+                    this.setState({ans_type:"boolean",
+                                now_q_id:Number(mind["data"][pos]["id"]),
+                                past_node:past,
+                                now_Question:question
+                            });
+                    break;
                 }; 
-                break;  
-            }else if (mind["data"][pos]["parentid"] == String(q_id) && mind["data"][pos]["nodetype"] == "question"){
-                question = mind["data"][pos]["topic"];
-                this.setState({now_q_id:Number(mind["data"][pos]["id"])});
+            } 
+        }
+        this.refreshTree();
+    };*/
+    printlog = () =>{
+        var done = true;
+        var question={};
+        var past = this.state.past_node; 
+        var mind = this.state.nowmind;
+        var question_list = this.state.Question_list;
+        for(var pos=this.state.now_r_id ;pos<mind["data"].length;pos++){
+            if (mind["data"][pos]["parentid"] == String(this.state.now_r_id) && mind["data"][pos]["nodetype"] == "log"){
+                question["question"] = "Log : ";
+                question["retype"] = mind["data"][pos]["topic"];
                 past.push(pos);
-                this.setState({past_node:past});
-                if ( mind["data"][pos]["retype"] == "I" || mind["data"][pos]["retype"] == "F"){
-                    this.setState({ans_type:"number"});
-                    return (
-                        <div >
-                            <table>
-                                <tr>
-                                    <td>{question}</td>
-                                    <td>
-                                        <input id = "ans_input" className = "file_input" type = "number"></input>
-                                        <button className = "sub" onClick = {() => this.judge() } > next </button>
-                                    </td>
-                                </tr>
-                            </table>
-                        </div>  
-                    );
-                }else if ( mind["data"][pos]["retype"] == "b"){
-                    this.setState({ans_type:"boolean"});
-                    return (
-                        <div >
-                            <table>
-                                <tr>
-                                    <td>{question}</td>
-                                    <td>
-                                        <input  type="radio" name="ans" value="true"> true</input>
-                                        <input  type="radio" name="ans" value="false">false</input>
-                                        <button className = "sub" onClick = {() => this.judge() } > next </button>
-                                    </td>
-                                </tr>
-                            </table>
-                        </div> 
-                    );
-                }; 
+                this.setState({
+                                past_node:past,
+                                now_Question:question,
+                                finish : true
+                            });
+                break;
             } 
             pos++;
         }
-    };
+    }
+    getTree = (id) =>{
+            axios
+            .post(`/DecisionTreeJsmind/`,{
+                'fk': id,
+            })
+            .then((res) => {              
+                this.setState({nowmind: res.data["link_list"]});
+                console.log(this.state.nowmind);
+                if (this.state._jm===null){
+                    
+                    var jm = new jsMind(this.state.options);  
+                    //var mind = jsMind.util.json.string2json(this.state.nowmind);   
+                    jm.show(this.state.nowmind);  
+                    this.setState({_jm: jm});
+                    this.first_question();
+                }
+            })
+            .catch((err) => {
+                console.log(err)
+                return;
+                });
+    }
+    renderQuestion=()=>{
+        const Question = this.state.Question_list;
+        
+        return (Question.map((q)=>(
+            <tr>
+                <td> {q["question"]} </td>
+                <td> {q["answer"]} </td>
+            </tr>
+            ))
+        );
+    }
+    renderNextQuestion=()=>{
+        const Question = this.state.now_Question;
+        const Q_list = this.state.Question_list;
 
+        if(this.state.has_next){
+            return (
+
+                    Q_list.map((q)=>(
+                    <tr>
+                        <td> {q["question"]} </td>
+                        <td> </td>
+                        <td> {q["answer"]} </td>
+                    </tr>))
+ 
+            );
+        }else if (Question["retype"] == "n"){
+            return (
+                    <tr>
+                        <td>{Question["question"]}</td>
+                        <td>
+                            <input name="answerValue" type="number" value={this.state.answerValue} onChange={this.handleChange}></input>
+                        </td>
+                    </tr>
+            );
+        }else if ( Question["retype"] == "b"){
+            return (
+                    <tr>
+                        <td>{Question["question"]}</td>
+                        <td>
+                            <input name="answerValue" type="radio" value="true" onChange={this.handleChange} checked={this.state.answerValue === "true"}/>
+                            <span style={{ marginLeft: "10px",marginRight: "10px" }}>true</span>
+                            <input name="answerValue" type="radio" value="false" onChange={this.handleChange} checked={this.state.answerValue === "false"}/>
+                            <span style={{ marginLeft: "10px",marginRight: "10px"  }}>false</span>
+                        </td>
+                    </tr>                
+        )
+        }; 
+ 
+    }
 
 
 
@@ -521,36 +549,13 @@ class DecisionTree extends React.Component{
         //this.setState( { activeCard: item, type: etype, modal: !this.state.modal } );
     };*/
 
-    getTree = (id) =>{
-        
-        axios
-          .post(`/DecisionTreeJsmind/`,{
-            'fk': id,
-          })
-          .then((res) => {              
-            this.setState({nowmind: res.data["link_list"]});
-            console.log(this.state.nowmind);
-            if (this.state._jm === undefined){
-                //    console.log(treedata["link_list"]) 
-                    var jm = new jsMind(this.state.options);  
-                    var mind = jsMind.util.json.string2json(this.state.nowmind);   
-                    
-                    jm.show(mind);  
-                    this.setState({_jm: jm});
-                    this.refreshList();
-                }
-            
-          })
-          .catch((err) => {
-              console.log(err)
-              return;
-            });
-    }
+
 
 
     //render html
     render(){
         const style = {display:"none"};
+        const bu_style = {}
         return(
             <div>
                 <div className="header">
@@ -578,8 +583,17 @@ class DecisionTree extends React.Component{
                             <Link to="/Engine">Engine</Link>
                         </li>
                     </ul>
-                </div>
-                <div> {this.refreshList()} </div>
+                </div> 
+                <div>
+                    <center>
+                        <table className="table mt-4">
+                            <tbody>{this.renderNextQuestion()}</tbody>
+                        </table>
+                    </center>
+                    <center><button className="btn btn-primary mr-2" onClick = {() => this.judge() } > {this.state.bottom_show} </button></center>
+                </div>      
+                    
+                
                 <div id = "jsmind_container" >    
                 </div>
                 <div style={style}>
@@ -591,7 +605,11 @@ class DecisionTree extends React.Component{
         
     }
 }
-
+/* <div> 
+                    <table className="table mt-4">
+                        {this.renderQuestion()}
+                    </table>
+                </div>*/
 export default function(props){
     const {state} = useLocation();
     //console.log(state);

@@ -18,109 +18,63 @@ export default class CustomModal extends Component {
         //console.log(props)
 
         this.state = {
-            parentnode: this.props.parentnode,
-            Ntype:{},
-            Qtype:{},
+            answerValue:this.props.answerValue,
             nowstate:this.props.nowstate,
-            addItem: { 
-                "topic": "",
-                "nodetype": "",
-                "respondtype": "",
-                "intmax": "",
-                "intmin": "",
-                "other": "",
-            }
+            now_Question:this.props.now_Question,
+            mind: this.props.mind,
+
         };
         //console.log(this.state.activeItem)
     }
 
-    handleChange = (e) => {
-        //console.log(e.target);
-        let { name, value } = e.target;
+    renderNextQuestion=()=>{
+        const Question = this.state.now_Question;
 
-        if (e.target.type === "checkbox") {
-            value = e.target.checked;
-            
+        if(this.state.finish){
+            this.renderQuestion();
         }
-        if(name ==="question"){
-            if (value ==="Integer" || value ==="Float"){
-                return ( 
-                <Form key = { "variable_add" } >
-                    <FormGroup >
-                        <Label for = "node-nodetype" > Rule </Label> 
-                        < Input type = "text"
-                        id = "vpool-name"
-                        name = "name"
-                        value = { variable["name"] }
-                        readOnly = { false }
-                        onChange = {(event) => this.handleChange(event) }
-                        placeholder = "Enter Name"/>
-                    </FormGroup> 
-                    <FormGroup >
-                    <Label for = "vpool-dType" > Variable Data Type </Label> 
-                    <select id = "vpool-dType"
-                    name = "datatype"
-                    value = { variable["datatype"] }
-                    onChange = {
-                        (event) => this.handleChange(event) } >
-                    <option key = {-1 } value = { "" } > </option> 
-                    { this.renderKeys() } 
-                    </select> 
-                    </FormGroup> 
-                </Form>
+        if (Question["retype"] == "n"){
+            return (
+                <div>
+                    <table className="table mt-4">
+                        <tbody>
+                            <tr>
+                                <td>{Question["question"]}</td>
+                                <td>
+                                    <input name="answerValue" type="number" value={this.state.answerValue} onChange={this.handleChange}></input>
+                                </td>
+                                <td>
+                                    <button className="btn btn-primary mr-2" onClick = {() => this.judge() } > next </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             );
-            }
-        }
-
-
-        const activeItem = this.state.activeItem;
-        activeItem[name] = value
-
-        this.setState({ activeItem });
-    };
-
-    renderKeys = (datatype) => {
-        const keys = Object.keys(datatype)
-
-        return keys.map((key, index) => ( 
-            <option key = { key }
-            value = { key } > { datatype[key] } </option>
-        ));
+        }else if ( Question["retype"] == "b"){
+            return (
+                <div>
+                    <table className="table mt-4">
+                        <tbody>
+                            <tr>
+                                <td>{Question["question"]}</td>
+                                <td>
+                                <input name="answerValue" type="radio" value="true" onChange={this.handleChange} checked={this.state.answerValue === "true"}/>
+                                <span style={{ marginLeft: "10px",marginRight: "10px" }}>true</span>
+                                <input name="answerValue" type="radio" value="false" onChange={this.handleChange} checked={this.state.answerValue === "false"}/>
+                                <span style={{ marginLeft: "10px",marginRight: "10px"  }}>false</span>
+                                </td>
+                                <td>
+                                    <button className="btn btn-primary mr-2" onClick = {() => this.judge() } > next </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            )
+        }; 
+ 
     }
-
-    renderQuestion() {
-        const variable = this.state.activeItem
-        const datatype = this.state.dType
-            //console.log(rule);
-        return ( <Form key = { "variable_add" } >
-            <FormGroup >
-                <Label for = "node-nodetype" > Question </Label> 
-                < Input type = "text"
-                id = "vpool-name"
-                name = "name"
-                value = { variable["name"] }
-                readOnly = { false }
-                onChange = {(event) => this.handleChange(event) }
-                placeholder = "Enter Name"/>
-            </FormGroup> 
-            <FormGroup >
-            <Label for = "vpool-dType" > Variable Data Type </Label> 
-            <select id = "vpool-dType"
-            name = "datatype"
-            value = { variable["datatype"] }
-            onChange = {
-                (event) => this.handleChange(event) } >
-            <option key = {-1 } value = { "" } > </option> 
-            { this.renderKeys() } 
-            </select> 
-            </FormGroup> 
-            </Form>
-        );
-    }
-    renderOpt=()=>{
-
-        <Button color = "success" onClick = { () => onAdd(this.state.activeItem) } >Add </Button>
-    } 
     render() {
         const { toggle } = this.props;
         const { onAdd } = this.props;
