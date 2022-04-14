@@ -584,9 +584,9 @@ class DecisionTree extends React.Component{
                         </li>
                     </ul>
                 </div> 
-                <div>
+                <div style={{ marginLeft: "10%",  marginRight: "10%" }}>
                     <center>
-                        <table className="table mt-4">
+                        <table className="table mt-4 table-hover" >
                             <tbody>{this.renderNextQuestion()}</tbody>
                         </table>
                     </center>
