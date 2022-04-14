@@ -38,3 +38,10 @@ This branch is for completed Code.
     cd frontend
     npm start
     ```
+
+3. ## Port settings on linux server
+    ```bash
+    #replace <PORT> with the port you want to enable/disable public access
+    sudo ufw allow <PORT> # open port for public
+    sudo ufw deny <PORT> # close port from public
+    ```
