@@ -1,7 +1,9 @@
-This branch is for completed code
-## DO NOT work on this branch! This branch is for completed Code.
+# DO NOT work on this branch! 
+This branch is for completed Code.
 
-## Install
+> ### Make sure you are under BusinessEngine Folder!
+
+## **Install Packages**
 1. For Backend (Server)
     
     (1.) Environment requires: python=3.9.9
@@ -21,17 +23,18 @@ This branch is for completed code
     npm install
     ```
 
-## How to run django server
-```bash
-pipenv shell
-cd web_project
-python manage.py makemigrations # for migrations (if needed), if not, ignore this line
-python manage.py migrate # for migrations (if needed), if not, ignore this line
-python manage.py runserver
-```
+## **Run Program**
+1. ### How to run django server
+    ```bash
+    pipenv shell
+    cd web_project
+    python manage.py makemigrations # for migrations (if needed), if not, ignore this line
+    python manage.py migrate # for migrations (if needed), if not, ignore this line
+    python manage.py runserver
+    ```
 
-## How to run react web
-```bash
-cd frontend
-npm start
-```
+2. ## How to run react web
+    ```bash
+    cd frontend
+    npm start
+    ```
