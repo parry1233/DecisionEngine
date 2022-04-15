@@ -386,7 +386,8 @@ class RuleSet extends React.Component{
         return(
             <div>
                <div className="header">
-                    <h2>Business Enginess</h2>
+                    <img src={require('./img/1200px-O-Bank_logo.png')} size="small" width="150"/>
+                    <h2>O-Bank Decision Engine</h2>
                     <hr/>
                 </div>
                 <div className="menu-bar">
