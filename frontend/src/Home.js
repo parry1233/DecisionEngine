@@ -67,9 +67,9 @@ class Home extends React.Component{
     renderDTLib = () => {
         return this.state.dtLib.map((eachCase) => (
             <li key={eachCase["id"]}>
-                <a href={`http://127.0.0.1:8000/DecisionTree/${eachCase["name"]}/`}>
+                <Link to={`/DecisionTree`} state ={{id:eachCase["id"], name:eachCase["name"]}}>
                     {eachCase["name"]}
-                </a>
+                </Link>
             </li>
         ));
     }
