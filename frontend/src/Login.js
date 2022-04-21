@@ -17,7 +17,11 @@ async function loginUser(credentials) {
 async function loginUser(credentials) {
     if(credentials["username"]==="admin"&&credentials["password"]==="admin")
     {
-        return {'token':'abcdefg'}
+        return 'abcdefg';
+    }
+    else
+    {
+      alert('帳號或密碼錯誤!')
     }
 }
 

@@ -2,6 +2,8 @@ import React from "react";
 import { Link } from "react-router-dom";
 import './template/title.css'
 import axios from "axios";
+import { Button } from "reactstrap";
+import useToken from "./components/UseToken";
 
 class Home extends React.Component{
     
@@ -94,6 +96,10 @@ class Home extends React.Component{
         ));
     }
 
+    logout = () => {
+        this.props.removeToken(this.props.getToken(),'aaa','bbb')
+    }
+
     //render html
     render(){
         return(
@@ -135,6 +141,9 @@ class Home extends React.Component{
                         <li>
                             <Link to="/Engine">Engine</Link>
                         </li>
+                        <li className="float-right">
+                            <Link to="#" className="disabledCursor float-right" onClick={()=>this.logout()}>Logout</Link>
+                        </li>
                     </ul>
                 </div>
             </div>
@@ -143,4 +152,7 @@ class Home extends React.Component{
     }
 }
 
-export default Home;
+export default function(){
+    const {getToken, removeToken} = useToken();
+    return <Home getToken={getToken} removeToken = { removeToken }/>;
+};
