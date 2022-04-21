@@ -297,7 +297,7 @@ class ScoreCardPool(models.Model):
             text += " , ".join(words)
         except RuntimeError as e:
             text = str(e)
-        return f"{self.fkey.name} | {text} | {self.score}"
+        return f"{self.fkey.name} | {text} | {self.score} {self.description}"
 
 
 class DecisionTreeLibrary(models.Model):

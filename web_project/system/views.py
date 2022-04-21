@@ -21,6 +21,7 @@ def value_transform(kmap):
     # print(kmap)
     kmap = {x.replace('r', ''): y for x, y in kmap.items()}
     k2names = {}
+    keyNotExist = []
     for x in kmap.keys():
         obj = VariablePool.objects.filter(pk=x)
         if(obj.exists()):
@@ -30,6 +31,10 @@ def value_transform(kmap):
             cast = {'b': lambda x: x == True,
                     'F': lambda x: float(x), 'I': lambda x: float(int(x))}
             kmap[x] = cast[datatype](kmap[x])
+        else:
+            keyNotExist.append(x)
+    for x in keyNotExist:
+        kmap.pop(x)
     kmap = {"r"+x: y for x, y in kmap.items()}
     k2names = {"r"+x: (x, y) for x, y in k2names.items()}
     vardata = {k2names[x][1]: (k2names[x][0], y) for x, y in kmap.items()}
