@@ -13,10 +13,13 @@ import RuleSet from "./RuleSet";
 import DecisionTreeLibrary from "./DecisionTreeLibrary";
 import DecisionTree from "./DecisionTree";
 import Engine from "./Engine";
-
+import Login from './Login';
+import useToken from './components/UseToken';
 
 class App extends React.Component{
+
     render(){
+
         return(
             <Router>
                 <Routes>
@@ -39,4 +42,12 @@ class App extends React.Component{
     }
 }
 
-export default App;
+export default function(){
+    const { token, setToken } = useToken();
+    if(!token) {
+        return <Login setToken={setToken} />
+    }
+    else{
+        return <App/>
+    }
+};
