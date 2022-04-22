@@ -117,7 +117,10 @@ class VariableAll extends React.Component{
     };
 
     onDelete = (item) => {
-        axios
+        if(!this.props.getToken()) window.location.reload();
+        else
+        {
+            axios
             .delete(`/api/VariablePool/${item["id"]}/`,
             {
                 //here is body(data)
@@ -138,6 +141,7 @@ class VariableAll extends React.Component{
                 //console.log(this.state.activeCase)
             })
             .catch((err) => console.log(err));
+        }
     }
 
     refreshList = () => {
@@ -215,12 +219,12 @@ class VariableAll extends React.Component{
             <div>
                 <div>This is View All Variable Pool!</div>
                 <div>
-                    <Link to="/" className="btn btn-secondary mr-2">
+                    <a href="/" className="btn btn-secondary mr-2">
                         Home
-                    </Link>
-                    <Link to="/VariableLibrary" className="btn btn-secondary mr-2">
+                    </a>
+                    <a href="/VariableLibrary" className="btn btn-secondary mr-2">
                         Back
-                    </Link>
+                    </a>
                 </div>
 
                 <div className="container py-3">

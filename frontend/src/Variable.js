@@ -55,7 +55,10 @@ class Varaible extends React.Component{
     };
 
     onAdd = (item) => {
-        axios
+        if(!this.props.getToken()) window.location.reload();
+        else
+        {
+            axios
             .post(`/api/VariablePool/`,
             {
                 //here is body(data)
@@ -86,11 +89,15 @@ class Varaible extends React.Component{
                 //console.log(this.state.activeCase)
             })
             .catch((err) => console.log(err));
+        }
     };
 
     onSave = (item) => {
         //console.log(item);
-        axios
+        if(!this.props.getToken()) window.location.reload();
+        else
+        {
+            axios
             .put(`/api/VariablePool/${item["id"]}/`,
             {
                 //here is body(data)
@@ -121,10 +128,14 @@ class Varaible extends React.Component{
                 //console.log(this.state.activeCase)
             })
             .catch((err) => console.log(err));
+        }
     };
 
     onDelete = (item) => {
-        axios
+        if(!this.props.getToken()) window.location.reload();
+        else
+        {
+            axios
             .delete(`/api/VariablePool/${item["id"]}/`,
             {
                 //here is body(data)
@@ -145,6 +156,7 @@ class Varaible extends React.Component{
                 //console.log(this.state.activeCase)
             })
             .catch((err) => console.log(err));
+        }
     }
 
     refreshList = () => {
@@ -281,19 +293,19 @@ class Varaible extends React.Component{
                             <a href="/">Home</a>
                         </li>
                         <li>
-                            <Link to="/ScoreLibrary">Score Card</Link>
+                            <a href="/ScoreLibrary">Score Card</a>
                         </li>
                         <li>
-                            <Link to="/DecisionTreeLibrary">Decision Tree</Link>
+                            <a href="/DecisionTreeLibrary">Decision Tree</a>
                         </li>
                         <li>
-                            <Link to="/VariableLibrary">Variable</Link>
+                            <a href="/VariableLibrary">Variable</a>
                         </li>
                         <li>
-                            <Link to="/RuleSetLibrary">Rule Set</Link>
+                            <a href="/RuleSetLibrary">Rule Set</a>
                         </li>
                         <li>
-                            <Link to="/Engine">Engine</Link>
+                            <a href="/Engine">Engine</a>
                         </li>
                     </ul>
                 </div>

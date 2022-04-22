@@ -47,64 +47,99 @@ class RuleSetLibrary extends React.Component{
     };
 
     onAdd = (id,nameIn,type) => {
+        if(!this.props.getToken()) window.location.reload();
         //console.log(id+' '+nameIn+' '+type);
-        if(type === 1) // this is add
+        else
         {
-            axios
-            .post(`/api/RuleSetLibrary/`,
+            if(type === 1) // this is add
             {
-                //here is body(data)
-                'name': nameIn,
-            },
-            {
-              headers:{
-                  //here is headers for token and cookies
-                  'token':'try4sdgsdsafsd232a84sd'
-              }
-            })
-            .then((res) => {
-                //console.log(res.data["names"])
-                //console.log(res.data)
-                if(res.data)
+                axios
+                .post(`/api/RuleSetLibrary/`,
                 {
-                    if(res.data["error"])
-                    {
-                        alert(res.data["error"])
-                    }
+                    //here is body(data)
+                    'name': nameIn,
+                },
+                {
+                headers:{
+                    //here is headers for token and cookies
+                    'token':'try4sdgsdsafsd232a84sd'
                 }
-                this.new_Toggle();
-                //this.setState({
-                //    activeCase: res.data,
-                //    modal: !this.state.modal });
-                //console.log(this.state.activeCase)
-            })
-            .catch((err) => console.log(err));
+                })
+                .then((res) => {
+                    //console.log(res.data["names"])
+                    //console.log(res.data)
+                    if(res.data)
+                    {
+                        if(res.data["error"])
+                        {
+                            alert(res.data["error"])
+                        }
+                    }
+                    this.new_Toggle();
+                    //this.setState({
+                    //    activeCase: res.data,
+                    //    modal: !this.state.modal });
+                    //console.log(this.state.activeCase)
+                })
+                .catch((err) => console.log(err));
+            }
+            else if(type === 2) //this is edit
+            {
+                axios
+                .put(`/api/RuleSetLibrary/${id}/`,
+                {
+                    //here is body(data)
+                    'name': nameIn,
+                },
+                {
+                headers:{
+                    //here is headers for token and cookies
+                    'token':'try4sdgsdsafsd232a84sd'
+                }
+                })
+                .then((res) => {
+                    //console.log(res.data["names"])
+                    //console.log(res.data)
+                    if(res.data)
+                    {
+                        if(res.data["error"])
+                        {
+                            alert(res.data["error"])
+                        }
+                    }
+                    this.new_Toggle();
+                    //this.setState({
+                    //    activeCase: res.data,
+                    //    modal: !this.state.modal });
+                    //console.log(this.state.activeCase)
+                })
+                .catch((err) => console.log(err));
+            }
         }
-        else if(type === 2) //this is edit
+        
+    };
+
+    onDel = (id) => {
+        if(!this.props.getToken()) window.location.reload();
+        else
         {
             axios
-            .put(`/api/RuleSetLibrary/${id}/`,
+            .delete(`/api/RuleSetLibrary/${id}`,
             {
                 //here is body(data)
-                'name': nameIn,
             },
             {
-              headers:{
-                  //here is headers for token and cookies
-                  'token':'try4sdgsdsafsd232a84sd'
-              }
-            })
+                headers:{
+                    //here is headers for token and cookies
+                    'token':'try4sdgsdsafsd232a84sd'
+                }
+            }
+            )
             .then((res) => {
                 //console.log(res.data["names"])
-                //console.log(res.data)
-                if(res.data)
-                {
-                    if(res.data["error"])
-                    {
-                        alert(res.data["error"])
-                    }
-                }
-                this.new_Toggle();
+                
+                this.refreshList();
+                    
                 //this.setState({
                 //    activeCase: res.data,
                 //    modal: !this.state.modal });
@@ -113,32 +148,6 @@ class RuleSetLibrary extends React.Component{
             .catch((err) => console.log(err));
         }
         
-    };
-
-    onDel = (id) => {
-        axios
-        .delete(`/api/RuleSetLibrary/${id}`,
-        {
-            //here is body(data)
-        },
-        {
-            headers:{
-                //here is headers for token and cookies
-                'token':'try4sdgsdsafsd232a84sd'
-            }
-        }
-        )
-        .then((res) => {
-            //console.log(res.data["names"])
-            
-            this.refreshList();
-                
-            //this.setState({
-            //    activeCase: res.data,
-            //    modal: !this.state.modal });
-            //console.log(this.state.activeCase)
-        })
-        .catch((err) => console.log(err));
     }
 
 
@@ -182,19 +191,19 @@ class RuleSetLibrary extends React.Component{
                             <a href="/">Home</a>
                         </li>
                         <li>
-                            <Link to="/ScoreLibrary">Score Card</Link>
+                            <a href="/ScoreLibrary">Score Card</a>
                         </li>
                         <li>
-                            <Link to="/DecisionTreeLibrary">Decision Tree</Link>
+                            <a href="/DecisionTreeLibrary">Decision Tree</a>
                         </li>
                         <li>
-                            <Link to="/VariableLibrary">Variable</Link>
+                            <a href="/VariableLibrary">Variable</a>
                         </li>
                         <li>
-                            <Link to="/RuleSetLibrary">Rule Set</Link>
+                            <a href="/RuleSetLibrary">Rule Set</a>
                         </li>
                         <li>
-                            <Link to="/Engine">Engine</Link>
+                            <a href="/Engine">Engine</a>
                         </li>
                     </ul>
                 </div>

@@ -32,7 +32,10 @@ class RuleSetAll extends React.Component{
 
     
     onDelete = (item) => {
-        axios
+        if(!this.props.getToken()) window.location.reload();
+        else
+        {
+            axios
             .delete(`/api/RuleSetPool/${item["id"]}/`,
             {
                 //here is body(data)
@@ -53,6 +56,7 @@ class RuleSetAll extends React.Component{
                 //console.log(this.state.activeCase)
             })
             .catch((err) => console.log(err));
+        }
     }
 
     refreshList = () => {
@@ -195,12 +199,12 @@ class RuleSetAll extends React.Component{
             <div>
                 <div>This is Rule Set All!</div>
                 <div>
-                    <Link to="/" className="btn btn-secondary mr-2">
+                    <a href="/" className="btn btn-secondary mr-2">
                         Home
-                    </Link>
-                    <Link to="/RuleSetLibrary" className="btn btn-secondary mr-2">
+                    </a>
+                    <a href="/RuleSetLibrary" className="btn btn-secondary mr-2">
                         Back
-                    </Link>
+                    </a>
                 </div>
 
                 <div className="container py-3">

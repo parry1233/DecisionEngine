@@ -115,31 +115,31 @@ class Home extends React.Component{
                             <a href="/">Home</a>
                         </li>
                         <li>
-                            <Link to="/ScoreLibrary">Score Card</Link>
+                            <a href="/ScoreLibrary">Score Card</a>
                             <ul>
                                 {this.renderSCLib()}
                             </ul>
                         </li>
                         <li>
-                        <Link to="/DecisionTreeLibrary">Decision Tree</Link>
+                        <a href="/DecisionTreeLibrary">Decision Tree</a>
                             <ul>
                                 {this.renderDTLib()}
                             </ul>
                         </li>
                         <li>
-                            <Link to="/VariableLibrary">Variable</Link>
+                            <a href="/VariableLibrary">Variable</a>
                             <ul>
                                 {this.renderVarLib()}
                             </ul>
                         </li>
                         <li>
-                            <Link to="/RuleSetLibrary">Rule Set</Link>
+                            <a href="/RuleSetLibrary">Rule Set</a>
                             <ul>
                                 {this.renderRuleLib()}
                             </ul>
                         </li>
                         <li>
-                            <Link to="/Engine">Engine</Link>
+                            <a href="/Engine">Engine</a>
                         </li>
                         <li className="float-right">
                             <Link to="#" className="disabledCursor float-right" onClick={()=>this.logout()}>Logout</Link>
@@ -151,8 +151,11 @@ class Home extends React.Component{
         );
     }
 }
+export default Home;
 
-export default function(){
+/*
+export default function({getToken, removeToken}){
     const {getToken, removeToken} = useToken();
     return <Home getToken={getToken} removeToken = { removeToken }/>;
 };
+*/

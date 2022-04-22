@@ -47,64 +47,99 @@ class DecisionTreeLibrary extends React.Component{
     };
 
     onAdd = (id,nameIn,type) => {
+        if(!this.props.getToken()) window.location.reload();
         //console.log(id+' '+nameIn+' '+type);
-        if(type === 1) // this is add
+        else
         {
-            axios
-            .post(`/api/DecisionTreeLibrary/`,
+            if(type === 1) // this is add
             {
-                //here is body(data)
-                'name': nameIn,
-            },
-            {
-              headers:{
-                  //here is headers for token and cookies
-                  'token':'try4sdgsdsafsd232a84sd'
-              }
-            })
-            .then((res) => {
-                //console.log(res.data["names"])
-                //console.log(res.data)
-                if(res.data)
+                axios
+                .post(`/api/DecisionTreeLibrary/`,
                 {
-                    if(res.data["error"])
-                    {
-                        alert(res.data["error"])
-                    }
+                    //here is body(data)
+                    'name': nameIn,
+                },
+                {
+                headers:{
+                    //here is headers for token and cookies
+                    'token':this.props.getToken()
                 }
-                this.new_Toggle();
-                //this.setState({
-                //    activeCase: res.data,
-                //    modal: !this.state.modal });
-                //console.log(this.state.activeCase)
-            })
-            .catch((err) => console.log(err));
+                })
+                .then((res) => {
+                    //console.log(res.data["names"])
+                    //console.log(res.data)
+                    if(res.data)
+                    {
+                        if(res.data["error"])
+                        {
+                            alert(res.data["error"])
+                        }
+                    }
+                    this.new_Toggle();
+                    //this.setState({
+                    //    activeCase: res.data,
+                    //    modal: !this.state.modal });
+                    //console.log(this.state.activeCase)
+                })
+                .catch((err) => console.log(err));
+            }
+            else if(type === 2) //this is edit
+            {
+                axios
+                .put(`/api/DecisionTreeLibrary/${id}/`,
+                {
+                    //here is body(data)
+                    'name': nameIn,
+                },
+                {
+                headers:{
+                    //here is headers for token and cookies
+                    'token':this.props.getToken()
+                }
+                })
+                .then((res) => {
+                    //console.log(res.data["names"])
+                    //console.log(res.data)
+                    if(res.data)
+                    {
+                        if(res.data["error"])
+                        {
+                            alert(res.data["error"])
+                        }
+                    }
+                    this.new_Toggle();
+                    //this.setState({
+                    //    activeCase: res.data,
+                    //    modal: !this.state.modal });
+                    //console.log(this.state.activeCase)
+                })
+                .catch((err) => console.log(err));
+            }
         }
-        else if(type === 2) //this is edit
+        
+    };
+
+    onDel = (id) => {
+        if(!this.props.getToken()) window.location.reload();
+        else
         {
             axios
-            .put(`/api/DecisionTreeLibrary/${id}/`,
+            .delete(`/api/DecisionTreeLibrary/${id}`,
             {
                 //here is body(data)
-                'name': nameIn,
             },
             {
-              headers:{
-                  //here is headers for token and cookies
-                  'token':'try4sdgsdsafsd232a84sd'
-              }
-            })
+                headers:{
+                    //here is headers for token and cookies
+                    'token':this.props.getToken()
+                }
+            }
+            )
             .then((res) => {
                 //console.log(res.data["names"])
-                //console.log(res.data)
-                if(res.data)
-                {
-                    if(res.data["error"])
-                    {
-                        alert(res.data["error"])
-                    }
-                }
-                this.new_Toggle();
+                
+                this.refreshList();
+                    
                 //this.setState({
                 //    activeCase: res.data,
                 //    modal: !this.state.modal });
@@ -113,32 +148,6 @@ class DecisionTreeLibrary extends React.Component{
             .catch((err) => console.log(err));
         }
         
-    };
-
-    onDel = (id) => {
-        axios
-        .delete(`/api/DecisionTreeLibrary/${id}`,
-        {
-            //here is body(data)
-        },
-        {
-            headers:{
-                //here is headers for token and cookies
-                'token':'try4sdgsdsafsd232a84sd'
-            }
-        }
-        )
-        .then((res) => {
-            //console.log(res.data["names"])
-            
-            this.refreshList();
-                
-            //this.setState({
-            //    activeCase: res.data,
-            //    modal: !this.state.modal });
-            //console.log(this.state.activeCase)
-        })
-        .catch((err) => console.log(err));
     }
 
     renderCase = () => {
@@ -181,19 +190,19 @@ class DecisionTreeLibrary extends React.Component{
                             <a href="/">Home</a>
                         </li>
                         <li>
-                            <Link to="/ScoreLibrary">Score Card</Link>
+                            <a href="/ScoreLibrary">Score Card</a>
                         </li>
                         <li>
-                            <Link to="/DecisionTreeLibrary">Decision Tree</Link>
+                            <a href="/DecisionTreeLibrary">Decision Tree</a>
                         </li>
                         <li>
-                            <Link to="/VariableLibrary">Variable</Link>
+                            <a href="/VariableLibrary">Variable</a>
                         </li>
                         <li>
-                            <Link to="/RuleSetLibrary">Rule Set</Link>
+                            <a href="/RuleSetLibrary">Rule Set</a>
                         </li>
                         <li>
-                            <Link to="/Engine">Engine</Link>
+                            <a href="/Engine">Engine</a>
                         </li>
                     </ul>
                 </div>

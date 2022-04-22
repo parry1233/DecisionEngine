@@ -45,7 +45,7 @@ class Engine extends React.Component{
             {
                 headers:{
                     //here is headers for token and cookies
-                    'token':'try4sdgsdsafsd232a84sd'
+                    'utoken':this.props.getToken()
                 }
             }
             )
@@ -64,7 +64,7 @@ class Engine extends React.Component{
             {
                 headers:{
                     //here is headers for token and cookies
-                    'token':'try4sdgsdsafsd232a84sd'
+                    'utoken':this.props.getToken()
                 }
             }
             )
@@ -171,7 +171,7 @@ class Engine extends React.Component{
         axios
             .get(`/api/ScoreCardPool/link/${this.state.activeLib.fk}/`)
             .then((res => {
-                console.log(res);
+                //console.log(res);
                 cardList = res.data;
                 let cardList_transfer = [];
                 cardList.forEach((card) => {
@@ -187,87 +187,91 @@ class Engine extends React.Component{
     }
 
     result = () => {
-        let api = ""
-        const type = this.state.activeLib.type;
-        const fk = this.state.activeLib.fk
-        if(type==="sc") { api = "/ScoreCardEngine/" }
-        else if(type==="dt") { api = "/DecisionTreeEngine/" }
-        else if(type==="rs") { api = "/RuleSetEngine/" }
-
-        let varmap = {};
-        const varIn = this.state.var_in;
-        const varKeys = Object.keys(varIn);
-        varKeys.map((key,index) => {
-            if(varIn[key]!=="")
-            {
-                varmap[key] =  new Number(varIn[key]);
-            }
-        })
-
-        if((api==="/ScoreCardEngine/" || api ==="/DecisionTreeEngine/") && fk !== -1)
+        if(!this.props.getToken()) window.location.reload();
+        else
         {
-            if(api==="/ScoreCardEngine/")
+            let api = ""
+            const type = this.state.activeLib.type;
+            const fk = this.state.activeLib.fk
+            if(type==="sc") { api = "/ScoreCardEngine/" }
+            else if(type==="dt") { api = "/DecisionTreeEngine/" }
+            else if(type==="rs") { api = "/RuleSetEngine/" }
+
+            let varmap = {};
+            const varIn = this.state.var_in;
+            const varKeys = Object.keys(varIn);
+            varKeys.map((key,index) => {
+                if(varIn[key]!=="")
+                {
+                    varmap[key] =  new Number(varIn[key]);
+                }
+            })
+
+            if((api==="/ScoreCardEngine/" || api ==="/DecisionTreeEngine/") && fk !== -1)
             {
-                this.getSC(fk);
+                if(api==="/ScoreCardEngine/")
+                {
+                    this.getSC(fk);
+                }
+                axios
+                .post(`${api}`,
+                {
+                    //here is body(data)
+                    'fk': fk,
+                    'varmap': varmap
+                },
+                {
+                headers:{
+                    //here is headers for token and cookies
+                    'utoken':this.props.getToken()
+                }
+                })
+                .then((res) => {
+                    //console.log(res.data["names"])
+                    //console.log(res.data)
+                    if(res.data)
+                    {
+                        if(res.data["error"])
+                        {
+                            alert(res.data["error"]);
+                        }
+                    }
+                    const results = res.data;
+                    this.setState({ results });
+                })
+                .catch((err) => console.log(err));
             }
-            axios
-            .post(`${api}`,
+            else if(api==="/RuleSetEngine/" && fk !== -1)
             {
-                //here is body(data)
-                'fk': fk,
-                'varmap': varmap
-            },
-            {
-              headers:{
-                  //here is headers for token and cookies
-                  'token':'try4sdgsdsafsd232a84sd'
-              }
-            })
-            .then((res) => {
-                //console.log(res.data["names"])
-                //console.log(res.data)
-                if(res.data)
+                axios
+                .post(`${api}`,
                 {
-                    if(res.data["error"])
-                    {
-                        alert(res.data["error"]);
-                    }
-                }
-                const results = res.data;
-                this.setState({ results });
-            })
-            .catch((err) => console.log(err));
-        }
-        else if(api==="/RuleSetEngine/" && fk !== -1)
-        {
-            axios
-            .post(`${api}`,
-            {
-                //here is body(data)
-                "fk": fk,
-                "circular": this.state.circular,
-                "varmap": varmap
-            },
-            {
-              headers:{
-                  //here is headers for token and cookies
-                  'token':'try4sdgsdsafsd232a84sd'
-              }
-            })
-            .then((res) => {
-                //console.log(res.data["names"])
-                //console.log(res.data)
-                if(res.data)
+                    //here is body(data)
+                    "fk": fk,
+                    "circular": this.state.circular,
+                    "varmap": varmap
+                },
                 {
-                    if(res.data["error"])
-                    {
-                        alert(res.data["error"]);
-                    }
+                headers:{
+                    //here is headers for token and cookies
+                    'utoken':this.props.getToken()
                 }
-                const results = res.data;
-                this.setState({ results });
-            })
-            .catch((err) => console.log(err));
+                })
+                .then((res) => {
+                    //console.log(res.data["names"])
+                    //console.log(res.data)
+                    if(res.data)
+                    {
+                        if(res.data["error"])
+                        {
+                            alert(res.data["error"]);
+                        }
+                    }
+                    const results = res.data;
+                    this.setState({ results });
+                })
+                .catch((err) => console.log(err));
+            }
         }
     }
 
@@ -390,19 +394,19 @@ class Engine extends React.Component{
                             <a href="/">Home</a>
                         </li>
                         <li>
-                            <Link to="/ScoreLibrary">Score Card</Link>
+                            <a href="/ScoreLibrary">Score Card</a>
                         </li>
                         <li>
-                            <Link to="/DecisionTreeLibrary">Decision Tree</Link>
+                            <a href="/DecisionTreeLibrary">Decision Tree</a>
                         </li>
                         <li>
-                            <Link to="/VariableLibrary">Variable</Link>
+                            <a href="/VariableLibrary">Variable</a>
                         </li>
                         <li>
-                            <Link to="/RuleSetLibrary">Rule Set</Link>
+                            <a href="/RuleSetLibrary">Rule Set</a>
                         </li>
                         <li>
-                            <Link to="/Engine">Engine</Link>
+                            <a href="/Engine">Engine</a>
                         </li>
                     </ul>
                 </div>

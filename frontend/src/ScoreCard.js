@@ -81,7 +81,10 @@ class ScoreCard extends React.Component{
     };
 
     onAdd = (item) => {
-        axios
+        if(!this.props.getToken()) window.location.reload();
+        else
+        {
+            axios
             .post(`/api/ScoreCardPool/`,
             {
                 //here is body(data)
@@ -114,86 +117,94 @@ class ScoreCard extends React.Component{
                 //console.log(this.state.activeCase)
             })
             .catch((err) => console.log(err));
+        } 
     };
 
     onSave = (item,type) => {
+        if(!this.props.getToken()) window.location.reload();
         //console.log(item,type);
-        if(type===1)
+        else
         {
-          console.log("Edit Variable");
-          console.log(item)
-    
-          /*
-          //this part is currently a test version for specific id api, should be POST func
-          axios
-            .put(`/api/VariablePool/${item["id"]}`,
+            if(type===1)
             {
-                //here is body(data)
-                'name':item["rule"][0]["name"]
-            },
+            console.log("Edit Variable");
+            console.log(item)
+        
+            /*
+            //this part is currently a test version for specific id api, should be POST func
+            axios
+                .put(`/api/VariablePool/${item["id"]}`,
+                {
+                    //here is body(data)
+                    'name':item["rule"][0]["name"]
+                },
+                {
+                    headers:{
+                        //here is headers for token and cookies
+                        'token':'try4sdgsdsafsd232a84sd'
+                    }
+                }
+                )
+                .then((res) => {
+                    //console.log(res.data["names"])
+                    console.log(res.data)
+        
+                    //this.setState({
+                    //    activeCase: res.data,
+                    //    modal: !this.state.modal });
+                    //console.log(this.state.activeCase)
+                })
+                .catch((err) => console.log(err));
+            */
+            }
+            else if(type===2)
             {
+            //console.log("Edit Score");
+            //console.log(item)
+        
+            //this part is currently a test version for specific id api, should be POST func
+            axios
+                .put(`/api/ScoreCardPool/${item["id"]}/`,
+                {
+                    //here is body(data)
+                    'fk': this.case_info.id,
+                    'rule': this.ruleParse(item["rule"]),
+                    'weight': `${item["weight"]}`,
+                    'score': `${item["score"]}`,
+                    'description': `${item["description"]}`
+                },
+                {
                 headers:{
                     //here is headers for token and cookies
                     'token':'try4sdgsdsafsd232a84sd'
                 }
-            }
-            )
-            .then((res) => {
-                //console.log(res.data["names"])
-                console.log(res.data)
-    
-                //this.setState({
-                //    activeCase: res.data,
-                //    modal: !this.state.modal });
-                //console.log(this.state.activeCase)
-            })
-            .catch((err) => console.log(err));
-          */
-        }
-        else if(type===2)
-        {
-          //console.log("Edit Score");
-          //console.log(item)
-    
-          //this part is currently a test version for specific id api, should be POST func
-          axios
-            .put(`/api/ScoreCardPool/${item["id"]}/`,
-            {
-                //here is body(data)
-                'fk': this.case_info.id,
-                'rule': this.ruleParse(item["rule"]),
-                'weight': `${item["weight"]}`,
-                'score': `${item["score"]}`,
-                'description': `${item["description"]}`
-            },
-            {
-              headers:{
-                  //here is headers for token and cookies
-                  'token':'try4sdgsdsafsd232a84sd'
-              }
-            })
-            .then((res) => {
-                //console.log(res.data["names"])
-                //console.log(res.data)
-                if(res.data)
-                {
-                    if(res.data["error"])
+                })
+                .then((res) => {
+                    //console.log(res.data["names"])
+                    //console.log(res.data)
+                    if(res.data)
                     {
-                        alert(res.data["error"])
+                        if(res.data["error"])
+                        {
+                            alert(res.data["error"])
+                        }
                     }
-                }
-                this.toggle();
-                //this.setState({
-                //    activeCase: res.data,
-                //    modal: !this.state.modal });
-                //console.log(this.state.activeCase)
-            })
-            .catch((err) => console.log(err));
+                    this.toggle();
+                    //this.setState({
+                    //    activeCase: res.data,
+                    //    modal: !this.state.modal });
+                    //console.log(this.state.activeCase)
+                })
+                .catch((err) => console.log(err));
+            }
         }
     };
 
     onDelete = (item) => {
-        axios
+        if(!this.props.getToken()) window.location.reload();
+        else
+        {
+            axios
             .delete(`/api/ScoreCardPool/${item["id"]}/`,
             {
                 //here is body(data)
@@ -214,6 +225,7 @@ class ScoreCard extends React.Component{
                 //console.log(this.state.activeCase)
             })
             .catch((err) => console.log(err));
+        }
     }
 
     refreshList = () => {
@@ -355,19 +367,19 @@ class ScoreCard extends React.Component{
                             <a href="/">Home</a>
                         </li>
                         <li>
-                            <Link to="/ScoreLibrary">Score Card</Link>
+                            <a href="/ScoreLibrary">Score Card</a>
                         </li>
                         <li>
-                            <Link to="/DecisionTreeLibrary">Decision Tree</Link>
+                            <a href="/DecisionTreeLibrary">Decision Tree</a>
                         </li>
                         <li>
-                            <Link to="/VariableLibrary">Variable</Link>
+                            <a href="/VariableLibrary">Variable</a>
                         </li>
                         <li>
-                            <Link to="/RuleSetLibrary">Rule Set</Link>
+                            <a href="/RuleSetLibrary">Rule Set</a>
                         </li>
                         <li>
-                            <Link to="/Engine">Engine</Link>
+                            <a href="/Engine">Engine</a>
                         </li>
                     </ul>
                 </div>
